@@ -1,14 +1,14 @@
-import React from 'react'
-import Banner from '../component/homePage/Banner'
-import BannerBottom from '../component/homePage/BannerBottom'
-import TestApi from '../component/homePage/TestApi'
+
+import Banner from '../components/homePage/Banner'
+import Footer from '../components/homePage/Footer'
+import Login from '../components/homePage/Login'
 
 const HomePage = () => {
   return (
     <div>
         <Banner/>
-        <BannerBottom/>
-        <TestApi/>
+        <Footer/>
+        <Login/>
     </div>
   )
 }
