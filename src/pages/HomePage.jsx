@@ -7,8 +7,8 @@ const HomePage = () => {
   return (
     <div>
         <Banner/>
+        
         <Footer/>
-        <Login/>
     </div>
   )
 }
