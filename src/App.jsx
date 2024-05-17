@@ -15,9 +15,9 @@ function App() {
 
   return (
     <>
-    {/* <HomePage/> */}
+    <HomePage/>
     {/* <AboutPage/> */}
-    <ContactPage/>
+    {/* <ContactPage/> */}
     {/* <PetHotelPage/> */}
     {/* <PetServicePage/> */}
     {/* <ForDogPage/> */}

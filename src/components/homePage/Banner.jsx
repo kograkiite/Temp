@@ -30,21 +30,21 @@ const Banner = () => {
                               </div>
                               <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                                   <ul className="nav navbar-nav cl-effect-16">
-                                      <li><a href="index.html" className="active" data-hover="Home">TRANG CHỦ</a></li>
-                                      <li><a href="about.html" data-hover="About">GIỚI THIỆU</a></li> 
+                                      <li><a href="index.html" className="active">TRANG CHỦ</a></li>
+                                      <li><a href="about.html">GIỚI THIỆU</a></li> 
                                       <li><a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">DỊCH VỤ <span className="caret"></span></a>
                                           <ul className="dropdown-menu">
-                                              <li><a href="icons.html" data-hover="PetHotel">KHÁCH SẠN THÚ CƯNG</a></li>
-                                              <li><a href="codes.html" data-hover="PetService">DỊCH VỤ THÚ CƯNG</a></li>
+                                              <li><a href="icons.html" >KHÁCH SẠN THÚ CƯNG</a></li>
+                                              <li><a href="codes.html" >DỊCH VỤ THÚ CƯNG</a></li>
                                           </ul>
                                       </li> 
                                       <li><a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">CỬA HÀNG <span className="caret"></span></a>
                                           <ul className="dropdown-menu">
-                                              <li><a href="icons.html" data-hover="PetHotel">DÀNH CHO CHÓ</a></li>
-                                              <li><a href="codes.html" data-hover="PetService">DÀNH CHO MÈO</a></li>
+                                              <li><a href="icons.html">DÀNH CHO CHÓ</a></li>
+                                              <li><a href="codes.html">DÀNH CHO MÈO</a></li>
                                           </ul>
                                       </li> 
-                                      <li><a href="contact.html" data-hover="Contact">LIÊN HỆ</a></li>
+                                      <li><a href="contact.html">LIÊN HỆ</a></li>
                                   </ul>  
                                   <div className="clearfix"> </div>	
                               </div>
