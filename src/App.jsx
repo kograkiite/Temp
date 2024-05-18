@@ -10,18 +10,20 @@ import PetHotelPage from './pages/PetHotelPage'
 import PetServicePage from './pages/PetServicePage'
 import ForDogPage from './pages/ForDogPage'
 import ForCatPage from './pages/ForCatPage'
+import LoginPage from './pages/LoginPage'
 function App() {
 
 
   return (
     <>
-    <HomePage/>
+    {/* <HomePage/> */}
     {/* <AboutPage/> */}
     {/* <ContactPage/> */}
     {/* <PetHotelPage/> */}
     {/* <PetServicePage/> */}
     {/* <ForDogPage/> */}
     {/* <ForCatPage/> */}
+    <LoginPage/>
     </>
   )
 }

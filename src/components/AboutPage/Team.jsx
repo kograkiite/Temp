@@ -10,7 +10,7 @@ export const Team = () => {
 				<div className="team-row agileits-w3layouts">
 					<div className="col-sm-3 col-xs-6 team-grids">
 						<div className="team-agileimg">
-							<img className="img-responsive" src="images/t1.jpg" alt=""/>
+							<img className="img-responsive" src="../assets/image/t1.jps" alt=""/>
 
 						</div>
 					</div>					
