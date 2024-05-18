@@ -11,6 +11,7 @@ import PetServicePage from './pages/PetServicePage'
 import ForDogPage from './pages/ForDogPage'
 import ForCatPage from './pages/ForCatPage'
 import LoginPage from './pages/LoginPage'
+import ChangePasswordPage from './pages/ChangePasswordPage'
 function App() {
 
 
@@ -24,6 +25,7 @@ function App() {
     {/* <ForDogPage/> */}
     {/* <ForCatPage/> */}
     <LoginPage/>
+    {/* <ChangePasswordPage/> */}
     </>
   )
 }
