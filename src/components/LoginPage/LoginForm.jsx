@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import '../LoginPage/LoginForm.css';
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -37,46 +36,48 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="container">
-      {isSignUp ? (
-        <SignUp setIsSignUp={setIsSignUp} />
-      ) : isForgotPassword ? (
-        <ForgotPassword setIsForgotPassword={setIsForgotPassword} />
-      ) : (
-        <div>
-          <h2>Login</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label>Email:</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-              />
-              {errors.email && <p className="error-message">{errors.email}</p>}
-            </div>
-            <div className="form-group">
-              <label>Password:</label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-              />
-              {errors.password && <p className="error-message">{errors.password}</p>}
-            </div>
-            <button type="submit">Login</button>
-          </form>
-          <div>
-            <button onClick={() => setIsSignUp(true)}>Sign Up</button>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    {isSignUp ? (
+      <SignUp setIsSignUp={setIsSignUp} />
+    ) : isForgotPassword ? (
+      <ForgotPassword setIsForgotPassword={setIsForgotPassword} />
+    ) : (
+      <div className="max-w-lg p-20 bg-white rounded-lg shadow-lg"> 
+        <h2 className="text-2xl font-semibold mb-6">Login</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label htmlFor="email" className="block mb-1">Email:</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full px-12 py-2 border rounded-md"
+            />
+            {errors.email && <p className="text-red-500 mt-1">{errors.email}</p>}
           </div>
-          <div>
-            <button onClick={() => setIsForgotPassword(true)}>Forgot Password</button>
+          <div className="mb-4">
+            <label htmlFor="password" className="block mb-1">Password:</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              className="w-full px-12 py-2 border rounded-md"
+            />
+            {errors.password && <p className="text-red-500 mt-1">{errors.password}</p>}
           </div>
+          <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md">Login</button>
+        </form>
+        <div className="mt-4 flex justify-between">
+          <button className="text-blue-500" onClick={() => setIsSignUp(true)}>Sign Up</button>
+          <button className="text-blue-500" onClick={() => setIsForgotPassword(true)}>Forgot Password</button>
         </div>
-      )}
-    </div>
+      </div>
+    )}
+  </div>
   );
 };
 
@@ -125,90 +126,104 @@ const SignUp = ({ setIsSignUp }) => {
   };
 
   return (
-    <div className="container">
-    <h2>Sign Up</h2>
-    <form onSubmit={handleSubmit} className="signup-form">
-        <div className="form-row">
-        <div className="form-group">
-            <label>First Name:</label>
-            <input
-            type="text"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            />
-            {errors.firstName && <p className="error-message">{errors.firstName}</p>}
+    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+      <h2 className="text-2xl font-semibold mb-6">Sign Up</h2>
+      <form onSubmit={handleSubmit} className="signupForm">
+        <div className="mb-4">
+          <div className="flex">
+            <div className="w-1/2 pr-2">
+              <label htmlFor="firstName" className="block mb-1">First Name:</label>
+              <input
+                type="text"
+                id="firstName"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border rounded-md"
+              />
+              {errors.firstName && <p className="text-red-500 mt-1">{errors.firstName}</p>}
+            </div>
+            <div className="w-1/2 pl-2">
+              <label htmlFor="lastName" className="block mb-1">Last Name:</label>
+              <input
+                type="text"
+                id="lastName"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border rounded-md"
+              />
+              {errors.lastName && <p className="text-red-500 mt-1">{errors.lastName}</p>}
+            </div>
+          </div>
         </div>
-        <div className="form-group">
-            <label>Last Name:</label>
-            <input
-            type="text"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            />
-            {errors.lastName && <p className="error-message">{errors.lastName}</p>}
-        </div>
-        </div>
-        <div className="form-group">
-        <label>Email:</label>
-        <input
+        <div className="mb-4">
+          <label htmlFor="email" className="block mb-1">Email:</label>
+          <input
             type="email"
+            id="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
-        />
-        {errors.email && <p className="error-message">{errors.email}</p>}
+            className="w-full px-3 py-2 border rounded-md"
+          />
+          {errors.email && <p className="text-red-500 mt-1">{errors.email}</p>}
         </div>
-        <div className="form-group">
-        <label>Password:</label>
-        <input
+        <div className="mb-4">
+          <label htmlFor="password" className="block mb-1">Password:</label>
+          <input
             type="password"
+            id="password"
             name="password"
             value={formData.password}
             onChange={handleChange}
-        />
-        {errors.password && <p className="error-message">{errors.password}</p>}
+            className="w-full px-3 py-2 border rounded-md"
+          />
+          {errors.password && <p className="text-red-500 mt-1">{errors.password}</p>}
         </div>
-        <div className="form-group">
-        <label>Confirm Password:</label>
-        <input
+        <div className="mb-4">
+          <label htmlFor="confirmPassword" className="block mb-1">Confirm Password:</label>
+          <input
             type="password"
+            id="confirmPassword"
             name="confirmPassword"
             value={formData.confirmPassword}
             onChange={handleChange}
-        />
-        {errors.confirmPassword && <p className="error-message">{errors.confirmPassword}</p>}
+            className="w-full px-3 py-2 border rounded-md"
+          />
+          {errors.confirmPassword && <p className="text-red-500 mt-1">{errors.confirmPassword}</p>}
         </div>
-        <div className="form-row">
-        <div className="form-group">
-            <label>Phone Number:</label>
-            <input
+        <div className="mb-4">
+          <label htmlFor="phoneNumber" className="block mb-1">Phone Number:</label>
+          <input
             type="text"
+            id="phoneNumber"
             name="phoneNumber"
             value={formData.phoneNumber}
             onChange={handleChange}
-            />
-            {errors.phoneNumber && <p className="error-message">{errors.phoneNumber}</p>}
+            className="w-full px-3 py-2 border rounded-md"
+          />
+          {errors.phoneNumber && <p className="text-red-500 mt-1">{errors.phoneNumber}</p>}
         </div>
-        <div className="form-group">
-            <label>Address:</label>
-            <input
+        <div className="mb-4">
+          <label htmlFor="address" className="block mb-1">Address:</label>
+          <input
             type="text"
+            id="address"
             name="address"
             value={formData.address}
             onChange={handleChange}
-            />
-            {errors.address && <p className="error-message">{errors.address}</p>}
+            className="w-full px-3 py-2 border rounded-md"
+          />
+          {errors.address && <p className="text-red-500 mt-1">{errors.address}</p>}
         </div>
-        </div>
-        <button type="submit">Sign Up</button>
-    </form>
-    <button onClick={() => setIsSignUp(false)}>Back to Login</button>
+        <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md">Sign Up</button>
+      </form>
+      <button className="text-blue-500 mt-4" onClick={() => setIsSignUp(false)}>Back to Login</button>
     </div>
-
   );
 };
+
 
 const ForgotPassword = ({ setIsForgotPassword }) => {
   const [email, setEmail] = useState('');
@@ -228,21 +243,23 @@ const ForgotPassword = ({ setIsForgotPassword }) => {
   };
 
   return (
-    <div className="container">
-      <h2>Forgot Password</h2>
+    <div className="max-w-lg p-20 bg-white rounded-lg shadow-lg">
+      <h2 className="text-2xl font-semibold mb-6">Forgot Password</h2>
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Email:</label>
+        <div className="mb-4">
+          <label htmlFor="email" className="block mb-1">Email:</label>
           <input
             type="email"
+            id="email"
             value={email}
             onChange={handleChange}
+            className="w-full px-12 py-2 border rounded-md"
           />
-          {errors && <p className="error-message">{errors}</p>}
+          {errors && <p className="text-red-500 mt-1">{errors}</p>}
         </div>
-        <button type="submit">Submit</button>
+        <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md">Submit</button>
       </form>
-      <button onClick={() => setIsForgotPassword(false)}>Back to Login</button>
+      <button className="text-blue-500 mt-4" onClick={() => setIsForgotPassword(false)}>Back to Login</button>
     </div>
   );
 };

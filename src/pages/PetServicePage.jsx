@@ -1,7 +1,7 @@
 import React from 'react'
-import Banner from '../components/ServicePage/Banner'
 import Footer from '../components/homePage/Footer'
 import Title from '../components/ServicePage/PetService/Title'
+import Banner from '../components/Banner'
 
 const PetServicePage = () => {
   return (

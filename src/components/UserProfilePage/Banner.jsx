@@ -11,10 +11,7 @@ const Banner = () => {
                               <h1><a href="index.html">Pet Service</a></h1> 
                           </div>
                           <div className="agileits_w3layouts_sign_in">
-                              <ul>
-                              <li><a href="../Login" className="play-icon">ĐĂNG NHẬP</a></li>
-                                  
-                              </ul>
+                              
                           </div>
                           <div className="clearfix"> </div>
                       </div> 
