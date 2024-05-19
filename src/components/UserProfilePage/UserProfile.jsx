@@ -11,17 +11,13 @@ const UserProfile = () => {
   });
 
   useEffect(() => {
-    // Fetch user data from an API or context if needed
-    // setUser(fetchedUserData);
   }, []);
 
-  const handleLogout = () => {
-    // Logic for logging out the user
-    console.log('User logged out');
+  const handleUpdateInfo = () => {
+    console.log('Update info clicked');
   };
 
   const handleChangePassword = () => {
-    // Logic for changing password
     console.log('Change password clicked');
   };
 
@@ -53,16 +49,16 @@ const UserProfile = () => {
         </div>
         <div className="flex justify-between mt-6">
           <button
-            onClick={handleChangePassword}
-            className="w-1/2 bg-blue-500 text-white py-2 px-4 rounded-md mr-2 hover:bg-blue-700 transition duration-300"
+            onClick={handleUpdateInfo}
+            className="w-1/2 bg-green-500 text-white py-2 px-4 rounded-md mr-2 hover:bg-green-700 transition duration-300"
           >
-            Đổi mật khẩu
+            Cập nhật thông tin
           </button>
           <button
-            onClick={handleLogout}
-            className="w-1/2 bg-red-500 text-white py-2 px-4 rounded-md ml-2 hover:bg-red-700 transition duration-300"
+            onClick={handleChangePassword}
+            className="w-1/2 bg-blue-500 text-white py-2 px-4 rounded-md ml-2 hover:bg-blue-700 transition duration-300"
           >
-            Đăng xuất
+            Đổi mật khẩu
           </button>
         </div>
       </div>
