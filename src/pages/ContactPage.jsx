@@ -1,7 +1,8 @@
 import React from 'react'
-import Banner from '../components/ContactPage/Banner'
-import Footer from '../components/homePage/Footer'
+
 import Contact from '../components/ContactPage/Contact'
+import Banner from '../components/homePage/Banner'
+import Footer from '../components/homePage/Footer'
 
 const ContactPage = () => {
   return (

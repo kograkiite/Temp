@@ -13,6 +13,7 @@ import ForCatPage from './pages/ForCatPage'
 import LoginPage from './pages/LoginPage'
 import UserProfilePage from './pages/UserProfilePage'
 import ChangePasswordPage from './pages/ChangePasswordPage'
+import UpdateUserProfilePage from './pages/UpdateUserProfilePage'
 
 
 function App() {
@@ -21,15 +22,16 @@ function App() {
   return (
     <>
     <HomePage/>
-    {/* <AboutPage/> */}
-    {/* <ContactPage/> */}
-    {/* <PetHotelPage/> */}
-    {/* <PetServicePage/> */}
-    {/* <ForDogPage/> */}
-    {/* <ForCatPage/> */}
+    <AboutPage/>
+    <ContactPage/>
+    <PetHotelPage/>
+    <PetServicePage/>
+    <ForDogPage/>
+    <ForCatPage/>
     <LoginPage/>
     <UserProfilePage/>
     <ChangePasswordPage/>
+    <UpdateUserProfilePage/>
     </>
   )
 }

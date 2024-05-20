@@ -1,15 +1,13 @@
-import React from 'react'
+import React from 'react';
 
 const Title = () => {
   return (
-    <div>
-        <div className="contact">
-		<div className="container">   
-			<h3 className="agileits-title w3title2">DÀNH CHO MÈO</h3>
-		</div>
-	</div>  
+    <div className="bg-gray-100 py-6">
+      <div className="container mx-auto px-4">
+        <h3 className="text-6xl text-red-500 font-semibold text-center">DÀNH CHO MÈO</h3>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default Title
+export default Title;

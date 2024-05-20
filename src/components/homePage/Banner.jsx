@@ -1,74 +1,75 @@
+import React, { useState, useEffect } from 'react';
+import 'tailwindcss/tailwind.css';
 
 const Banner = () => {
-    return (
-      <div>
-          <div className="w3ls-banner jarallax">
-          <div className="w3lsbanner-info">
-              <div className="header">
-                  <div className="container">   
-                      <div className="agile_header_grid"> 
-                          <div className="header-mdl agileits-logo">
-                              <h1><a href="index.html">Pet Service</a></h1> 
-                          </div>
-                          <div className="agileits_w3layouts_sign_in">
-                              <ul>
-                              <li><a href="../Login" className="play-icon">ĐĂNG NHẬP</a></li>
-                                  
-                              </ul>
-                          </div>
-                          <div className="clearfix"> </div>
-                      </div> 
-                      <div className="header-nav">	
-                          <nav className="navbar navbar-default">
-                              <div className="navbar-header">
-                                  <button type="button" className="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                                      <span className="sr-only">Toggle navigation</span>
-                                      <span className="icon-bar"></span>
-                                      <span className="icon-bar"></span>
-                                      <span className="icon-bar"></span>
-                                  </button> 
-                              </div>
-                              <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                                  <ul className="nav navbar-nav cl-effect-16">
-                                      <li><a href="index.html" className="active">TRANG CHỦ</a></li>
-                                      <li><a href="about.html">GIỚI THIỆU</a></li> 
-                                      <li><a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">DỊCH VỤ <span className="caret"></span></a>
-                                          <ul className="dropdown-menu">
-                                              <li><a href="icons.html" >KHÁCH SẠN THÚ CƯNG</a></li>
-                                              <li><a href="codes.html" >DỊCH VỤ THÚ CƯNG</a></li>
-                                          </ul>
-                                      </li> 
-                                      <li><a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">CỬA HÀNG <span className="caret"></span></a>
-                                          <ul className="dropdown-menu">
-                                              <li><a href="icons.html">DÀNH CHO CHÓ</a></li>
-                                              <li><a href="codes.html">DÀNH CHO MÈO</a></li>
-                                          </ul>
-                                      </li> 
-                                      <li><a href="contact.html">LIÊN HỆ</a></li>
-                                  </ul>  
-                                  <div className="clearfix"> </div>	
-                              </div>
-                          </nav>    
-                      </div>	
-                  </div>	
-              </div>	
-              <div className="banner-text agileinfo"> 
-                  <div className="container">
-                      <div className="agile_banner_info">
-                          <div className="agile_banner_info1">
-                              <h6>Welcome to<i> Pet Service</i></h6>
-                              <div id="typed-strings" className="agileits_w3layouts_strings">
-                                  <p><i>Happy for you is happy for you.</i></p>
-                              </div>
-                              <span id="typed" style={{whiteSpace:"pre"}}></span>
-                          </div>
-                      </div> 
-                  </div>
-              </div>
-          </div>	
-      </div>	
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 768);
+      // Nếu màn hình lớn hơn hoặc bằng 768px, đóng menu
+      if (window.innerWidth >= 768) {
+        setIsOpen(false);
+      }
+    };
+
+    handleResize(); // Xác định trạng thái màn hình khi load
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  const closeMenu = () => {
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="jarallax bg-gray-200">
+      <div className="p-5 bg-white shadow md:flex md:items-center md:justify-between">
+        <div className="flex items-center justify-between w-full md:w-auto">
+          <div className="flex items-center">
+            <img className="h-20 w-20" src="/src/assets/image/iconPet.png" alt="Pet Service Logo" />
+            <span className="text-4xl ml-2 px-7 cursor-pointer">Pet Service</span>
+          </div>
+          <button
+            className="text-3xl md:hidden focus:outline-none"
+            onClick={toggleMenu}
+          >
+            ☰
+          </button>
+        </div>
+        <ul className={`flex-col md:flex md:flex-row md:items-center w-full md:w-auto ${isOpen || !isSmallScreen ? 'flex' : 'hidden'}`}>
+          <li className="mx-4 my-3 md:my-0">
+            <a href="#" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">TRANG CHỦ</a>
+          </li>
+          <li className="mx-4 my-3 md:my-0">
+            <a href="#" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">GIỚI THIỆU</a>
+          </li>
+          <li className="mx-4 my-3 md:my-0">
+            <a href="#" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">DỊCH VỤ</a>
+          </li>
+          <li className="mx-4 my-3 md:my-0">
+            <a href="#" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">CỬA HÀNG</a>
+          </li>
+          <li className="mx-4 my-3 md:my-0">
+            <a href="#" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">LIÊN HỆ</a>
+          </li>
+          <li className="mx-4 my-3 md:my-0">
+            <button onClick={closeMenu} className="bg-cyan-400 text-white duration-500 px-6 py-2 hover:bg-cyan-500 rounded">
+              ĐĂNG NHẬP
+            </button>
+          </li>
+        </ul>
       </div>
-    )
-  }
-  
-  export default Banner
+    </div>
+  );
+};
+
+export default Banner;

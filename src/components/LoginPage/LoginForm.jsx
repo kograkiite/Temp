@@ -42,8 +42,8 @@ const LoginForm = () => {
     ) : isForgotPassword ? (
       <ForgotPassword setIsForgotPassword={setIsForgotPassword} />
     ) : (
-      <div className="max-w-lg p-20 bg-white rounded-lg shadow-lg"> 
-        <h2 className="text-2xl font-semibold mb-6">Login</h2>
+      <div className="max-w-3xl p-20 bg-white rounded-lg shadow-lg"> 
+        <h2 className="text-4xl text-blue-500 font-semibold mb-6 text-center">ĐĂNG NHẬP</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="email" className="block mb-1">Email:</label>
@@ -58,7 +58,7 @@ const LoginForm = () => {
             {errors.email && <p className="text-red-500 mt-1">{errors.email}</p>}
           </div>
           <div className="mb-4">
-            <label htmlFor="password" className="block mb-1">Password:</label>
+            <label htmlFor="password" className="block mb-1">Mật khẩu:</label>
             <input
               type="password"
               id="password"
@@ -69,11 +69,11 @@ const LoginForm = () => {
             />
             {errors.password && <p className="text-red-500 mt-1">{errors.password}</p>}
           </div>
-          <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md">Login</button>
+          <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md">Đăng nhập</button>
         </form>
         <div className="mt-4 flex justify-between">
-          <button className="text-blue-500" onClick={() => setIsSignUp(true)}>Sign Up</button>
-          <button className="text-blue-500" onClick={() => setIsForgotPassword(true)}>Forgot Password</button>
+          <button className="text-blue-500" onClick={() => setIsSignUp(true)}>Đăng kí</button>
+          <button className="text-blue-500" onClick={() => setIsForgotPassword(true)}>Quên mật khẩu</button>
         </div>
       </div>
     )}
@@ -126,13 +126,13 @@ const SignUp = ({ setIsSignUp }) => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-semibold mb-6">Sign Up</h2>
+    <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md">
+      <h2 className="text-4xl text-blue-500 font-semibold mb-6 text-center">Đăng kí</h2>
       <form onSubmit={handleSubmit} className="signupForm">
-        <div className="mb-4">
+        <div className="mb-1">
           <div className="flex">
             <div className="w-1/2 pr-2">
-              <label htmlFor="firstName" className="block mb-1">First Name:</label>
+              <label htmlFor="firstName" className="block mb-1">Tên:</label>
               <input
                 type="text"
                 id="firstName"
@@ -144,7 +144,7 @@ const SignUp = ({ setIsSignUp }) => {
               {errors.firstName && <p className="text-red-500 mt-1">{errors.firstName}</p>}
             </div>
             <div className="w-1/2 pl-2">
-              <label htmlFor="lastName" className="block mb-1">Last Name:</label>
+              <label htmlFor="lastName" className="block mb-1">Họ:</label>
               <input
                 type="text"
                 id="lastName"
@@ -157,7 +157,7 @@ const SignUp = ({ setIsSignUp }) => {
             </div>
           </div>
         </div>
-        <div className="mb-4">
+        <div className="mb-1">
           <label htmlFor="email" className="block mb-1">Email:</label>
           <input
             type="email"
@@ -169,8 +169,8 @@ const SignUp = ({ setIsSignUp }) => {
           />
           {errors.email && <p className="text-red-500 mt-1">{errors.email}</p>}
         </div>
-        <div className="mb-4">
-          <label htmlFor="password" className="block mb-1">Password:</label>
+        <div className="mb-1">
+          <label htmlFor="password" className="block mb-1">Mật khẩu:</label>
           <input
             type="password"
             id="password"
@@ -181,8 +181,8 @@ const SignUp = ({ setIsSignUp }) => {
           />
           {errors.password && <p className="text-red-500 mt-1">{errors.password}</p>}
         </div>
-        <div className="mb-4">
-          <label htmlFor="confirmPassword" className="block mb-1">Confirm Password:</label>
+        <div className="mb-1">
+          <label htmlFor="confirmPassword" className="block mb-1">Xác nhận mật khẩu:</label>
           <input
             type="password"
             id="confirmPassword"
@@ -193,8 +193,8 @@ const SignUp = ({ setIsSignUp }) => {
           />
           {errors.confirmPassword && <p className="text-red-500 mt-1">{errors.confirmPassword}</p>}
         </div>
-        <div className="mb-4">
-          <label htmlFor="phoneNumber" className="block mb-1">Phone Number:</label>
+        <div className="mb-1">
+          <label htmlFor="phoneNumber" className="block mb-1">Số điện thoại:</label>
           <input
             type="text"
             id="phoneNumber"
@@ -205,8 +205,8 @@ const SignUp = ({ setIsSignUp }) => {
           />
           {errors.phoneNumber && <p className="text-red-500 mt-1">{errors.phoneNumber}</p>}
         </div>
-        <div className="mb-4">
-          <label htmlFor="address" className="block mb-1">Address:</label>
+        <div className="mb-2">
+          <label htmlFor="address" className="block mb-1">Địa chỉ:</label>
           <input
             type="text"
             id="address"
@@ -217,9 +217,9 @@ const SignUp = ({ setIsSignUp }) => {
           />
           {errors.address && <p className="text-red-500 mt-1">{errors.address}</p>}
         </div>
-        <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md">Sign Up</button>
+        <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md">Đăng kí</button>
       </form>
-      <button className="text-blue-500 mt-4" onClick={() => setIsSignUp(false)}>Back to Login</button>
+      <button className="text-blue-500 mt-4" onClick={() => setIsSignUp(false)}>Trở về đăng nhập</button>
     </div>
   );
 };
@@ -243,8 +243,8 @@ const ForgotPassword = ({ setIsForgotPassword }) => {
   };
 
   return (
-    <div className="max-w-lg p-20 bg-white rounded-lg shadow-lg">
-      <h2 className="text-2xl font-semibold mb-6">Forgot Password</h2>
+    <div className="max-w-4xl p-20 bg-white rounded-lg shadow-lg">
+      <h2 className="text-4xl text-blue-500 font-semibold mb-6 text-center">Quên mật khẩu</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label htmlFor="email" className="block mb-1">Email:</label>
@@ -257,9 +257,9 @@ const ForgotPassword = ({ setIsForgotPassword }) => {
           />
           {errors && <p className="text-red-500 mt-1">{errors}</p>}
         </div>
-        <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md">Submit</button>
+        <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md">Gửi</button>
       </form>
-      <button className="text-blue-500 mt-4" onClick={() => setIsForgotPassword(false)}>Back to Login</button>
+      <button className="text-blue-500 mt-4" onClick={() => setIsForgotPassword(false)}>Trở về đăng nhập</button>
     </div>
   );
 };

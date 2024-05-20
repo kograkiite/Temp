@@ -1,7 +1,7 @@
 import React from 'react'
-import Footer from '../components/homePage/Footer'
 import Title from '../components/StorePage/ForCatPage/Title'
-import Banner from '../components/Banner'
+import Banner from '../components/homePage/Banner'
+import Footer from '../components/homePage/Footer'
 
 const ForCatPage = () => {
   return (

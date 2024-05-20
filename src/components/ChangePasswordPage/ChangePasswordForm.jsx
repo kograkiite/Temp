@@ -37,13 +37,23 @@ const ChangePasswordForm = () => {
     }
   };
 
+  const handleCancel = () => {
+    console.log('Operation canceled');
+    setFormData({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    });
+    setErrors({});
+  };
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
-        <h2 className="text-center text-2xl font-semibold mb-6">Change Password</h2>
+    <div className="flex items-center justify-center min-h-3/4 py-3 bg-gray-100">
+      <div className="w-full max-w-xl p-8 bg-white rounded-lg shadow-md">
+        <h2 className="text-center text-2xl font-semibold mb-6">Đổi mật khẩu</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="form-group">
-            <label className="block mb-2">Current Password:</label>
+            <label className="block mb-2">Mật khẩu hiện tại:</label>
             <input
               type="password"
               name="currentPassword"
@@ -54,7 +64,7 @@ const ChangePasswordForm = () => {
             {errors.currentPassword && <p className="text-red-500 text-xs mt-1">{errors.currentPassword}</p>}
           </div>
           <div className="form-group">
-            <label className="block mb-2">New Password:</label>
+            <label className="block mb-2">Mật khẩu mới:</label>
             <input
               type="password"
               name="newPassword"
@@ -65,7 +75,7 @@ const ChangePasswordForm = () => {
             {errors.newPassword && <p className="text-red-500 text-xs mt-1">{errors.newPassword}</p>}
           </div>
           <div className="form-group">
-            <label className="block mb-2">Confirm New Password:</label>
+            <label className="block mb-2">Xác nhận mật khẩu mới:</label>
             <input
               type="password"
               name="confirmPassword"
@@ -75,7 +85,10 @@ const ChangePasswordForm = () => {
             />
             {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
           </div>
-          <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Change Password</button>
+          <div className="flex justify-between mt-6">
+            <button type="submit" className="w-1/2 bg-blue-500 text-white py-2 px-4 rounded-md mr-2 hover:bg-blue-600 transition duration-300">Đổi mật khẩu</button>
+            <button type="button" onClick={handleCancel} className="w-1/2 bg-gray-500 text-white py-2 px-4 rounded-md ml-2 hover:bg-gray-600 transition duration-300">Hủy</button>
+          </div>
         </form>
       </div>
     </div>
