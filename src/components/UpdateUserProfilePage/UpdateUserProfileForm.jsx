@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import 'tailwindcss/tailwind.css';
 
-const UpdateUserProfile = ({ user, onSave, onCancel }) => {
+const UpdateUserProfile = ({ user, onSave }) => {
   const [formData, setFormData] = useState({ ...user });
-
+  const navigate = useNavigate()
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -16,6 +17,10 @@ const UpdateUserProfile = ({ user, onSave, onCancel }) => {
     e.preventDefault();
     onSave(formData);
   };
+
+  const onCancel = () =>{
+    navigate('/user-profile')
+  }
 
   return (
     <div className="flex items-center justify-center min-h-3/4 py-6 bg-gray-100">

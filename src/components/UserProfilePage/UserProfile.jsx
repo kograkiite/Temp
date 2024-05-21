@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import 'tailwindcss/tailwind.css';
 
 const UserProfile = () => {
@@ -9,16 +10,17 @@ const UserProfile = () => {
     phoneNumber: '123-456-7890',
     address: '123 Main St, Anytown, USA',
   });
+  const navigate = useNavigate()
 
   useEffect(() => {
   }, []);
 
   const handleUpdateInfo = () => {
-    console.log('Update info clicked');
+    navigate('/update-user-profile')
   };
 
   const handleChangePassword = () => {
-    console.log('Change password clicked');
+    navigate('/change-password')
   };
 
   return (

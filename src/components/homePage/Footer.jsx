@@ -10,7 +10,7 @@ const Footer = () => {
               <div>
                 <div className="mb-4">
                   <h2 className="text-3xl md:text-4xl font-semibold">
-                    <a href="index.html">Pet Service</a>
+                    Pet Service
                   </h2>
                 </div>
                 <p className="text-base md:text-lg lg:text-xl">

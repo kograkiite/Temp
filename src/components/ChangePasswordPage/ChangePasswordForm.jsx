@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import 'tailwindcss/tailwind.css';
 
 const ChangePasswordForm = () => {
@@ -7,6 +8,7 @@ const ChangePasswordForm = () => {
     newPassword: '',
     confirmPassword: '',
   });
+  const navigate = useNavigate()
 
   const [errors, setErrors] = useState({});
 
@@ -38,17 +40,11 @@ const ChangePasswordForm = () => {
   };
 
   const handleCancel = () => {
-    console.log('Operation canceled');
-    setFormData({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-    });
-    setErrors({});
+    navigate('/user-profile')
   };
 
   return (
-    <div className="flex items-center justify-center min-h-3/4 py-3 bg-gray-100">
+    <div className="flex items-center justify-center min-h-min py-8 bg-gray-100">
       <div className="w-full max-w-xl p-8 bg-white rounded-lg shadow-md">
         <h2 className="text-center text-2xl font-semibold mb-6">Đổi mật khẩu</h2>
         <form onSubmit={handleSubmit} className="space-y-4">

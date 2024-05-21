@@ -36,7 +36,7 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="flex justify-center items-center min-h-3/4 py-5 bg-gray-100">
     {isSignUp ? (
       <SignUp setIsSignUp={setIsSignUp} />
     ) : isForgotPassword ? (

@@ -14,6 +14,8 @@ import LoginPage from './pages/LoginPage'
 import UserProfilePage from './pages/UserProfilePage'
 import ChangePasswordPage from './pages/ChangePasswordPage'
 import UpdateUserProfilePage from './pages/UpdateUserProfilePage'
+import { Route, Routes } from 'react-router-dom'
+import PostLogin from './pages/PostLogin'
 
 
 function App() {
@@ -21,7 +23,7 @@ function App() {
 
   return (
     <>
-    <HomePage/>
+    {/* <HomePage/>
     <AboutPage/>
     <ContactPage/>
     <PetHotelPage/>
@@ -31,7 +33,21 @@ function App() {
     <LoginPage/>
     <UserProfilePage/>
     <ChangePasswordPage/>
-    <UpdateUserProfilePage/>
+    <UpdateUserProfilePage/> */}
+    <Routes>
+      <Route path='/' element={<HomePage/>}/>
+      <Route path='/about' element={<AboutPage/>}/>
+      <Route path='/contact' element={<ContactPage/>}/>
+      <Route path='/login' element={<LoginPage/>}/>
+      <Route path='/home' element={<PostLogin/>}/>
+      <Route path='/for-dog' element={<ForDogPage/>}/>
+      <Route path='/for-cat' element={<ForCatPage/>}/>
+      <Route path='/pet-service' element={<PetServicePage/>}/>
+      <Route path='/pet-hotel' element={<PetHotelPage/>}/>
+      <Route path='/user-profile' element={<UserProfilePage/>}/>
+      <Route path='/change-password' element={<ChangePasswordPage/>}/>
+      <Route path='/update-user-profile' element={<UpdateUserProfilePage/>}/>
+    </Routes>
     </>
   )
 }
