@@ -3,6 +3,7 @@ import React from 'react'
 import Title from '../components/StorePage/ForDogPage/Title'
 import Banner from '../components/homePage/Banner'
 import Footer from '../components/homePage/Footer'
+import ProductList from '../components/StorePage/ForDogPage/ProductList'
 
 
 const ForDogPage = () => {
@@ -10,6 +11,7 @@ const ForDogPage = () => {
     <div>
         <Banner/>
         <Title/>
+        <ProductList/>
         <Footer/>
     </div>
   )
