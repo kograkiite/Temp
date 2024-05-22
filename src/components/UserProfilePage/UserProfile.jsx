@@ -23,15 +23,31 @@ const UserProfile = () => {
     navigate('/change-password')
   };
 
+  const handelClickUserProfile = () => {
+    navigate('/user-profile')
+  }
+
+  const handelClickPetList = () => {
+    navigate('/pet-list')
+  }
+
+  const handelClickTransactionHistory = () => {
+    navigate('/transaction-history')
+  }
+
+  const handelClickLogOut = () => {
+    navigate('/')
+  }
+
   return (
     <div className="flex flex-col md:flex-row">
       <div className="md:h-15 bg-gray-200 w-full md:w-1/3 p-4 flex flex-col justify-center px-10 items-center md:items-start"> 
         <h2 className="text-4xl font-semibold mb-4">Tài khoản</h2>
         <ul className='list-disc pl-4'>
-          <li className="mb-2 text-gray-500 cursor-pointer hover:text-blue-500 duration-500">Thông tin người dùng</li>
-          <li className="mb-2 text-gray-500 cursor-pointer hover:text-blue-500 duration-500">Danh sách thú cưng</li>
-          <li className="mb-2 text-gray-500 cursor-pointer hover:text-blue-500 duration-500">Lịch sử giao dịch</li>
-          <li className="mb-2 text-gray-500 cursor-pointer hover:text-blue-500 duration-500">Đăng xuất</li>
+          <li className="mb-2 text-gray-500 cursor-pointer hover:text-blue-500 duration-500" onClick={handelClickUserProfile}>Thông tin người dùng</li>
+          <li className="mb-2 text-gray-500 cursor-pointer hover:text-blue-500 duration-500" onClick={handelClickPetList}>Danh sách thú cưng</li>
+          <li className="mb-2 text-gray-500 cursor-pointer hover:text-blue-500 duration-500" onClick={handelClickTransactionHistory}>Lịch sử giao dịch</li>
+          <li className="mb-2 text-gray-500 cursor-pointer hover:text-blue-500 duration-500" onClick={handelClickLogOut}>Đăng xuất</li>
         </ul>
       </div>
       <div className="flex items-center justify-center min-h-3/4 py-6 bg-gray-100 w-full md:w-2/3">

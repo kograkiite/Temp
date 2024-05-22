@@ -16,6 +16,9 @@ import ChangePasswordPage from './pages/ChangePasswordPage'
 import UpdateUserProfilePage from './pages/UpdateUserProfilePage'
 import { Route, Routes } from 'react-router-dom'
 import PostLogin from './pages/PostLogin'
+import ProductDetailPage from './pages/ProductDetailPage'
+import PetListPage from './pages/PetListPage'
+import TransactionHistoryPage from './pages/TransactionHistoryPage'
 
 
 function App() {
@@ -47,6 +50,9 @@ function App() {
       <Route path='/user-profile' element={<UserProfilePage/>}/>
       <Route path='/change-password' element={<ChangePasswordPage/>}/>
       <Route path='/update-user-profile' element={<UpdateUserProfilePage/>}/>
+      <Route path='/product-detail/:id' element={<ProductDetailPage/>}/>
+      <Route path='/pet-list' element={<PetListPage/>}/>
+      <Route path='/transaction-history' element={<TransactionHistoryPage/>}/>
     </Routes>
     </>
   )
