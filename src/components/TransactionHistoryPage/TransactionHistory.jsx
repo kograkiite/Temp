@@ -1,22 +1,33 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FcCheckmark } from "react-icons/fc";
 
 const TransactionHistory = () => {
   const navigate = useNavigate();
 
-  // Dummy transaction data for demonstration
   const [transactions, setTransactions] = useState([
     { id: 1, date: '2023-05-01', description: 'Purchase food', amount: '$50', status: 'Completed' },
     { id: 2, date: '2023-05-03', description: 'Vet visit', amount: '$200', status: 'Pending' },
     { id: 3, date: '2023-05-07', description: 'Pet grooming', amount: '$30', status: 'Completed' },
   ]);
 
+  const [reviewTransactionId, setReviewTransactionId] = useState(null);
+  const [isReviewing, setIsReviewing] = useState(false);
+  const [isReviewSuccess, setIsReviewSuccess] = useState(false);
+
   useEffect(() => {
-    // Fetch transaction data or any other initialization logic
-  }, []);
+    let timeout;
+    if (isReviewSuccess) {
+      timeout = setTimeout(() => {
+        setIsReviewSuccess(false);
+      }, 2000);
+    }
+    return () => clearTimeout(timeout);
+  }, [isReviewSuccess]);
 
   const handleReviewTransaction = (id) => {
-    // Logic for reviewing transaction
+    setReviewTransactionId(id);
+    setIsReviewing(true);
   }
 
   const handleClickUserProfile = () => {
@@ -33,6 +44,11 @@ const TransactionHistory = () => {
 
   const handleClickLogOut = () => {
     navigate('/');
+  }
+
+  const handleSubmitReview = () => {
+    setIsReviewSuccess(true);
+    setIsReviewing(false);
   }
 
   return (
@@ -71,12 +87,35 @@ const TransactionHistory = () => {
                   <a href={`/transaction-detail/${transaction.id}`} className="mr-2 text-blue-500 hover:underline">Chi tiết</a>
                 </td>
                 <td className="border px-4 py-2">
-                    <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onClick={() => handleReviewTransaction(transaction.id)}>Đánh giá</button>
+                  <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onClick={() => handleReviewTransaction(transaction.id)}>Đánh giá</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+        {isReviewing && (
+          <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
+            <div className="bg-white p-8 rounded-lg px-10 py-10 sm:w-4/6 md:w-3/6">
+              <h2 className="text-2xl font-semibold mb-4">Đánh giá giao dịch #{reviewTransactionId}</h2>
+              <textarea
+                className="w-full h-60 border rounded-md px-4 py-2 mb-4"
+                placeholder="Nhập đánh giá của bạn..."
+              ></textarea>
+              <div className="flex justify-end">
+                <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2" onClick={handleSubmitReview}>Gửi</button>
+                <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" onClick={() => setIsReviewing(false)}>Hủy</button>
+              </div>
+            </div>
+          </div>
+        )}
+        {isReviewSuccess && (
+          <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
+            <div className="bg-white p-8 rounded-lg px-10 py-10 sm:w-4/6 md:w-3/6 flex flex-col items-center">
+              <FcCheckmark className="text-green-600 w-40 h-40 mb-4" />
+              <div className="text-green-600 text-3xl mt-2 text-center">Đánh giá của bạn đã được gửi thành công!</div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

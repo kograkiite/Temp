@@ -1,47 +1,97 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import 'tailwindcss/tailwind.css';
 
 const PetList = () => {
     const navigate = useNavigate();
 
-    // Dummy pet data for demonstration
     const [pets, setPets] = useState([
-        { id: 1, name: 'Max', species: 'Dog', gender: 'Male' },
-        { id: 2, name: 'Whiskers', species: 'Cat', gender: 'Female' },
-        { id: 3, name: 'Buddy', species: 'Dog', gender: 'Male' }
+        { id: 1, name: 'Max', species: 'Chó', gender: 'Đực' },
+        { id: 2, name: 'Whiskers', species: 'Mèo', gender: 'Cái' },
+        { id: 3, name: 'Buddy', species: 'Chó', gender: 'Đực' }
     ]);
 
+    const [newPetData, setNewPetData] = useState({
+        name: '',
+        species: '',
+        gender: '',
+    });
+
+    const [editPetId, setEditPetId] = useState(null);
+    const [editPetData, setEditPetData] = useState({
+        id: '',
+        name: '',
+        species: '',
+        gender: ''
+    });
+
+    const [isAddMode, setIsAddMode] = useState(false);
+
     useEffect(() => {
-        // Fetch pet data or any other initialization logic
     }, []);
 
-    const handleUpdatePet = (id) => {
-        // Logic for updating pet
-    }
+    const handleUpdatePet = (pet) => {
+        setEditPetId(pet.id);
+        setEditPetData(pet);
+    };
+
+    const handleSavePet = () => {
+        setPets(pets.map(pet => (pet.id === editPetData.id ? editPetData : pet)));
+        setEditPetId(null);
+    };
 
     const handleDeletePet = (id) => {
-        // Logic for deleting pet
-    }
+        setPets(pets.filter(pet => pet.id !== id));
+    };
+
+    const genders = ['Đực', 'Cái'];
+
+    const handleClickAddPetButton = () => {
+        setIsAddMode(true);
+    };
 
     const handleAddPet = () => {
-        // Logic for adding a new pet
-    }
+        setPets([
+            ...pets,
+            {
+                id: pets.length + 1,
+                name: newPetData.name,
+                species: newPetData.species,
+                gender: newPetData.gender
+            }
+        ]);
+        setIsAddMode(false); 
+        setNewPetData({ name: '', species: '', gender: '' }); 
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setEditPetData({
+            ...editPetData,
+            [name]: name === 'gender' ? genders[value] : value
+        });
+    };
+
+    const handleCancelAdd = () => {
+        setIsAddMode(false); 
+        setNewPetData({ name: '', species: '', gender: '' }); 
+    };
 
     const handleClickUserProfile = () => {
         navigate('/user-profile');
-    }
+    };
 
     const handleClickPetList = () => {
         navigate('/pet-list');
-    }
+    };
 
     const handleClickTransactionHistory = () => {
         navigate('/transaction-history');
-    }
+    };
 
     const handleClickLogOut = () => {
         navigate('/');
-    }
+    };
 
     return (
         <div className="flex flex-col md:flex-row">
@@ -67,24 +117,130 @@ const PetList = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {pets.map((pet, index) => (
-                            <tr key={index}>
-                                <td className="border px-4 py-2">{index + 1}</td>
-                                <td className="border px-4 py-2">{pet.name}</td>
-                                <td className="border px-4 py-2">{pet.species}</td>
-                                <td className="border px-4 py-2">{pet.gender}</td>
-                                <td className="border px-4 py-2">
-                                    <button className="mr-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => handleUpdatePet(pet.id)}>Cập nhật</button>
-                                </td>
-                                <td className="border px-4 py-2">
-                                    <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onClick={() => handleDeletePet(pet.id)}>Xóa</button>
-                                </td>
-                            </tr>
+    {pets.map((pet, index) => (
+        <tr key={pet.id}>
+            <td className="border px-4 py-2">{index + 1}</td>
+            <td className="border px-4 py-2">
+                {editPetId === pet.id ? (
+                    <input
+                        type="text"
+                        name="name"
+                        value={editPetData.name}
+                        onChange={handleChange}
+                        className="p-2 bg-gray-200 rounded-md w-full"
+                    />
+                ) : (
+                    pet.name
+                )}
+            </td>
+            <td className="border px-4 py-2">
+                {editPetId === pet.id ? (
+                    <input
+                        type="text"
+                        name="species"
+                        value={editPetData.species}
+                        onChange={handleChange}
+                        className="p-2 bg-gray-200 rounded-md w-full"
+                    />
+                ) : (
+                    pet.species
+                )}
+            </td>
+            <td className="border px-4 py-2">
+                {editPetId === pet.id ? (
+                    <select
+                        name="gender"
+                        value={genders.indexOf(editPetData.gender)}
+                        onChange={handleChange}
+                        className="p-2 bg-gray-200 rounded-md w-full"
+                    >
+                        {genders.map((gender, index) => (
+                            <option key={index} value={index}>{gender}</option>
                         ))}
-                    </tbody>
+                    </select>
+                ) : (
+                    pet.gender
+                )}
+            </td>
+            <td className="border px-4 py-2">
+                {editPetId === pet.id ? (
+                    <button
+                        className="mr-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                        onClick={handleSavePet}
+                    >
+                        Lưu
+                    </button>
+                ) : (
+                    <button
+                        className="mr-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        onClick={() => handleUpdatePet(pet)}
+                    >
+                        Cập nhật
+                    </button>
+                )}
+                <button
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                    onClick={() => handleDeletePet(pet.id)}
+                >
+                    Xóa
+                </button>
+            </td>
+        </tr>
+    ))}
+    {isAddMode && (
+        <tr>
+            <td className="border px-4 py-2">{pets.length + 1}</td>
+            <td className="border px-4 py-2">
+                <input
+                    type="text"
+                    placeholder="Tên"
+                    value={newPetData.name}
+                    onChange={(e) => setNewPetData({ ...newPetData, name: e.target.value })}
+                    className="p-2 bg-gray-200 rounded-md w-full"
+                />
+            </td>
+            <td className="border px-4 py-2">
+                <input
+                    type="text"
+                    placeholder="Chủng loại"
+                    value={newPetData.species}
+                    onChange={(e) => setNewPetData({ ...newPetData, species: e.target.value })}
+                    className="p-2 bg-gray-200 rounded-md w-full"
+                />
+            </td>
+            <td className="border px-4 py-2">
+                <select
+                    value={newPetData.gender}
+                    onChange={(e) => setNewPetData({ ...newPetData, gender: e.target.value })}
+                    className="p-2 bg-gray-200 rounded-md w-full"
+                >
+                    <option value="">Chọn giới tính</option>
+                    {genders.map((gender, index) => (
+                        <option key={index} value={gender}>{gender}</option>
+                    ))}
+                </select>
+            </td>
+            <td className="border px-4 py-2">
+                <button
+                    className="mr-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                    onClick={handleAddPet} 
+                >
+                    Thêm
+                </button>
+                <button
+                    className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                    onClick={handleCancelAdd}
+                >
+                    Hủy
+                </button>
+            </td>
+        </tr>
+    )}
+</tbody>
+
                 </table>
                 <div className="flex justify-end mt-4">
-                    <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onClick={handleAddPet}>Thêm thú cưng</button>
+                    <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onClick={handleClickAddPetButton}>Thêm thú cưng</button>
                 </div>
             </div>
         </div>

@@ -1,16 +1,16 @@
 import React from 'react'
 import Banner from '../components/UserProfilePage/Banner'
-import UpdateUserProfileForm from '../components/UpdateUserProfilePage/UpdateUserProfileForm'
 import Footer from '../components/homePage/Footer'
+import TransactionDetail from '../components/TransactionDetailPage/TransactionDetail'
 
-const UpdateUserProfilePage = () => {
+const TransactionDetailPage = () => {
   return (
     <div>
         <Banner/>
-        <UpdateUserProfileForm/>
+        <TransactionDetail/>
         <Footer/>
     </div>
   )
 }
 
-export default UpdateUserProfilePage
+export default TransactionDetailPage
