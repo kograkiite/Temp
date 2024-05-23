@@ -12,6 +12,7 @@ const UserProfile = () => {
   });
   const [isEditMode, setIsEditMode] = useState(false);
   const [formData, setFormData] = useState({ ...user });
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
   const handleUpdateInfo = () => {
@@ -25,12 +26,27 @@ const UserProfile = () => {
   const handleCancel = () => {
     setIsEditMode(false);
     setFormData({ ...user });
+    setErrors({});
   };
 
   const handleSave = () => {
-    setUser(formData);
-    setIsEditMode(false);
+    let newErrors = {};
+
+    if (!formData.firstName.trim()) newErrors.firstName = 'Tên không được để trống';
+    if (!formData.lastName.trim()) newErrors.lastName = 'Họ không được để trống';
+    if (!formData.email.trim()) newErrors.email = 'Email không được để trống';
+    if (!formData.phoneNumber.trim()) newErrors.phoneNumber = 'Số điện thoại không được để trống';
+    if (!formData.address.trim()) newErrors.address = 'Địa chỉ không được để trống';
+
+    if (Object.keys(newErrors).length === 0) {
+      setUser(formData);
+      setIsEditMode(false);
+      setErrors({});
+    } else {
+      setErrors(newErrors);
+    }
   };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -67,6 +83,7 @@ const UserProfile = () => {
                     value={formData.firstName}
                     onChange={handleChange}
                   />
+                  {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
                 </div>
                 <div className="w-1/2 pl-2">
                   <label className="block mb-2 font-light" htmlFor="lastName">Họ:</label>
@@ -78,6 +95,7 @@ const UserProfile = () => {
                     value={formData.lastName}
                     onChange={handleChange}
                   />
+                  {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
                 </div>
               </div>
               <div className="mb-4">
@@ -90,6 +108,7 @@ const UserProfile = () => {
                   value={formData.email}
                   onChange={handleChange}
                 />
+                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
               </div>
               <div className="mb-4">
                 <label className="block mb-2 font-light" htmlFor="phoneNumber">Số điện thoại:</label>
@@ -101,6 +120,7 @@ const UserProfile = () => {
                   value={formData.phoneNumber}
                   onChange={handleChange}
                 />
+                {errors.phoneNumber && <p className="text-red-500 text-sm mt-1">{errors.phoneNumber}</p>}
               </div>
               <div className="mb-4">
                 <label className="block mb-2 font-light" htmlFor="address">Địa chỉ:</label>
@@ -112,6 +132,7 @@ const UserProfile = () => {
                   value={formData.address}
                   onChange={handleChange}
                 />
+                {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
               </div>
               <div className="flex justify-between mt-6">
                 <button
@@ -173,7 +194,7 @@ const UserProfile = () => {
         </div>
       </div>
     </div>
-  );
+  );  
 };
 
 export default UserProfile;

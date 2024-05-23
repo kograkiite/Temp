@@ -22,6 +22,11 @@ import TransactionDetailPage from './pages/TransactionDetailPage'
 import ServiceDetailPage from './pages/ServiceDetailPage'
 import CartPage from './pages/CartPage'
 import PaymentPage from './pages/PaymentPage'
+import StaffHomePage from './pages/StaffHomePage'
+import StaffSchedulePage from './pages/StaffSchedulePage'
+import ManageAccountPage from './pages/ManageAccountPage'
+import BookingListPage from './pages/BookingListPage'
+import BookingDetailPage from './pages/BookingDetailPage'
 
 
 function App() {
@@ -57,8 +62,14 @@ function App() {
       <Route path='/transaction-history' element={<TransactionHistoryPage/>}/>
       <Route path='/transaction-detail/:id' element={<TransactionDetailPage/>}/>
       <Route path='/service-detail/:id' element={<ServiceDetailPage/>}/>
+      <Route path='/product-detail/:id' element={<ProductDetailPage/>}/>
       <Route path='/cart' element={<CartPage/>}/>
       <Route path='/payment' element={<PaymentPage/>}/>
+      <Route path='/staff' element={<StaffHomePage/>}/>
+      <Route path='/staff-schedule' element={<StaffSchedulePage/>}/>
+      <Route path='/accounts' element={<ManageAccountPage/>}/>
+      <Route path='/booking-list' element={<BookingListPage/>}/>
+      <Route path='/booking-detail/:id' element={<BookingDetailPage/>}/>
     </Routes>
     </>
   )

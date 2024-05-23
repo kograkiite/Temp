@@ -14,6 +14,8 @@ const TransactionHistory = () => {
   const [reviewTransactionId, setReviewTransactionId] = useState(null);
   const [isReviewing, setIsReviewing] = useState(false);
   const [isReviewSuccess, setIsReviewSuccess] = useState(false);
+  const [reviewText, setReviewText] = useState('');
+  const [reviewError, setReviewError] = useState('');
 
   useEffect(() => {
     let timeout;
@@ -28,6 +30,8 @@ const TransactionHistory = () => {
   const handleReviewTransaction = (id) => {
     setReviewTransactionId(id);
     setIsReviewing(true);
+    setReviewText('');
+    setReviewError('');
   }
 
   const handleClickUserProfile = () => {
@@ -47,6 +51,12 @@ const TransactionHistory = () => {
   }
 
   const handleSubmitReview = () => {
+    if (reviewText.trim() === '') {
+      setReviewError('Đánh giá không được để trống');
+      return;
+    }
+
+    // Xử lý gửi đánh giá ở đây
     setIsReviewSuccess(true);
     setIsReviewing(false);
   }
@@ -100,7 +110,10 @@ const TransactionHistory = () => {
               <textarea
                 className="w-full h-60 border rounded-md px-4 py-2 mb-4"
                 placeholder="Nhập đánh giá của bạn..."
+                value={reviewText}
+                onChange={(e) => setReviewText(e.target.value)}
               ></textarea>
+              {reviewError && <p className="text-red-500 mb-4">{reviewError}</p>}
               <div className="flex justify-end">
                 <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2" onClick={handleSubmitReview}>Gửi</button>
                 <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" onClick={() => setIsReviewing(false)}>Hủy</button>
