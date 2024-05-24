@@ -1,5 +1,5 @@
 
-import Banner from '../components/StaffHomePage/Banner'
+import Banner from '../components/HomePage_Staff/Banner'
 import Footer from '../components/homePage/Footer'
 import BookingDetail from '../components/BookingDetailPage/BookingDetail'
 

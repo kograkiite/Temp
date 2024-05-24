@@ -1,16 +1,15 @@
-
-import BookingList from '../components/BookingListPage/BookingList'
 import Banner from '../components/HomePage_Staff/Banner'
+import Schedule from '../components/SchedulePage_Manager/Schedule'
 import Footer from '../components/homePage/Footer'
 
-const BookingListPage = () => {
+const SchedulePage_Manager = () => {
   return (
     <div>
         <Banner/>
-        <BookingList/>
+        <Schedule/>
         <Footer/>
     </div>
   )
 }
 
-export default BookingListPage
+export default SchedulePage_Manager

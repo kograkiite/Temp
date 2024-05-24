@@ -1,16 +1,16 @@
 
-import BookingList from '../components/BookingListPage/BookingList'
+import Feedback from '../components/CustomerFeedbackPage/Feedback'
 import Banner from '../components/HomePage_Staff/Banner'
 import Footer from '../components/homePage/Footer'
 
-const BookingListPage = () => {
+const CustomerFeedbackPage = () => {
   return (
     <div>
         <Banner/>
-        <BookingList/>
+        <Feedback/>
         <Footer/>
     </div>
   )
 }
 
-export default BookingListPage
+export default CustomerFeedbackPage

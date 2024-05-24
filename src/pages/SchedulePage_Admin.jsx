@@ -1,9 +1,9 @@
 
-import Banner from '../components/StaffHomePage/Banner'
+import Banner from '../components/HomePage_Staff/Banner'
 import Schedule from '../components/SchedulePage_Admin/Schedule'
 import Footer from '../components/homePage/Footer'
 
-const StaffSchedulePage = () => {
+const SchedulePage_Admin = () => {
   return (
     <div>
         <Banner/>
@@ -13,4 +13,4 @@ const StaffSchedulePage = () => {
   )
 }
 
-export default StaffSchedulePage
+export default SchedulePage_Admin

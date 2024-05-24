@@ -1,9 +1,9 @@
 
 import Footer from '../components/homePage/Footer'
-import Banner from '../components/StaffHomePage/Banner'
+import Banner from '../components/HomePage_Staff/Banner'
 import Welcome from '../components/homePage/Welcome'
 
-const StaffHomePage = () => {
+const HomePage_Staff = () => {
   return (
     <div>
         <Banner/>
@@ -13,4 +13,4 @@ const StaffHomePage = () => {
   )
 }
 
-export default StaffHomePage
+export default HomePage_Staff

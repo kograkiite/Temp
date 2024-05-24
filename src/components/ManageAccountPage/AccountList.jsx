@@ -59,7 +59,7 @@ const AccountList = () => {
     };
 
     return (
-        <div className="account-list p-10 overflow-x-auto">
+        <div className="account-list p-40 overflow-x-auto">
             <h2 className="text-5xl text-center text-red-500 font-semibold mb-4">Danh sách người dùng</h2>
             <div className="max-w-full overflow-x-auto">
                 <table className="border-collapse border border-gray-300 w-full">

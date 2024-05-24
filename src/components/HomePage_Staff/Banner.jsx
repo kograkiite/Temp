@@ -49,7 +49,7 @@ const Banner = () => {
   };
 
   const clickTitle = () => {
-    navigate('/');
+    navigate('/staff  ');
   };
 
   const handleUserIconClick = () => {

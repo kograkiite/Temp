@@ -22,11 +22,12 @@ import TransactionDetailPage from './pages/TransactionDetailPage'
 import ServiceDetailPage from './pages/ServiceDetailPage'
 import CartPage from './pages/CartPage'
 import PaymentPage from './pages/PaymentPage'
-import StaffHomePage from './pages/StaffHomePage'
-import StaffSchedulePage from './pages/StaffSchedulePage'
+import StaffHomePage from './pages/HomePage_Staff'
+import StaffSchedulePage from './pages/SchedulePage_Admin'
 import ManageAccountPage from './pages/ManageAccountPage'
 import BookingListPage from './pages/BookingListPage'
 import BookingDetailPage from './pages/BookingDetailPage'
+import CustomerFeedbackPage from './pages/CustomerFeedbackPage'
 
 
 function App() {
@@ -70,6 +71,7 @@ function App() {
       <Route path='/accounts' element={<ManageAccountPage/>}/>
       <Route path='/booking-list' element={<BookingListPage/>}/>
       <Route path='/booking-detail/:id' element={<BookingDetailPage/>}/>
+      <Route path='/customer-feedback' element={<CustomerFeedbackPage/>}/>
     </Routes>
     </>
   )
