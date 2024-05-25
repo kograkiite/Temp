@@ -1,82 +1,41 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-const products = [
-  {
-    id: 1,
-    name: 'Dog Food',
-    description: 'Nutritious food for your dog.',
-    price: '$20 per bag',
-  },
-  {
-    id: 2,
-    name: 'Dog Leash',
-    description: 'Durable leash for daily walks.',
-    price: '$15',
-  },
-  {
-    id: 3,
-    name: 'Dog Bed',
-    description: 'Comfortable bed for your dog to sleep in.',
-    price: '$50',
-  },
-  {
-    id: 4,
-    name: 'Chew Toy',
-    description: 'Fun chew toy for your dog.',
-    price: '$10',
-  },
-  {
-    id: 5,
-    name: 'Dog Collar',
-    description: 'Adjustable collar with a bell.',
-    price: '$8',
-  },
-  {
-    id: 6,
-    name: 'Dog Shampoo',
-    description: 'Gentle shampoo for your dog\'s coat.',
-    price: '$12',
-  },
-  {
-    id: 7,
-    name: 'Dog Sweater',
-    description: 'Warm sweater for cold days.',
-    price: '$25',
-  },
-  {
-    id: 8,
-    name: 'Dog Harness',
-    description: 'Comfortable harness for your dog.',
-    price: '$30',
-  },
-  {
-    id: 9,
-    name: 'Dog Treats',
-    description: 'Tasty treats for training and rewards.',
-    price: '$10 per pack',
-  },
-];
+import {getForDogProducts } from '../../../apis/ApiProduct';
 
 const ProductList = () => {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    getForDogProducts().then((data) => {
+      setData(data);
+    });
+  }, []);
+
   const navigate = useNavigate();
 
   const handleProductClick = (id) => {
-    navigate(`/product-detail/${id}`);
+    navigate(`/for-dog-product-detail/${id}`);
   };
 
   return (
     <div className="container mx-auto p-5">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {products.map((product) => (
-          <div
-            key={product.id}
-            className="bg-white shadow p-5 cursor-pointer hover:bg-gray-100 transition"
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-40">
+        {data.map((product) => (
+          <div 
+            key={product.id} 
+            className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer transition transform hover:scale-105 duration-300"
             onClick={() => handleProductClick(product.id)}
           >
-            <h2 className="text-2xl font-bold mb-2">{product.name}</h2>
-            <p className="mb-2">{product.description}</p>
-            <p className="font-bold">{product.price}</p>
+            <img 
+              src={product.image} 
+              alt={product.name} 
+              className="w-2/3 h-2/3 object-cover mx-auto" 
+            />
+            <div className="p-4">
+              <h3 className="text-xl font-semibold text-gray-800">{product.name}</h3>
+              <p className="text-gray-600 mt-2">${product.price}</p>
+              <p className="text-gray-500 mt-2">{product.description}</p>
+            </div>
           </div>
         ))}
       </div>

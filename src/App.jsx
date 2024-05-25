@@ -15,11 +15,11 @@ import UserProfilePage from './pages/UserProfilePage'
 import ChangePasswordPage from './pages/ChangePasswordPage'
 import { Route, Routes } from 'react-router-dom'
 import PostLogin from './pages/PostLogin'
-import ProductDetailPage from './pages/ProductDetailPage'
+import ForCatProductDetailPage from './pages/ForCatProductDetailPage'
+import ForDogProductDetailPage from './pages/ForDogProductDetailPage'
 import PetListPage from './pages/PetListPage'
 import TransactionHistoryPage from './pages/TransactionHistoryPage'
 import TransactionDetailPage from './pages/TransactionDetailPage'
-import ServiceDetailPage from './pages/ServiceDetailPage'
 import CartPage from './pages/CartPage'
 import PaymentPage from './pages/PaymentPage'
 import StaffHomePage from './pages/HomePage_Staff'
@@ -27,7 +27,10 @@ import StaffSchedulePage from './pages/SchedulePage_Admin'
 import ManageAccountPage from './pages/ManageAccountPage'
 import BookingListPage from './pages/BookingListPage'
 import BookingDetailPage from './pages/BookingDetailPage'
-import CustomerFeedbackPage from './pages/CustomerFeedbackPage'
+import BookingFeedbackPage from './pages/BookingFeedbackPage'
+import UserProfilePage_Staff from './pages/UserProfilePage_Staff'
+import PetServiceDetailPage from './pages/PetServiceDetailPage'
+import HotelServiceDetailPage from './pages/HotelServiceDetailPage'
 
 
 function App() {
@@ -35,17 +38,6 @@ function App() {
 
   return (
     <>
-    {/* <HomePage/>
-    <AboutPage/>
-    <ContactPage/>
-    <PetHotelPage/>
-    <PetServicePage/>
-    <ForDogPage/>
-    <ForCatPage/>
-    <LoginPage/>
-    <UserProfilePage/>
-    <ChangePasswordPage/>
-    <UpdateUserProfilePage/> */}
     <Routes>
       <Route path='/' element={<HomePage/>}/>
       <Route path='/about' element={<AboutPage/>}/>
@@ -58,12 +50,13 @@ function App() {
       <Route path='/pet-hotel' element={<PetHotelPage/>}/>
       <Route path='/user-profile' element={<UserProfilePage/>}/>
       <Route path='/change-password' element={<ChangePasswordPage/>}/>
-      <Route path='/product-detail/:id' element={<ProductDetailPage/>}/>
+      <Route path='/for-cat-product-detail/:id' element={<ForCatProductDetailPage/>}/>
+      <Route path='/for-dog-product-detail/:id' element={<ForDogProductDetailPage/>}/>
       <Route path='/pet-list' element={<PetListPage/>}/>
       <Route path='/transaction-history' element={<TransactionHistoryPage/>}/>
       <Route path='/transaction-detail/:id' element={<TransactionDetailPage/>}/>
-      <Route path='/service-detail/:id' element={<ServiceDetailPage/>}/>
-      <Route path='/product-detail/:id' element={<ProductDetailPage/>}/>
+      <Route path='/pet-service-detail/:id' element={<PetServiceDetailPage/>}/>
+      <Route path='/hotel-service-detail/:id' element={<HotelServiceDetailPage/>}/>
       <Route path='/cart' element={<CartPage/>}/>
       <Route path='/payment' element={<PaymentPage/>}/>
       <Route path='/staff' element={<StaffHomePage/>}/>
@@ -71,7 +64,8 @@ function App() {
       <Route path='/accounts' element={<ManageAccountPage/>}/>
       <Route path='/booking-list' element={<BookingListPage/>}/>
       <Route path='/booking-detail/:id' element={<BookingDetailPage/>}/>
-      <Route path='/customer-feedback' element={<CustomerFeedbackPage/>}/>
+      <Route path='/booking-feedback' element={<BookingFeedbackPage/>}/>
+      <Route path='/user-profile-staff' element={<UserProfilePage_Staff/>}/>
     </Routes>
     </>
   )

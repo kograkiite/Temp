@@ -1,9 +1,9 @@
 
-import Feedback from '../components/CustomerFeedbackPage/Feedback'
+import Feedback from '../components/BookingFeedbackPage/Feedback'
 import Banner from '../components/HomePage_Staff/Banner'
 import Footer from '../components/homePage/Footer'
 
-const CustomerFeedbackPage = () => {
+const BookingFeedbackPage = () => {
   return (
     <div>
         <Banner/>
@@ -13,4 +13,4 @@ const CustomerFeedbackPage = () => {
   )
 }
 
-export default CustomerFeedbackPage
+export default BookingFeedbackPage

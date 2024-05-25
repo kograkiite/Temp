@@ -1,82 +1,41 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getPetService } from '../../../apis/ApiService';
 
-const services = [
-  {
-    id: 1,
-    name: 'Grooming',
-    description: 'Comprehensive grooming services for your pet.',
-    price: '$50',
-  },
-  {
-    id: 2,
-    name: 'Vet Consultation',
-    description: 'Professional veterinary consultation.',
-    price: '$30',
-  },
-  {
-    id: 3,
-    name: 'Pet Boarding',
-    description: 'Safe and comfortable boarding for your pet.',
-    price: '$70 per night',
-  },
-  {
-    id: 4,
-    name: 'Training',
-    description: 'Expert training sessions for your pet.',
-    price: '$100',
-  },
-  {
-    id: 5,
-    name: 'Dental Care',
-    description: 'Complete dental care for your pet.',
-    price: '$80',
-  },
-  {
-    id: 6,
-    name: 'Vaccination',
-    description: 'Essential vaccinations for your pet.',
-    price: '$40',
-  },
-  {
-    id: 7,
-    name: 'Pet Taxi',
-    description: 'Convenient pet transportation services.',
-    price: '$60',
-  },
-  {
-    id: 8,
-    name: 'Pet Spa',
-    description: 'Luxury spa services for your pet.',
-    price: '$120',
-  },
-  {
-    id: 9,
-    name: 'Pet Photography',
-    description: 'Professional photography sessions for your pet.',
-    price: '$150',
-  },
-];
+const ProductList = () => {
+  const [data, setData] = useState([]);
 
-const ServiceList = () => {
+  useEffect(() => {
+    getPetService().then((data) => {
+      setData(data);
+    });
+  }, []);
+
   const navigate = useNavigate();
 
-  const handleServiceClick = (id) => {
-    navigate(`/service-detail/${id}`);
+  const handleProductClick = (id) => {
+    navigate(`/pet-service-detail/${id}`);
   };
 
   return (
     <div className="container mx-auto p-5">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {services.map((service) => (
-          <div
-            key={service.id}
-            className="bg-white shadow p-5 cursor-pointer hover:bg-gray-100 transition"
-            onClick={() => handleServiceClick(service.id)}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-40">
+        {data.map((product) => (
+          <div 
+            key={product.id} 
+            className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer transition transform hover:scale-105 duration-300"
+            onClick={() => handleProductClick(product.id)}
           >
-            <h2 className="text-2xl font-bold mb-2">{service.name}</h2>
-            <p className="mb-2">{service.description}</p>
-            <p className="font-bold">{service.price}</p>
+            <img 
+              src={product.image} 
+              alt={product.name} 
+              className="w-2/3 h-2/3 object-cover mx-auto" 
+            />
+            <div className="p-4">
+              <h3 className="text-xl font-semibold text-gray-800">{product.name}</h3>
+              <p className="text-gray-600 mt-2">${product.price}</p>
+              <p className="text-gray-500 mt-2">{product.description}</p>
+            </div>
           </div>
         ))}
       </div>
@@ -84,4 +43,4 @@ const ServiceList = () => {
   );
 };
 
-export default ServiceList;
+export default ProductList;

@@ -29,6 +29,7 @@ const BookingList = () => {
                         <th className="border px-4 py-2">Tổng tiền</th>
                         <th className="border px-4 py-2">Trạng thái</th>
                         <th className="border px-4 py-2">Chi tiết</th>
+                        <th className="border px-4 py-2">Đánh giá</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,6 +41,9 @@ const BookingList = () => {
                             <td className="border px-4 py-2">{booking.status}</td>
                             <td className="border px-4 py-2">
                                 <a href={`/booking-detail/${booking.id}`} className="text-blue-500 hover:underline">Chi tiết</a>
+                            </td>
+                            <td className="border px-4 py-2">
+                                <a href={`/booking-feedback/${booking.id}`} className="text-blue-500 hover:underline">Xem đánh giá</a>
                             </td>
                         </tr>
                     ))}

@@ -54,7 +54,7 @@ const Banner = () => {
 
   const handleUserIconClick = () => {
     closeMenu();
-    navigate('/user-profile');
+    navigate('/user-profile-staff');
   };
 
   return (

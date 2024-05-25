@@ -25,12 +25,10 @@ const Schedule = () => {
     };
 
     const handleSave = () => {
-        // Logic to save changes
         setEditMode(false);
     };
 
     const handleCancel = () => {
-        // Logic to cancel editing
         setEditMode(false);
     };
 
