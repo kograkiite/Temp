@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
-const ProductDetail = ({ productData }) => {
+const ProductDetail = ({ serviceData }) => {
   // State to manage the quantity of the product
   const [quantity, setQuantity] = useState(1);
 
@@ -13,30 +13,30 @@ const ProductDetail = ({ productData }) => {
 
   // Function to handle adding the product to the cart
   const handleAddToCart = () => {
-    console.log('Added to cart:', productData, 'Quantity:', quantity);
+    console.log('Added to cart:', serviceData, 'Quantity:', quantity);
   };
 
   // Function to handle ordering the product
   const handleOrderNow = () => {
-    console.log('Ordered:', productData, 'Quantity:', quantity);
+    console.log('Ordered:', serviceData, 'Quantity:', quantity);
   };
 
   return ( 
     // Container for the product detail, using Tailwind CSS for styling
     <div className="flex m-5 py-20 px-32">
       {/* Left section for the product image */}
-      <div className="w-1/2 bg-cover bg-center h-96" style={{ backgroundImage: `url(${productData.image})` }}></div>
+      <div className="w-1/2 bg-cover bg-center h-96" style={{ backgroundImage: `url(${serviceData.image})` }}></div>
 
       {/* Right section for the product information */}
       <div className="w-1/2 p-5 ml-10">
         {/* Product name */}
-        <h1 className="text-6xl font-bold mb-4">{productData.name}</h1>
+        <h1 className="text-6xl font-bold mb-4">{serviceData.name}</h1>
 
         {/* Product price */}
-        <p className="text-2xl text-green-500 mb-4">{`Price: $${productData.price}`}</p>
+        <p className="text-2xl text-green-500 mb-4">{`Price: $${serviceData.price}`}</p>
 
         {/* Product description */}
-        <p className="mb-6">{productData.description}</p>
+        <p className="mb-6">{serviceData.description}</p>
         
         {/* Quantity control section */}
         <div className="flex items-center mb-6">
@@ -63,14 +63,5 @@ const ProductDetail = ({ productData }) => {
   );
 };
 
-// PropTypes to enforce the type and structure of productData
-ProductDetail.propTypes = {
-  productData: PropTypes.shape({
-    name: PropTypes.string.isRequired,       // Product name should be a string and is required
-    price: PropTypes.number.isRequired,      // Product price should be a number and is required
-    description: PropTypes.string.isRequired,// Product description should be a string and is required
-    image: PropTypes.string.isRequired,      // Product image URL should be a string and is required
-  }).isRequired,
-};
 
 export default ProductDetail;
