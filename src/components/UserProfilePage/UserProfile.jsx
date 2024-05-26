@@ -1,45 +1,51 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import 'tailwindcss/tailwind.css';
 
-const UserProfile = () => {
-  const [user, setUser] = useState({
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    phoneNumber: '123-456-7890',
-    address: '123 Main St, Anytown, USA',
-  });
+const UserProfile = ({ userData }) => {
+  // State to manage the edit mode
   const [isEditMode, setIsEditMode] = useState(false);
-  const [formData, setFormData] = useState({ ...user });
+
+  // State to manage the form data
+  const [formData, setFormData] = useState({ ...userData });
+
+  // State to manage validation errors
   const [errors, setErrors] = useState({});
+
+  // Hook for navigation
   const navigate = useNavigate();
 
+  // Handle switching to edit mode
   const handleUpdateInfo = () => {
     setIsEditMode(true);
   };
 
+  // Handle navigation to change password page
   const handleChangePassword = () => {
     navigate('/change-password');
   };
 
+  // Handle canceling the edit
   const handleCancel = () => {
     setIsEditMode(false);
-    setFormData({ ...user });
+    setFormData({ ...userData });
     setErrors({});
   };
 
+  // Handle saving the updated information
   const handleSave = () => {
     let newErrors = {};
 
-    if (!formData.firstName.trim()) newErrors.firstName = 'Tên không được để trống';
-    if (!formData.lastName.trim()) newErrors.lastName = 'Họ không được để trống';
+    if (!formData.first_name.trim()) newErrors.first_name = 'Tên không được để trống';
+    if (!formData.last_name.trim()) newErrors.last_name = 'Họ không được để trống';
     if (!formData.email.trim()) newErrors.email = 'Email không được để trống';
-    if (!formData.phoneNumber.trim()) newErrors.phoneNumber = 'Số điện thoại không được để trống';
+    if (!formData.phone_number.trim()) newErrors.phone_number = 'Số điện thoại không được để trống';
     if (!formData.address.trim()) newErrors.address = 'Địa chỉ không được để trống';
 
     if (Object.keys(newErrors).length === 0) {
-      setUser(formData);
+      // Update user logic (e.g., API call to save changes)
+      // setUser(formData);
       setIsEditMode(false);
       setErrors({});
     } else {
@@ -47,7 +53,7 @@ const UserProfile = () => {
     }
   };
 
-
+  // Handle change in form input fields
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -74,28 +80,28 @@ const UserProfile = () => {
             <form>
               <div className="flex justify-between mb-4">
                 <div className="w-1/2 pr-2">
-                  <label className="block mb-2 font-light" htmlFor="firstName">Tên:</label>
+                  <label className="block mb-2 font-light" htmlFor="first_name">Tên:</label>
                   <input
-                    id="firstName"
-                    name="firstName"
+                    id="first_name"
+                    name="first_name"
                     type="text"
                     className="p-2 bg-gray-200 rounded-md w-full"
-                    value={formData.firstName}
+                    value={formData.first_name}
                     onChange={handleChange}
                   />
-                  {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
+                  {errors.first_name && <p className="text-red-500 text-sm mt-1">{errors.first_name}</p>}
                 </div>
                 <div className="w-1/2 pl-2">
-                  <label className="block mb-2 font-light" htmlFor="lastName">Họ:</label>
+                  <label className="block mb-2 font-light" htmlFor="last_name">Họ:</label>
                   <input
-                    id="lastName"
-                    name="lastName"
+                    id="last_name"
+                    name="last_name"
                     type="text"
                     className="p-2 bg-gray-200 rounded-md w-full"
-                    value={formData.lastName}
+                    value={formData.last_name}
                     onChange={handleChange}
                   />
-                  {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
+                  {errors.last_name && <p className="text-red-500 text-sm mt-1">{errors.last_name}</p>}
                 </div>
               </div>
               <div className="mb-4">
@@ -111,16 +117,16 @@ const UserProfile = () => {
                 {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
               </div>
               <div className="mb-4">
-                <label className="block mb-2 font-light" htmlFor="phoneNumber">Số điện thoại:</label>
+                <label className="block mb-2 font-light" htmlFor="phone_number">Số điện thoại:</label>
                 <input
-                  id="phoneNumber"
-                  name="phoneNumber"
+                  id="phone_number"
+                  name="phone_number"
                   type="text"
                   className="p-2 bg-gray-200 rounded-md w-full"
-                  value={formData.phoneNumber}
+                  value={formData.phone_number}
                   onChange={handleChange}
                 />
-                {errors.phoneNumber && <p className="text-red-500 text-sm mt-1">{errors.phoneNumber}</p>}
+                {errors.phone_number && <p className="text-red-500 text-sm mt-1">{errors.phone_number}</p>}
               </div>
               <div className="mb-4">
                 <label className="block mb-2 font-light" htmlFor="address">Địa chỉ:</label>
@@ -156,24 +162,24 @@ const UserProfile = () => {
               <div className="flex justify-between mb-4">
                 <div className="w-1/2 pr-2">
                   <label className="block mb-2 font-bold">Tên:</label>
-                  <p className="p-2 bg-gray-200 rounded-md">{user.firstName}</p>
+                  <p className="p-2 bg-gray-200 rounded-md">{userData.first_name}</p>
                 </div>
                 <div className="w-1/2 pl-2">
                   <label className="block mb-2 font-bold">Họ:</label>
-                  <p className="p-2 bg-gray-200 rounded-md">{user.lastName}</p>
+                  <p className="p-2 bg-gray-200 rounded-md">{userData.last_name}</p>
                 </div>
               </div>
               <div className="mb-4">
                 <label className="block mb-2 font-bold">Email:</label>
-                <p className="p-2 bg-gray-200 rounded-md">{user.email}</p>
+                <p className="p-2 bg-gray-200 rounded-md">{userData.email}</p>
               </div>
               <div className="mb-4">
                 <label className="block mb-2 font-bold">Số điện thoại:</label>
-                <p className="p-2 bg-gray-200 rounded-md">{user.phoneNumber}</p>
+                <p className="p-2 bg-gray-200 rounded-md">{userData.phone_number}</p>
               </div>
               <div className="mb-4">
                 <label className="block mb-2 font-bold">Địa chỉ:</label>
-                <p className="p-2 bg-gray-200 rounded-md">{user.address}</p>
+                <p className="p-2 bg-gray-200 rounded-md">{userData.address}</p>
               </div>
               <div className="flex justify-between mt-6">
                 <button
@@ -195,6 +201,17 @@ const UserProfile = () => {
       </div>
     </div>
   );  
+};
+
+// PropTypes to enforce the type and structure of userData
+UserProfile.propTypes = {
+  userData: PropTypes.shape({
+    first_name: PropTypes.string.isRequired,
+    last_name: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    phone_number: PropTypes.string.isRequired,
+    address: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 export default UserProfile;

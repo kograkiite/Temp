@@ -5,9 +5,6 @@ const ProductDetail = ({ productData }) => {
   // State to manage the quantity of the product
   const [quantity, setQuantity] = useState(1);
 
-  // If productData is not available, return null to prevent rendering
-  if (!productData) return null;
-
   // Function to handle increasing the quantity
   const handleIncrease = () => setQuantity(quantity + 1);
 
@@ -24,7 +21,7 @@ const ProductDetail = ({ productData }) => {
     console.log('Ordered:', productData, 'Quantity:', quantity);
   };
 
-  return (
+  return ( 
     // Container for the product detail, using Tailwind CSS for styling
     <div className="flex m-5 py-20 px-32">
       {/* Left section for the product image */}

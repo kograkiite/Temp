@@ -1,39 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'tailwindcss/tailwind.css';
+import { getPetInformation } from '../../apis/ApiPet';
 
 const PetList = () => {
     const navigate = useNavigate();
-
-    const [pets, setPets] = useState([
-        { id: 1, name: 'Max', species: 'Chó', gender: 'Đực' },
-        { id: 2, name: 'Whiskers', species: 'Mèo', gender: 'Cái' },
-        { id: 3, name: 'Buddy', species: 'Chó', gender: 'Đực' }
-    ]);
-
-    const [newPetData, setNewPetData] = useState({
-        name: '',
-        species: '',
-        gender: '',
-    });
-
-    const [editPetId, setEditPetId] = useState(null);
-    const [editPetData, setEditPetData] = useState({
-        id: '',
-        name: '',
-        species: '',
-        gender: ''
-    });
-
+    const [pets, setPets] = useState([]);
     const [isAddMode, setIsAddMode] = useState(false);
-
-    const [errors, setErrors] = useState({
-        name: '',
-        species: '',
-        gender: ''
-    });
-
+    const [editPetId, setEditPetId] = useState(null);
+    const [newPetData, setNewPetData] = useState({ name: '', species: '', gender: '' });
+    const [editPetData, setEditPetData] = useState({ id: '', name: '', species: '', gender: '' });
+    const [errors, setErrors] = useState({ name: '', species: '', gender: '' });
+    const genders = ['Đực', 'Cái'];
+    
     useEffect(() => {
+        getPetInformation().then((data) => {
+            setPets(data);
+        });
     }, []);
 
     const handleUpdatePet = (pet) => {
@@ -55,20 +38,13 @@ const PetList = () => {
             return;
         }
 
-        setPets(pets.map(pet => (pet.id === editPetData.id ? editPetData : pet)));
+        setPets(pets.map((pet) => (pet.id === editPetData.id ? editPetData : pet)));
         setEditPetId(null);
         setErrors({ name: '', species: '', gender: '' });
     };
 
     const handleDeletePet = (id) => {
-        setPets(pets.filter(pet => pet.id !== id));
-    };
-
-    const genders = ['Đực', 'Cái'];
-
-    const handleClickAddPetButton = () => {
-        setIsAddMode(true);
-        setErrors({ name: '', species: '', gender: '' });
+        setPets(pets.filter((pet) => pet.id !== id));
     };
 
     const handleAddPet = () => {
@@ -84,15 +60,14 @@ const PetList = () => {
             return;
         }
 
-        setPets([
-            ...pets,
-            {
-                id: pets.length + 1,
-                name: newPetData.name,
-                species: newPetData.species,
-                gender: newPetData.gender
-            }
-        ]);
+        const newPet = {
+            id: pets.length + 1,
+            name: newPetData.name,
+            species: newPetData.species,
+            gender: newPetData.gender
+        };
+
+        setPets([...pets, newPet]);
         setIsAddMode(false);
         setNewPetData({ name: '', species: '', gender: '' });
         setErrors({ name: '', species: '', gender: '' });
@@ -100,10 +75,11 @@ const PetList = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setEditPetData({
-            ...editPetData,
-            [name]: name === 'gender' ? genders[value] : value
-        });
+        if (editPetId !== null) {
+            setEditPetData({ ...editPetData, [name]: name === 'gender' ? genders[value] : value });
+        } else {
+            setNewPetData({ ...newPetData, [name]: name === 'gender' ? genders[value] : value });
+        }
     };
 
     const handleCancelAdd = () => {
@@ -114,6 +90,11 @@ const PetList = () => {
 
     const handleCancelEdit = () => {
         setEditPetId(null);
+        setErrors({ name: '', species: '', gender: '' });
+    };
+
+    const handleClickAddPetButton = () => {
+        setIsAddMode(true);
         setErrors({ name: '', species: '', gender: '' });
     };
 
@@ -133,7 +114,7 @@ const PetList = () => {
         navigate('/');
     };
 
-    return (
+    return (pets &&
         <div className="flex flex-col md:flex-row">
             <div className="md:h-15 bg-gray-200 w-full md:w-1/3 p-4 flex flex-col justify-center px-10 items-center md:items-start">
                 <h2 className="text-4xl font-semibold mb-4">Tài khoản</h2>
@@ -312,6 +293,6 @@ const PetList = () => {
             </div>
         </div>
     );
-}
+};
 
 export default PetList;

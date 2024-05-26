@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'tailwindcss/tailwind.css';
 import { FaRegUserCircle } from "react-icons/fa";
+import { IoCartOutline } from "react-icons/io5";
 
 const Banner = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -47,6 +48,11 @@ const Banner = () => {
   const handleUserIconClick = () => {
     closeMenu();
     navigate('/user-profile');
+  };
+
+  const handleCartIconClick = () => {
+    closeMenu();
+    navigate('/cart');
   };
 
   return (
@@ -103,6 +109,13 @@ const Banner = () => {
           </li>
           <li className="mx-4 my-3 md:my-0">
             <a href="/contact" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">LIÊN HỆ</a>
+          </li>
+          <li className="mx-4 my-3 md:my-0">
+            {isSmallScreen ? (
+              <button onClick={handleCartIconClick} className="text-xl hover:text-cyan-500 duration-500">GIỎ HÀNG</button>
+            ) : (
+              <IoCartOutline className="userIcon w-10 h-10 hover:text-cyan-500 duration-500" onClick={handleCartIconClick} />
+            )}
           </li>
           <li className="mx-4 my-3 md:my-0">
             {isSmallScreen ? (

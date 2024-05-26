@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { getForCatProducts } from '../../../apis/ApiProduct';
 
 const ProductList = () => {
-  const [data, setData] = useState([]);
+  const [productData, setProductData] = useState([]);
 
   useEffect(() => {
     getForCatProducts().then((data) => {
-      setData(data);
+      setProductData(data);
     });
   }, []);
 
@@ -20,7 +20,7 @@ const ProductList = () => {
   return (
     <div className="container mx-auto p-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-40">
-        {data.map((product) => (
+        {productData.map((product) => (
           <div 
             key={product.id} 
             className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer transition transform hover:scale-105 duration-300"

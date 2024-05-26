@@ -4,6 +4,7 @@ import Banner from '../components/UserProfilePage/Banner'
 import Footer from '../components/homePage/Footer'
 
 const PetListPage = () => {
+    
   return (
     <div>
         <Banner/>

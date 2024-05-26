@@ -1,56 +1,48 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getAccounts } from '../../apis/ApiAccount';
 
 const AccountList = () => {
-    const [users, setUsers] = useState([
-        {
-            id: 1,
-            name: 'John Doe',
-            email: 'john.doe@example.com',
-            phone: '123456789',
-            address: '123 Main Street, City, Country',
-            role: 'Administrator'
-        },
-        {
-            id: 2,
-            name: 'Jane Smith',
-            email: 'jane.smith@example.com',
-            phone: '987654321',
-            address: '456 Elm Street, City, Country',
-            role: 'Customer'
-        },
-    ]);
+    const [accounts, setAccounts] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        getAccounts().then((data) => {
+            setAccounts(data);
+            setLoading(false);
+        });
+    }, []);
 
     const roles = ['Customer', 'Sale Staff', 'Caretaker Staff', 'Store Manager', 'Administrator'];
 
     const [editingId, setEditingId] = useState(null);
-    const [editedUser, setEditedUser] = useState(null);
+    const [editedUser, setEditedUser] = useState({});
 
     const handleEditUser = (id) => {
-        const userToEdit = users.find(user => user.id === id);
+        const userToEdit = accounts.find(user => user.id === id);
         setEditingId(id);
         setEditedUser(userToEdit);
     };
 
     const handleSaveUser = () => {
-        const updatedUsers = users.map(user => {
+        const updatedUsers = accounts.map(user => {
             if (user.id === editedUser.id) {
                 return editedUser;
             }
             return user;
         });
-        setUsers(updatedUsers);
+        setAccounts(updatedUsers);
         setEditingId(null);
-        setEditedUser(null);
+        setEditedUser({});
     };
 
     const handleCancelEdit = () => {
         setEditingId(null);
-        setEditedUser(null);
+        setEditedUser({});
     };
 
     const handleDeleteUser = (id) => {
         if (window.confirm('Bạn có chắc chắn muốn xóa người dùng này?')) {
-            setUsers(users.filter(user => user.id !== id));
+            setAccounts(accounts.filter(user => user.id !== id));
         }
     };
 
@@ -58,7 +50,11 @@ const AccountList = () => {
         setEditedUser({ ...editedUser, [field]: value });
     };
 
-    return (
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    return (accounts &&
         <div className="account-list p-40 overflow-x-auto">
             <h2 className="text-5xl text-center text-red-500 font-semibold mb-4">Danh sách người dùng</h2>
             <div className="max-w-full overflow-x-auto">
@@ -74,25 +70,25 @@ const AccountList = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {users.map((user) => (
+                        {accounts.map((user) => (
                             <tr key={user.id}>
                                 <td className="border px-4 py-2">
                                     {editingId === user.id ? (
                                         <input
                                             type="text"
-                                            value={editedUser.name}
+                                            value={editedUser.fullname || ''}
                                             onChange={(e) => handleInputChange('name', e.target.value)}
                                             className="p-2 bg-gray-200 rounded-md w-full"
                                         />
                                     ) : (
-                                        user.name
+                                        user.fullname
                                     )}
                                 </td>
                                 <td className="border px-4 py-2">
                                     {editingId === user.id ? (
                                         <input
                                             type="text"
-                                            value={editedUser.email}
+                                            value={editedUser.email || ''}
                                             onChange={(e) => handleInputChange('email', e.target.value)}
                                             className="p-2 bg-gray-200 rounded-md w-full"
                                         />
@@ -104,19 +100,19 @@ const AccountList = () => {
                                     {editingId === user.id ? (
                                         <input
                                             type="text"
-                                            value={editedUser.phone}
+                                            value={editedUser.phone_number || ''}
                                             onChange={(e) => handleInputChange('phone', e.target.value)}
                                             className="p-2 bg-gray-200 rounded-md w-full"
                                         />
                                     ) : (
-                                        user.phone
+                                        user.phone_number
                                     )}
                                 </td>
                                 <td className="border px-4 py-2">
                                     {editingId === user.id ? (
                                         <input
                                             type="text"
-                                            value={editedUser.address}
+                                            value={editedUser.address || ''}
                                             onChange={(e) => handleInputChange('address', e.target.value)}
                                             className="p-2 bg-gray-200 rounded-md w-full"
                                         />
@@ -127,10 +123,11 @@ const AccountList = () => {
                                 <td className="border px-4 py-2">
                                     {editingId === user.id ? (
                                         <select
-                                            value={editedUser.role}
+                                            value={editedUser.role || ''}
                                             onChange={(e) => handleInputChange('role', e.target.value)}
                                             className="p-2 bg-gray-200 rounded-md w-full"
                                         >
+                                            <option value="">Select Role</option>
                                             {roles.map((role, index) => (
                                                 <option key={index} value={role}>{role}</option>
                                             ))}
@@ -151,7 +148,6 @@ const AccountList = () => {
                                             <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onClick={() => handleDeleteUser(user.id)}>Xóa</button>
                                         </div>
                                     )}
-                                    
                                 </td>
                             </tr>
                         ))}

@@ -1,13 +1,23 @@
-import React from 'react'
+
 import Banner from '../components/UserProfilePage/Banner'
 import Footer from '../components/homePage/Footer'
 import TransactionDetail from '../components/TransactionDetailPage/TransactionDetail'
+import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { getTransactionDetail } from '../apis/ApiTransaction';
 
 const TransactionDetailPage = () => {
-  return (
+  const {id} = useParams();
+  const [transactionData, setTransactionData] = useState();
+    useEffect(()=>{
+      getTransactionDetail(id).then((data)=>{
+        setTransactionData(data)
+      })
+  },[])
+  return (transactionData &&
     <div>
         <Banner/>
-        <TransactionDetail/>
+        <TransactionDetail transactionData={transactionData}/>
         <Footer/>
     </div>
   )
