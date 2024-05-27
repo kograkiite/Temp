@@ -1,67 +1,64 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+import React, { useEffect, useState } from 'react';
+import useShopping from '../../hook/useShopping';
+import { getForDogProductsDetail } from '../../apis/ApiProduct';
+import { Link, useParams } from 'react-router-dom';
 
-const ProductDetail = ({ serviceData }) => {
-  // State to manage the quantity of the product
-  const [quantity, setQuantity] = useState(1);
+const ProductDetail = () => {
+    const { id } = useParams();
+    const [productData, setProductData] = useState(null);
+    const [quantity, setQuantity] = useState(1); // State để quản lý số lượng sản phẩm
 
-  // Function to handle increasing the quantity
-  const handleIncrease = () => setQuantity(quantity + 1);
+    useEffect(() => {
+        getForDogProductsDetail(id).then((data) => {
+            setProductData(data);
+        });
+    }, [id]);
 
-  // Function to handle decreasing the quantity
-  const handleDecrease = () => setQuantity(quantity > 1 ? quantity - 1 : 1);
+    const { handleAddItem } = useShopping();
 
-  // Function to handle adding the product to the cart
-  const handleAddToCart = () => {
-    console.log('Added to cart:', serviceData, 'Quantity:', quantity);
-  };
+    const handleIncrease = () => setQuantity(quantity + 1); // Tăng số lượng
+    const handleDecrease = () => setQuantity(quantity > 1 ? quantity - 1 : 1); // Giảm số lượng
 
-  // Function to handle ordering the product
-  const handleOrderNow = () => {
-    console.log('Ordered:', serviceData, 'Quantity:', quantity);
-  };
+    const handleOrderNow = () => {
+        console.log('Ordered:', productData, 'Quantity:', quantity);
+    };
 
-  return ( 
-    // Container for the product detail, using Tailwind CSS for styling
-    <div className="flex m-5 py-20 px-32">
-      {/* Left section for the product image */}
-      <div className="w-1/2 bg-cover bg-center h-96" style={{ backgroundImage: `url(${serviceData.image})` }}></div>
+    const handleAddToCart = () => {
+        if (productData) {
+            const productWithQuantity = { ...productData, quantity };
+            handleAddItem(productWithQuantity);
+        }
+    };
 
-      {/* Right section for the product information */}
-      <div className="w-1/2 p-5 ml-10">
-        {/* Product name */}
-        <h1 className="text-6xl font-bold mb-4">{serviceData.name}</h1>
+    const handleChangeQuantity = (e) => {
+        const value = parseInt(e.target.value);
+        if (!isNaN(value) && value > 0) {
+            setQuantity(value);
+        }
+    };
 
-        {/* Product price */}
-        <p className="text-2xl text-green-500 mb-4">{`Price: $${serviceData.price}`}</p>
-
-        {/* Product description */}
-        <p className="mb-6">{serviceData.description}</p>
-        
-        {/* Quantity control section */}
-        <div className="flex items-center mb-6">
-          {/* Decrease quantity button */}
-          <button onClick={handleDecrease} className="bg-gray-600 text-white border border-gray-400 p-2">-</button>
-          
-          {/* Display the current quantity */}
-          <span className="mx-3 text-lg">{quantity}</span>
-          
-          {/* Increase quantity button */}
-          <button onClick={handleIncrease} className="bg-black text-white border border-gray-400 p-2">+</button>
-        </div>
-        
-        {/* Action buttons section */}
-        <div className="flex space-x-4 justify-end">
-          {/* Add to Cart button */}
-          <button onClick={handleAddToCart} className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2">Add to Cart</button>
-          
-          {/* Order Now button */}
-          <button onClick={handleOrderNow} className="bg-green-500 hover:bg-green-700 text-white px-4 py-2">Order Now</button>
-        </div>
-      </div>
-    </div>
-  );
+    return (
+        productData && (
+            <div className="flex m-5 py-20 px-32">
+                <div className="w-1/2 bg-cover bg-center h-96" style={{ backgroundImage: `url(${productData.image})` }}></div>
+                <div className="w-1/2 p-5 ml-10">
+                    <h1 className="text-6xl font-bold mb-4">{productData.name}</h1>
+                    <p className="text-2xl text-green-500 mb-4">{`Price: $${productData.price}`}</p>
+                    <p className="mb-6">{productData.description}</p>
+                    <div className="flex items-center mb-6">
+                        <button onClick={handleDecrease} className="bg-gray-600 text-white border border-gray-400 p-2">-</button>
+                        <input value={quantity} onChange={handleChangeQuantity} className="mx-3 text-lg w-16 text-center" />
+                        <button onClick={handleIncrease} className="bg-black text-white border border-gray-400 p-2">+</button>
+                    </div>
+                    <div className="flex space-x-4 justify-end">
+                        <button onClick={handleAddToCart} className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2">Add to Cart</button>
+                        <button onClick={handleOrderNow} className="bg-green-500 hover:bg-green-700 text-white px-4 py-2">Order Now</button>
+                    </div>
+                </div>
+                <button className='bg-gray-200'><Link to='/cart'>ShoppingCart</Link></button>
+            </div>
+        )
+    );
 };
-
 
 export default ProductDetail;
