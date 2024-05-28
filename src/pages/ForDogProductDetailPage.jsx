@@ -9,11 +9,10 @@ import ProductDetail from '../components/ProductDetailPage/ProductDetail';
 
 
 const ForDogProductDetailPage = () => {
-    
     return (
       <div>
           <Banner/>
-          <ProductDetail/>
+          <ProductDetail type='dog'/>
           <Footer/>
       </div>
     )

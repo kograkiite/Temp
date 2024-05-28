@@ -1,10 +1,9 @@
 import useShopping from '../../hook/useShopping';
 
 const Cart = () => {
-    const { shoppingCart, handelUpdateQuantity } = useShopping();
-    console.log(shoppingCart);
+    const { shoppingCart, handelUpdateQuantity, handleRemoveItem } = useShopping();
 
-    // Tính tổng giá trị của giỏ hàng
+    // Calculate the total amount of the cart
     const totalAmount = shoppingCart.reduce((total, item) => {
         return total + item.price * item.quantity;
     }, 0);
@@ -22,6 +21,7 @@ const Cart = () => {
                                     <th className="px-4 py-2 text-left">Sản phẩm</th>
                                     <th className="px-4 py-2 text-left">Giá</th>
                                     <th className="px-4 py-2 text-left">Số lượng</th>
+                                    <th className="px-4 py-2 text-left">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -49,6 +49,14 @@ const Cart = () => {
                                                 min="1"
                                                 required
                                             />
+                                        </td>
+                                        <td className="px-4 py-2">
+                                            <button
+                                                onClick={() => handleRemoveItem(item.id)}
+                                                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                                            >
+                                                Xóa
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}

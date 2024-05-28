@@ -1,23 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import useShopping from '../../hook/useShopping';
-import { getForDogProductsDetail } from '../../apis/ApiProduct';
+import { getForCatProductsDetail, getForDogProductsDetail } from '../../apis/ApiProduct';
 import { Link, useParams } from 'react-router-dom';
 
-const ProductDetail = () => {
+const ProductDetail = ({ type }) => {
     const { id } = useParams();
     const [productData, setProductData] = useState(null);
-    const [quantity, setQuantity] = useState(1); // State để quản lý số lượng sản phẩm
+    const [quantity, setQuantity] = useState(1);
 
     useEffect(() => {
-        getForDogProductsDetail(id).then((data) => {
+        const fetchProductDetail = async () => {
+            let data;
+            if (type === 'cat') {
+                data = await getForCatProductsDetail(id);
+            } else if (type === 'dog') {
+                data = await getForDogProductsDetail(id);
+            }
             setProductData(data);
-        });
-    }, [id]);
+        };
+        fetchProductDetail();
+    }, [id, type]);
 
     const { handleAddItem } = useShopping();
 
-    const handleIncrease = () => setQuantity(quantity + 1); // Tăng số lượng
-    const handleDecrease = () => setQuantity(quantity > 1 ? quantity - 1 : 1); // Giảm số lượng
+    const handleIncrease = () => setQuantity(quantity + 1);
+    const handleDecrease = () => setQuantity(quantity > 1 ? quantity - 1 : 1);
 
     const handleOrderNow = () => {
         console.log('Ordered:', productData, 'Quantity:', quantity);
@@ -47,7 +54,13 @@ const ProductDetail = () => {
                     <p className="mb-6">{productData.description}</p>
                     <div className="flex items-center mb-6">
                         <button onClick={handleDecrease} className="bg-gray-600 text-white border border-gray-400 p-2">-</button>
-                        <input value={quantity} onChange={handleChangeQuantity} className="mx-3 text-lg w-16 text-center" />
+                        <input
+                            value={quantity}
+                            onChange={handleChangeQuantity}
+                            className="mx-3 text-lg w-16 text-center"
+                            type="number"
+                            min="1"
+                        />
                         <button onClick={handleIncrease} className="bg-black text-white border border-gray-400 p-2">+</button>
                     </div>
                     <div className="flex space-x-4 justify-end">
