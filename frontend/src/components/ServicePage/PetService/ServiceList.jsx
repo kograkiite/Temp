@@ -1,46 +1,53 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getPetService } from '../../../apis/ApiService';
+import { getForCatProducts } from '../../../apis/ApiProduct';
 
-const ProductList = () => {
-  const [data, setData] = useState([]);
+const ServiceList = () => {
+  const [productData, setProductData] = useState([]);
 
   useEffect(() => {
-    getPetService().then((data) => {
-      setData(data);
+    getForCatProducts().then((data) => {
+      setProductData(data);
     });
   }, []);
 
   const navigate = useNavigate();
 
   const handleProductClick = (id) => {
-    navigate(`/pet-service-detail/${id}`);
+    navigate(`/for-cat-product-detail/${id}`);
   };
 
   return (
-    <div className="container mx-auto p-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-40">
-        {data.map((product) => (
-          <div 
-            key={product.id} 
-            className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer transition transform hover:scale-105 duration-300"
-            onClick={() => handleProductClick(product.id)}
-          >
-            <img 
-              src={product.image} 
-              alt={product.name} 
-              className="w-2/3 h-2/3 object-cover mx-auto" 
-            />
-            <div className="p-4">
-              <h3 className="text-xl font-semibold text-gray-800">{product.name}</h3>
-              <p className="text-gray-600 mt-2">${product.price}</p>
-              <p className="text-gray-500 mt-2">{product.description}</p>
+    productData && (
+      <div className="flex justify-center p-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {productData.map((product) => (
+            <div
+              key={product.id}
+              className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer transition transform hover:scale-105 duration-300"
+              onClick={() => handleProductClick(product.id)}
+              style={{ width: '250px' }} // Set a fixed width for the card
+            >
+              <div className="w-full overflow-hidden" style={{ height: '250px' }}> {/* Set a fixed height for the image container */}
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-4 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-800">{product.name}</h3>
+                  <p className="text-gray-600 mt-2">${product.price}</p>
+                  <p className="text-gray-500 mt-2">{product.description}</p>
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
+    )
   );
 };
 
-export default ProductList;
+export default ServiceList;
