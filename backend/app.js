@@ -18,19 +18,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/api/auth', authRoutes);
-
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
-// Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Catch-all handler for any request that doesn't match an API route
-app.get('*', (req, res) => {
-  res.redirect('/main.jsx');
-});
-
+app.use('/', authRoutes);
 // Error handling middleware
 app.use(errorMiddleware);
 
