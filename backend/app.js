@@ -28,7 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Catch-all handler for any request that doesn't match an API route
 app.get('*', (req, res) => {
-  res.redirect('/index.html'); // Redirect to index.html
+  res.redirect('/main.jsx');
 });
 
 // Error handling middleware
