@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getForCatProducts } from '../../../apis/ApiProduct';
 
-const ProductList = () => {
+const ServiceList = () => {
   const [productData, setProductData] = useState([]);
 
   useEffect(() => {
@@ -49,5 +49,4 @@ const ProductList = () => {
     )
   );
 };
-
-export default ProductList;
+export default ServiceList;
