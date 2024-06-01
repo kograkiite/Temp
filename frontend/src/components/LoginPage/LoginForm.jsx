@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Form, Input, Button, Typography, Row, Col } from 'antd';
+import { Form, Input, Button, Typography, Modal, Row, Col } from 'antd';
+import { CheckCircleOutlined } from '@ant-design/icons';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const { Title } = Typography;
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
   const [errors, setErrors] = useState({});
   const [isSignUp, setIsSignUp] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [loginMessage, setLoginMessage] = useState('');
+  const [successModalVisible, setSuccessModalVisible] = useState(false); // State để kiểm soát việc hiển thị Modal
+  const navigate = useNavigate()
 
   const validate = () => {
     const newErrors = {};
@@ -28,8 +31,12 @@ const LoginForm = () => {
           email: email,
           password: password,
         });
-        setLoginMessage(response.data.message);
         console.log('Login successful', response.data.user);
+        setSuccessModalVisible(true); // Hiển thị Modal khi đăng nhập thành công
+        setTimeout(() => {
+          setSuccessModalVisible(false);
+          navigate('/home'); // Chuyển hướng đến trang home
+        }, 2000);
       } catch (error) {
         if (error.response) {
           setLoginMessage(error.response.data.message);
@@ -92,6 +99,19 @@ const LoginForm = () => {
           </div>
         </div>
       )}
+     <Modal
+        visible={successModalVisible}
+        onCancel={() => setSuccessModalVisible(false)}
+        footer={[
+        ]}
+        centered
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+          <CheckCircleOutlined style={{ fontSize: '170px', color: '#52c41a' }} />
+          <p className="mt-4">Bạn đã đăng nhập thành công!</p>
+        </div>
+      </Modal>
+
     </div>
   );
 };

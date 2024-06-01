@@ -10,7 +10,7 @@ const Contact = () => {
   return (
     <div className="bg-gray-100 px-4 md:px-20 lg:px-40">
       <div className="container mx-auto">
-        <Title level={2} className="text-red-500 text-center font-semibold mb-8">Liên hệ</Title>
+        <Title level={2} className="text-red-500 text-center font-semibold mb-8 mt-10">Liên hệ</Title>
         <Row gutter={[16, 16]}>
           <Col xs={24} md={8}>
             <div className="address-row flex items-center">
