@@ -4,13 +4,16 @@ const path = require('path');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const errorMiddleware = require('./middlewares/errorMiddleware');
+const authMiddleware = require('./middlewares/authMiddleware'); 
+
 const dotenv = require('dotenv');
 
+// Config dotenv
 dotenv.config();
 
 const app = express();
 
-// Connect to database
+// Connect MongoDB
 connectDB();
 
 // Middleware
@@ -19,9 +22,23 @@ app.use(express.json());
 
 // Routes
 app.use('/', authRoutes);
-// Error handling middleware
-app.use(errorMiddleware);
 
+// Apply authMiddleware to protected routes
+app.use('/protected', authMiddleware);
+
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Catch-all handler for any request that doesn't match an API route
+app.get('*', (req, res) => {
+  res.redirect('/main.jsx'); // Redirect to main.jsx
+});
+
+// Error handling middleware
+app.use(errorMiddleware); // Apply errorMiddleware
+
+
+// Start server
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
