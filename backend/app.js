@@ -8,12 +8,11 @@ const authMiddleware = require('./middlewares/authMiddleware');
 
 const dotenv = require('dotenv');
 
-// Config dotenv
 dotenv.config();
 
 const app = express();
 
-// Connect MongoDB
+// Connect to database
 connectDB();
 
 // Middleware
@@ -31,15 +30,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Catch-all handler for any request that doesn't match an API route
 app.get('*', (req, res) => {
-  res.redirect('/main.jsx'); // Redirect to main.jsx
+  res.redirect('/'); // Redirect to main.jsx
 });
 
 // Error handling middleware
 app.use(errorMiddleware); // Apply errorMiddleware
 
-
-// Start server
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

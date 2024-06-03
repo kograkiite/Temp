@@ -1,14 +1,12 @@
 const express = require('express');
-const { register, login, resetPassword } = require('../controllers/authController');
+const { login, register, forgotPassword, changePassword, resetPassword } = require('../controllers/authController');
+const authMiddleware = require('../middlewares/authMiddleware');
 const router = express.Router();
 
-// Đăng ký người dùng mới
-router.post('/register', register);
-
-// Đăng nhập người dùng
 router.post('/login', login);
-
-// Đặt lại mật khẩu
-router.post('/reset-password', resetPassword);
+router.post('/register', register);
+router.post('/forgot-password', forgotPassword);
+router.post('/change-password', authMiddleware, changePassword);
+router.post('/reset-password/:accountId/:token', resetPassword);
 
 module.exports = router;
