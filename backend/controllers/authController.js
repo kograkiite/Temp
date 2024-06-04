@@ -47,7 +47,45 @@ exports.register = async (req, res) => {
     });
     await newAccount.save();
 
-    res.json({ message: 'Registration successful', user: { accountID: newAccount.account_id, fullname: newAccount.fullname, email: newAccount.email, phone: newAccount.phone, address: newAccount.address } });
+    res.json({ message: 'Đăng ký thành công!', 
+               user: { accountID: newAccount.account_id, 
+                       fullname: newAccount.fullname, 
+                       email: newAccount.email, phone: 
+                       newAccount.phone, address: 
+                       newAccount.address } });
+
+    // Tạo nội dung email
+    const mailOptions = {
+      from: '"PetService" <petservicesswp391@gmail.com>',
+      to: email,
+      subject: "Chào mừng đến với PetService!",
+      html: `<p>Chào bạn ${fullname},</p>
+             <p>Cảm ơn bạn đã đăng ký tài khoản tại PetService. Chúng tôi rất vui mừng chào đón bạn đến với cộng đồng yêu thú cưng của chúng tôi.</p>
+             <p>Hãy truy cập vào tài khoản của bạn để khám phá nhiều dịch vụ và thông tin hữu ích dành cho thú cưng của bạn.</p>
+             <p>Chúc bạn có những trải nghiệm tuyệt vời tại PetService!</p>
+             <p>Thân ái,</p>
+             <p>Đội ngũ PetService</p>`,
+    };
+
+    // Gửi email
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      secure: false,
+      port: 587,
+      auth: {
+        user: EMAIL_USERNAME,
+        pass: EMAIL_PASSWORD,
+      },
+    });
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+        return res.status(500).json({ message: 'Lỗi khi gửi email' });
+      }
+      console.log('Email sent:', info.response);
+      res.json({ message: 'Email gửi thành công' });
+    });
   } catch (error) {
     console.error('Error during registration:', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -76,7 +114,7 @@ exports.login = async (req, res) => {
       { expiresIn: JWT_EXPIRES_IN }
     );
     res.json({
-      message: 'Login successful',
+      message: 'Đăng nhập thành công!',
       user: { 
         account_id: account.account_id, 
         email: account.email, 
@@ -110,7 +148,7 @@ exports.forgotPassword = async (req, res) => {
     
     // Tạo nội dung email
     const mailOptions = {
-      from: '"PetService" <kijtei2@gmail.com>',
+      from: '"PetService" <petservicesswp391@gmail.com>',
       to: email,
       subject: "Reset Password",
       html: `<p>Chào bạn,</p>

@@ -14,7 +14,7 @@ const authMiddleware = (req, res, next) => {
 
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) {
-      return res.status(401).json({ message: 'Failed to authenticate token' });
+      return res.status(401).json({ message: 'Xác thực thất bại!' });
     }
 
     req.user = decoded;
