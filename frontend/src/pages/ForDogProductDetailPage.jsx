@@ -1,8 +1,6 @@
 
-import { useEffect, useState } from 'react';
-import Banner from '../components/homePage/Banner'
-import Footer from '../components/homePage/Footer'
-import { useParams } from 'react-router-dom';
+import Banner from '../components/HomePage/Banner'
+import Footer from '../components/HomePage/Footer'
 
 import ProductDetail from '../components/ProductDetailPage/ProductDetail';
 

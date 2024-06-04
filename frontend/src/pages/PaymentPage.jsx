@@ -1,6 +1,6 @@
 import PaymentMethod from "../components/PaymentPage/PaymentMethod"
-import Banner from "../components/UserProfilePage/Banner"
-import Footer from "../components/homePage/Footer"
+import Banner from "../components/HomePage/Banner"
+import Footer from "../components/HomePage/Footer"
 
 const PaymentPage = () => {
   return (

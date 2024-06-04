@@ -1,17 +1,16 @@
 
-import PetList from '../components/PetListPage/PetList'
 import Banner from '../components/HomePage/Banner'
+import Schedule from '../components/SchedulePage/Schedule'
 import Footer from '../components/HomePage/Footer'
 
-const PetListPage = () => {
-    
+const SchedulePage_Admin = () => {
   return (
     <div>
         <Banner/>
-        <PetList/>
+        <Schedule/>
         <Footer/>
     </div>
   )
 }
 
-export default PetListPage
+export default SchedulePage_Admin

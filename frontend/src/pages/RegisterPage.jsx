@@ -1,17 +1,16 @@
 
-import PetList from '../components/PetListPage/PetList'
+import RegisterForm from '../components/RegisterPage/RegisterForm'
 import Banner from '../components/HomePage/Banner'
 import Footer from '../components/HomePage/Footer'
 
-const PetListPage = () => {
-    
+const RegisterPage = () => {
   return (
     <div>
         <Banner/>
-        <PetList/>
+        <RegisterForm/>
         <Footer/>
     </div>
   )
 }
 
-export default PetListPage
+export default RegisterPage
