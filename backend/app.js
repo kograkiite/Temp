@@ -20,7 +20,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/', authRoutes);
+app.use('/api/auth', authRoutes);
 
 // Apply authMiddleware to protected routes
 app.use('/protected', authMiddleware);
