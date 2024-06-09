@@ -1,16 +1,30 @@
-import { useState } from 'react';
-import { Table, Input, Select, Button } from 'antd';
+import { useEffect, useState } from 'react';
+import { Table, Input, Select, Button, message } from 'antd';
+import axios from 'axios';
 const { Option } = Select;
 
 const AccountList = () => {
-    const [accounts, setAccounts] = useState([
-        { id: 1, fullname: 'John Doe', email: 'john@example.com', phone_number: '123456789', address: '123 Street, City', role: 'Administrator' },
-        { id: 2, fullname: 'Jane Smith', email: 'jane@example.com', phone_number: '987654321', address: '456 Avenue, Town', role: 'Customer' },
-        // Add more sample data here
-    ]);
     const [editingId, setEditingId] = useState(null);
     const [editedUser, setEditedUser] = useState(null);
-    const roles = ['Customer', 'Sale Staff', 'Caretaker Staff', 'Store Manager', 'Administrator'];
+    const [roles] = useState(['Customer', 'Sale Staff', 'Caretaker Staff', 'Store Manager', 'Administrator']);
+    const [accounts, setAccounts] = useState([]);
+
+    useEffect(() => {
+        const fetchAccounts = async () => {
+            try {
+                const response = await axios.get('http://localhost:3001/api/accounts/all', {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                });
+                setAccounts(response.data.accounts);
+            } catch (error) {
+                console.error('Error fetching accounts:', error);
+            }
+        };
+
+        fetchAccounts();
+    }, []);
 
     const handleCancel = () => {
         setEditingId(null);
@@ -23,22 +37,34 @@ const AccountList = () => {
         setEditedUser(userToEdit);
     };
 
-    const handleSaveUser = () => {
+    const handleSaveUser = async () => {
         // Validation to ensure no fields are empty
-        if (!editedUser.fullname || !editedUser.email || !editedUser.phone_number || !editedUser.address || !editedUser.role) {
+        if (!editedUser.fullname || !editedUser.email || !editedUser.phone || !editedUser.address || !editedUser.role) {
             alert('All fields are required');
             return;
         }
 
-        const updatedUsers = accounts.map(user => {
-            if (user.id === editedUser.id) {
-                return editedUser;
-            }
-            return user;
-        });
-        setAccounts(updatedUsers);
-        setEditingId(null);
-        setEditedUser(null);
+        try {
+            const response = await axios.put(`http://localhost:3001/api/accounts/${editedUser.id}`, editedUser, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            // Assuming your API returns the updated user data, update the local state with it
+            const updatedUser = response.data.user;
+            const updatedUsers = accounts.map(user => {
+                if (user.id === updatedUser.id) {
+                    return updatedUser;
+                }
+                return user;
+            });
+            setAccounts(updatedUsers);
+            setEditingId(null);
+            setEditedUser(null);
+        } catch (error) {
+            console.error('Error updating user:', error);
+            message.error('Failed to update user. Please try again.');
+        }
     };
 
     const handleInputChange = (field, value) => {
@@ -78,13 +104,13 @@ const AccountList = () => {
         },
         {
             title: 'Số Điện Thoại',
-            dataIndex: 'phone_number',
-            key: 'phone_number',
+            dataIndex: 'phone',
+            key: 'phone',
             render: (text, record) => (
                 editingId === record.id ? (
                     <Input
-                        value={editedUser.phone_number}
-                        onChange={(e) => handleInputChange('phone_number', e.target.value)}
+                        value={editedUser.phone}
+                        onChange={(e) => handleInputChange('phone', e.target.value)}
                     />
                 ) : (
                     text
@@ -133,7 +159,7 @@ const AccountList = () => {
             render: (text, record) => (
                 editingId === record.id ? (
                     <>
-                         <div className="flex space-x-2">
+                        <div className="flex space-x-2">
                             <Button type="primary" onClick={handleSaveUser}>Lưu</Button>
                             <Button onClick={handleCancel}>Hủy</Button>
                         </div>
@@ -146,7 +172,7 @@ const AccountList = () => {
     ];
 
     return (
-        <div className="account-list p-40 overflow-x-auto">
+        <div className="account-list p-4 md:p-10 overflow-x-auto">
             <h2 className="text-5xl text-center text-red-500 font-semibold mb-4">Danh sách người dùng</h2>
             <div className="max-w-full overflow-x-auto">
                 <Table dataSource={accounts} columns={columns} rowKey="id" />
