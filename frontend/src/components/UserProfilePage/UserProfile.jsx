@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout, Menu, Typography, Button, Form, Input, message, Grid } from 'antd';
 import {
@@ -23,9 +23,15 @@ const UserProfile = () => {
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
-    setUser(storedUser);
-    setFormData({ ...storedUser });
+    if (!storedUser) {
+      navigate('/');
+    } else {
+      setUser(storedUser);
+      setFormData({ ...storedUser });
+    }
   }, []);
+  
+  
   console.log(user)
   const handleUpdateInfo = () => {
     setIsEditMode(true);

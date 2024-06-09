@@ -44,7 +44,7 @@ const Banner = () => {
     localStorage.clear();
     setRole('guest');
     setUser(null);
-    window.location.reload();
+    navigate('/')
   };
 
   const userMenuItems = [

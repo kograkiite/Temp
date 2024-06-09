@@ -1,73 +1,92 @@
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 const Account = require('../models/Account');
-const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h';
 const EMAIL_USERNAME = process.env.EMAIL_USERNAME;
 const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
+let otps = {};
 
-// Generate a random alphanumeric accountID
-const generateAccountID = () => {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const length = 6;
-  let accountID = '';
-  for (let i = 0; i < length; i++) {
-    accountID += characters.charAt(Math.floor(Math.random() * characters.length));
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const account = await Account.findOne({ email }); 
+    if (account) {
+      const isMatch = await bcrypt.compare(password, account.password);
+      if (isMatch) {
+        // Create JWT token with unique payload
+        const token = jwt.sign(
+          { 
+            id: account._id, 
+            email: account.email, 
+            fullname: account.fullname, 
+            role: account.role,
+            phone: account.phone,
+            address: account.address 
+          },
+          JWT_SECRET,
+          { expiresIn: JWT_EXPIRES_IN }
+        );
+        return res.json({ 
+          message: 'Login successful', 
+          user: { 
+            id: account._id, 
+            email: account.email, 
+            role: account.role, 
+            fullname: account.fullname,
+            phone: account.phone, // Include phone
+            address: account.address // Include address
+          }, 
+          token 
+        });
+      } else {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+    } else {
+      return res.status(401).json({ message: 'Cannot find account' });
+    }
+  } catch (error) {
+    console.error('Error during login:', error);
+    return res.status(500).json({ message: 'Internal server error' });
   }
-  return accountID;
 };
 
-// Register API
-const bcrypt = require('bcrypt');
-
-exports.register = async (req, res) => {
-  const { fullname, email, password, phone, address } = req.body;
+const generateAccountID = async () => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
-    const existingAccount = await Account.findOne({ email });
-    if (existingAccount) {
-      return res.status(400).json({ message: 'Email đã tồn tại!' });
+    // Tìm kiếm tài khoản cuối cùng dựa trên account_id
+    const lastAccount = await Account.findOne({}, { account_id: 1 }).sort({ account_id: -1 }).session(session).exec();
+    let lastId = 0;
+
+    if (lastAccount && lastAccount.account_id) {
+      const idPart = lastAccount.account_id.substring(1);
+      if (/^\d+$/.test(idPart)) {
+        lastId = parseInt(idPart);
+      } else {
+        console.error(`Invalid account_id format found: ${lastAccount.account_id}`);
+        throw new Error('Invalid last account ID format');
+      }
     }
 
-    // Generate accountID
-    const accountID = generateAccountID();
+    const newId = lastId + 1;
+    const newAccountId = `A${newId.toString().padStart(3, '0')}`;
 
-    // Mã hóa mật khẩu trước khi lưu
-    const hashedPassword = await bcrypt.hash(password, 10);
+    await session.commitTransaction();
+    return newAccountId;
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
+  }
+};
 
-    const newAccount = new Account({ 
-      account_id: accountID,
-      fullname: fullname, 
-      email: email,
-      password: hashedPassword, // Lưu mật khẩu đã mã hóa
-      phone: phone, 
-      address: address,
-      status: 1, 
-      role: 'customer' 
-    });
-    await newAccount.save();
 
-    res.json({ message: 'Đăng ký thành công!', 
-               user: { accountID: newAccount.account_id, 
-                       fullname: newAccount.fullname, 
-                       email: newAccount.email, phone: 
-                       newAccount.phone, address: 
-                       newAccount.address } });
-
-    // Tạo nội dung email
-    const mailOptions = {
-      from: '"PetService" <petservicesswp391@gmail.com>',
-      to: email,
-      subject: "Chào mừng đến với PetService!",
-      html: `<p>Chào bạn ${fullname},</p>
-             <p>Cảm ơn bạn đã đăng ký tài khoản tại PetService. Chúng tôi rất vui mừng chào đón bạn đến với cộng đồng yêu thú cưng của chúng tôi.</p>
-             <p>Hãy truy cập vào tài khoản của bạn để khám phá nhiều dịch vụ và thông tin hữu ích dành cho thú cưng của bạn.</p>
-             <p>Chúc bạn có những trải nghiệm tuyệt vời tại PetService!</p>
-             <p>Thân ái,</p>
-             <p>Đội ngũ PetService</p>`,
-    };
-
-    // Gửi email
+    // Setup email transporter
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       secure: false,
@@ -78,58 +97,90 @@ exports.register = async (req, res) => {
       },
     });
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error('Error sending email:', error);
-        return res.status(500).json({ message: 'Lỗi khi gửi email' });
-      }
-      console.log('Email sent:', info.response);
-      res.json({ message: 'Email gửi thành công' });
+// Register API
+exports.register = async (req, res) => {
+  const { fullname, email, password, phone, address } = req.body;
+  try {
+    const existingAccount = await Account.findOne({ email });
+    if (existingAccount) {
+      return res.status(400).json({ message: 'Email đã tồn tại!' });
+    }
+    // Generate accountID
+    const accountID = await generateAccountID();
+    // encrypt password before saving
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newAccount = new Account({ 
+      account_id: accountID,
+      fullname: fullname, 
+      email: email,
+      password: hashedPassword, // save encrypted password
+      phone: phone, 
+      address: address,
+      status: 1, 
+      role: 'customer' 
     });
+    await newAccount.save();
+
+    res.json({ message: 'Registration successful', user: { accountID: newAccount.account_id, fullname: newAccount.fullname, email: newAccount.email, phone: newAccount.phone, address: newAccount.address } });
+       // Tạo nội dung email
+       const mailOptions = {
+        from: '"PetService" <petservicesswp391@gmail.com>',
+        to: email,
+        subject: "Chào mừng đến với PetService!",
+        html: `<p>Chào bạn ${fullname},</p>
+               <p>Cảm ơn bạn đã đăng ký tài khoản tại PetService. Chúng tôi rất vui mừng chào đón bạn đến với cộng đồng yêu thú cưng của chúng tôi.</p>
+               <p>Hãy truy cập vào tài khoản của bạn để khám phá nhiều dịch vụ và thông tin hữu ích dành cho thú cưng của bạn.</p>
+               <p>Chúc bạn có những trải nghiệm tuyệt vời tại PetService!</p>
+               <p>Thân ái,</p>
+               <p>Đội ngũ PetService</p>`,
+      };
+  
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error('Error sending email:', error);
+          return res.status(500).json({ message: 'Error sending email' });
+        }
+        console.log('Email sent:', info.response);
+        res.json({ message: 'Email sent successfully' });
+      });
   } catch (error) {
     console.error('Error during registration:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
 
-exports.login = async (req, res) => {
-  const { email, password } = req.body;
+
+//change password api
+exports.changePassword = async (req, res) => {
+const {  currentPassword, newPassword } = req.body; 
+  const account_id = req.user.id; // get id from token stored in localStorage
   try {
-    // Tìm tài khoản bằng email
-    const account = await Account.findOne({ email });
+    // Find account by _id
+    const account = await Account.findById(account_id);
     if (!account) {
-      return res.status(401).json({ message: 'Email không tồn tại!' });
+      console.log('User not found');
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    // So sánh mật khẩu sử dụng bcrypt
-    const isMatch = await bcrypt.compare(password, account.password);
+    // Compare current password with the hashed password in the database
+    const isMatch = await bcrypt.compare(currentPassword, account.password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Email hoặc mật khẩu không chính xác!' });
+      console.log('Incorrect current password');
+      return res.status(400).json({ message: 'Incorrect current password' });
     }
 
-    // Tạo JWT token với thông tin payload độc nhất
-    const token = jwt.sign(
-      { id: account._id, email: account.email, role: account.role },
-      JWT_SECRET,
-      { expiresIn: JWT_EXPIRES_IN }
-    );
-    res.json({
-      message: 'Đăng nhập thành công!',
-      user: { 
-        account_id: account.account_id, 
-        email: account.email, 
-        role: account.role,
-        fullname: account.fullname,
-        phone: account.phone,
-        address: account.address
-      },
-      token
-    });
+    // Hash the new password before saving it
+    account.password = await bcrypt.hash(newPassword, 10);
+    await account.save();
+
+    console.log('Password changed successfully');
+    res.json({ message: 'Password changed successfully' });
   } catch (error) {
-    console.error('Error during login:', error);
+    console.error('Error changing password:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 
 //ForgotPassword API
 exports.forgotPassword = async (req, res) => {
@@ -137,7 +188,7 @@ exports.forgotPassword = async (req, res) => {
   try {
     const account = await Account.findOne({ email });
     if (!account) {
-      return res.status(404).json({ message: 'Email không tồn tại!' });
+      return res.status(404).json({ message: 'Email doesnt exist' });
     }
     
     const secret = JWT_SECRET + account.password;
@@ -148,13 +199,15 @@ exports.forgotPassword = async (req, res) => {
     
     // Tạo nội dung email
     const mailOptions = {
-      from: '"PetService" <petservicesswp391@gmail.com>',
+      from: `"PetService" <${EMAIL_USERNAME}>`,
       to: email,
-      subject: "Reset Password",
-      html: `<p>Chào bạn,</p>
-             <p>Vui lòng nhấp vào <a href="${resetLink}">đây</a> để đặt lại mật khẩu của bạn.</p>
-             <p>Liên kết sẽ hết hạn sau 5 phút.</p>`,
-    };
+      subject: "🔒 Yêu Cầu Đặt Lại Mật Khẩu",
+      html: `<p>Chào Bạn Yêu Thú Cưng,</p>
+             <p>Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu của bạn.</p>
+             <p>Vui lòng nhấp vào <a href="${resetLink}">đây</a> để đặt lại mật khẩu của bạn. Lưu ý rằng liên kết này sẽ hết hạn sau 5 phút vì lý do bảo mật.</p>
+             <p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.</p>
+             <p>Trân trọng,<br>Đội Ngũ PetService</p>`,
+  };
 
     // Gửi email
     const transporter = nodemailer.createTransport({
@@ -170,14 +223,14 @@ exports.forgotPassword = async (req, res) => {
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error('Error sending email:', error);
-        return res.status(500).json({ message: 'Lỗi khi gửi email' });
+        return res.status(500).json({ message: 'Errors when sending emails' });
       }
       console.log('Email sent:', info.response);
-      res.json({ message: 'Email gửi thành công' });
+      res.json({ message: 'Email sent successfully' });
     });
   } catch (error) {
     console.error('Error during password reset:', error);
-    res.status(500).json({ message: 'Lỗi server' });
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
@@ -190,14 +243,14 @@ exports.resetPassword = async (req, res) => {
     // Fetch the user's account from the database
     const account = await Account.findOne({ account_id: accountId });
     if (!account) {
-      return res.status(404).json({ message: 'Tài khoản không tồn tại!' });
+      return res.status(404).json({ message: 'Account doesnt exist!' });
     }
 
     // Verify the reset token
     const secret = JWT_SECRET + account.password;
     jwt.verify(token, secret, async (err, decoded) => {
       if (err) {
-        return res.status(400).json({ message: 'Token không hợp lệ hoặc đã hết hạn!' });
+        return res.status(400).json({ message: 'Invalid or expired tokens!' });
       }
 
       // Hash the new password
@@ -208,45 +261,13 @@ exports.resetPassword = async (req, res) => {
       await account.save();
 
       // Respond with success message
-      res.json({ message: 'Mật khẩu đã được đặt lại thành công!' });
+      res.json({ message: 'The password has been reset successfully!' });
     });
   } catch (error) {
     console.error('Error during password reset:', error);
-    res.status(500).json({ message: 'Lỗi server' });
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
-
-
-//ChangePassword API
-module.exports.changePassword = async (req, res) => {
-  const { currentPassword, newPassword } = req.body;
-  const account_id = req.user.id; // Get account_id from decoded token
-
-  try {
-    const account = await Account.findById(account_id);
-
-    if (!account) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    // So sánh mật khẩu hiện tại bằng cách sử dụng bcrypt
-    const isMatch = await bcrypt.compare(currentPassword, account.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Incorrect current password' });
-    }
-
-    // Mã hóa mật khẩu mới trước khi lưu
-    account.password = await bcrypt.hash(newPassword, 10);
-
-    await account.save();
-
-    res.json({ message: 'Password changed successfully' });
-  } catch (error) {
-    console.error('Error changing password:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
-
 
 exports.logout = (req, res) => {
   // When logout, clear the token in the client side

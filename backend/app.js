@@ -4,7 +4,11 @@ const path = require('path');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const errorMiddleware = require('./middlewares/errorMiddleware');
-const authMiddleware = require('./middlewares/authMiddleware'); 
+const {authMiddleware} = require('./middlewares/authMiddleware'); 
+const productRoutes = require('./routes/productRoutes');
+const accountRoutes = require('./routes/accountRoutes');
+const scheduleRoutes = require('./routes/scheduleRoutes');
+
 
 const dotenv = require('dotenv');
 
@@ -22,6 +26,18 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 
+// Product Routes
+app.use('/api/products', productRoutes);
+
+// Product Routes
+app.use('/api/accounts', accountRoutes); ;
+
+// Account Routes
+app.use('/api/accounts', accountRoutes);
+
+// Work Schedule Routes
+app.use('/api/schedules', scheduleRoutes);
+
 // Apply authMiddleware to protected routes
 app.use('/protected', authMiddleware);
 
@@ -30,11 +46,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Catch-all handler for any request that doesn't match an API route
 app.get('*', (req, res) => {
-  res.redirect('/'); // Redirect to main.jsx
+  if (!req.url.startsWith('/api')) {
+    res.redirect('/main.jsx'); // Redirect to main.jsx
+  }
 });
 
 // Error handling middleware
 app.use(errorMiddleware); // Apply errorMiddleware
+
 
 const PORT = process.env.PORT;
 
