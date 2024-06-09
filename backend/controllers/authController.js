@@ -20,7 +20,7 @@ exports.login = async (req, res) => {
         // Create JWT token with unique payload
         const token = jwt.sign(
           { 
-            id: account._id, 
+            id: account.account_id, 
             email: account.email, 
             fullname: account.fullname, 
             role: account.role,
@@ -33,7 +33,7 @@ exports.login = async (req, res) => {
         return res.json({ 
           message: 'Login successful', 
           user: { 
-            id: account._id, 
+            id: account.account_id, 
             email: account.email, 
             role: account.role, 
             fullname: account.fullname,

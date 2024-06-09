@@ -80,56 +80,57 @@ exports.getAccountByRole = async (req, res) => {
 
 
   // Update Account API 
-exports.updateAccount = async (req, res) => {
-    const accountId = req.user.id; // user's account ID is stored in the request
-    const updates = req.body; 
+// exports.updateAccount = async (req, res) => {
+//     const accountId = req.user.id; // user's account ID is stored in the request
+//     const updates = req.body; 
   
-    try {
-      // Find the account by ID
-      const account = await Account.findById(accountId);
+//     try {
+//       // Find the account by ID
+//       const account = await Account.findById(accountId);
   
-      if (!account) {
-        return res.status(404).json({ message: 'Invalid Account' });
-      }
+//       if (!account) {
+//         return res.status(404).json({ message: 'Invalid Account' });
+//       }
   
-      // Apply updates to the account object
-      Object.keys(updates).forEach((key) => {
-        account[key] = updates[key];
-      });
+//       // Apply updates to the account object
+//       Object.keys(updates).forEach((key) => {
+//         account[key] = updates[key];
+//       });
   
-      // Save the updated account
-      await account.save();
+//       // Save the updated account
+//       await account.save();
   
-      res.json({ message: 'Update account successfully', user: account });
-    } catch (error) {
-      console.error('Error while updating account', error);
-      res.status(500).json({ message: 'Internal Server Error' });
-    }
-  };
+//       res.json({ message: 'Update account successfully', user: account });
+//     } catch (error) {
+//       console.error('Error while updating account', error);
+//       res.status(500).json({ message: 'Internal Server Error' });
+//     }
+//   };
 
   // Update an account by ID (admin)
-exports.updateAccountById = async (req, res) => {
-    const accountId = req.params.id;
+  exports.updateAccountById = async (req, res) => {
+    const accountId = req.params.id;  // This should be account_id, not the MongoDB _id
     const updates = req.body;
-  
+
     try {
-      const account = await Account.findById(accountId);
-  
+      const account = await Account.findOne({ account_id: accountId });
+
       if (!account) {
         return res.status(404).json({ message: 'Account not found!' });
       }
-  
+
       // Update account properties
       Object.assign(account, updates);
-  
+
       await account.save();
-  
+
       res.json({ message: 'Account updated successfully', account });
-    } catch (error) {
-      console.error('Error updating account:', error);
-      res.status(500).json({ message: 'Internal server error' });
-    }
-  };
+      } catch (error) {
+        console.error('Error updating account:', error);
+        res.status(500).json({ message: 'Internal server error' });
+      }
+    };
+
 
   
   // Delete Account API (admin)
