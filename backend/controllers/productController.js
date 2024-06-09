@@ -21,43 +21,18 @@ const generateProductId = async () => {
 };
 
 
-//Create product (manager only)
-exports.createProduct = async (req, res) => {
-  try {
-    const { productName, price, petTypeId, description, imageURL } = req.body;
-
-    // Kiểm tra các trường bắt buộc
-    if (!productName || !price || !petTypeId || !description || !imageURL) {
-      return res.status(400).json({ message: 'Missing required fields' });
+  //Create product (manager only)
+  exports.createProduct = async (req, res) => {
+    try {
+        const productId = await generateProductId(); // Generate a new ProductID
+        const { productName, price, petTypeId, description, imageURL } = req.body;
+        const product = new Product({ ProductID: productId, ProductName: productName, Price: price, PetTypeId: petTypeId, Description: description, ImageURL: imageURL });
+        await product.save();
+        res.status(201).json(product);
+    } catch (error) {
+        res.status(500).json({ message: 'Error creating product', error });
     }
-
-    // Chuyển đổi Price sang kiểu số
-    const parsedPrice = parseFloat(price);
-    if (isNaN(parsedPrice)) {
-      return res.status(400).json({ message: 'Invalid price format' });
-    }
-
-    // Tạo mới sản phẩm
-    const productId = await generateProductId(); // Generate a new ProductID
-    const product = new Product({
-      ProductID: productId,
-      ProductName: productName,
-      Price: parsedPrice,
-      PetTypeId: petTypeId,
-      Description: description,
-      ImageURL: imageURL
-    });
-
-    // Lưu sản phẩm vào cơ sở dữ liệu
-    await product.save();
-
-    // Trả về thông báo thành công
-    res.status(201).json(product);
-  } catch (error) {
-    console.error('Error creating product:', error);
-    res.status(500).json({ message: 'Error creating product', error });
-  }
-};
+  };
 
 
 //Get all product

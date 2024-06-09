@@ -60,40 +60,39 @@ const ProductDetail = () => {
     };
 
     const handleSaveEdit = async (id) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        message.error('Authorization token not found. Please log in.');
-        return;
-      }
-  
-      const values = await form.validateFields(); // Validate form fields
-      const updatedProduct = {
-        ProductName: values.ProductName,
-        Price: parseFloat(values.Price),
-        Description: values.Description,
-        ImageURL: values.ImageURL
-      };
-  
-      await axios.patch(`http://localhost:3001/api/products/${id}`, updatedProduct, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-  
-      message.success('Product updated successfully', 0.5).then(() => {
-        window.location.reload(); // Reload the page after successful update
-      });
-    } catch (error) {
-      console.error('Error updating product:', error);
-      if (error.response && error.response.status === 401) {
-        message.error('Unauthorized. Please log in.');
-      } else {
-        message.error('Error updating product');
-      }
-    }
-  };
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                message.error('Authorization token not found. Please log in.');
+                return;
+            }
     
+            const values = await form.validateFields(); // Validate form fields
+            const updatedProduct = {
+                ProductName: values.ProductName,
+                Price: parseFloat(values.Price),
+                Description: values.Description,
+                ImageURL: values.ImageURL
+            };
+    
+            await axios.patch(`http://localhost:3001/api/products/${id}`, updatedProduct, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+    
+            message.success('Product updated successfully', 0.5).then(() => {
+                window.location.reload(); // Reload the page after successful update
+            });
+        } catch (error) {
+            console.error('Error updating product:', error);
+            if (error.response && error.response.status === 401) {
+                message.error('Unauthorized. Please log in.');
+            } else {
+                message.error('Error updating product');
+            }
+        }
+    };
 
     const handleDeleteProduct = () => {
         Modal.confirm({
@@ -185,7 +184,7 @@ const ProductDetail = () => {
                     ) : userRole === 'manager' ? (
                         editMode ? (
                             <div className="flex space-x-4 justify-end">
-                                <Button type="primary" onClick={handleSaveEdit}>Lưu</Button>
+                                <Button type="primary" onClick={() => handleSaveEdit(id)}>Lưu</Button>
                                 <Button onClick={handleCancelEdit}>Hủy</Button>
                             </div>
                         ) : (

@@ -65,7 +65,7 @@ const ProductList = () => {
         Description: values.Description,
         ImageURL: values.ImageURL
       };
-  
+      console.log(updatedProduct)
       await axios.patch(`http://localhost:3001/api/products/${id}`, updatedProduct, {
         headers: {
           'Authorization': `Bearer ${token}`,
