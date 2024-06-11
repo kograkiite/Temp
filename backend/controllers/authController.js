@@ -10,38 +10,24 @@ const EMAIL_USERNAME = process.env.EMAIL_USERNAME;
 const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
 let otps = {};
 
+// Login api to authenticate the user and provide a JWT token
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   try {
     const account = await Account.findOne({ email }); 
     if (account) {
+      if (account.status === 0) {
+        return res.status(403).json({ message: 'Account is locked' });
+      }
       const isMatch = await bcrypt.compare(password, account.password);
       if (isMatch) {
         // Create JWT token with unique payload
         const token = jwt.sign(
-          { 
-            id: account.account_id, 
-            email: account.email, 
-            fullname: account.fullname, 
-            role: account.role,
-            phone: account.phone,
-            address: account.address 
-          },
+          { id: account.account_id, email: account.email, fullname: account.fullname, role: account.role },
           JWT_SECRET,
           { expiresIn: JWT_EXPIRES_IN }
         );
-        return res.json({ 
-          message: 'Login successful', 
-          user: { 
-            id: account.account_id, 
-            email: account.email, 
-            role: account.role, 
-            fullname: account.fullname,
-            phone: account.phone, // Include phone
-            address: account.address // Include address
-          }, 
-          token 
-        });
+        return res.json({ message: 'Login successful', user: { id: account.account_id, email: account.email, role: account.role, fullname: account.fullname, phone: account.phone, address: account.address }, token });
       } else {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
@@ -117,7 +103,7 @@ exports.register = async (req, res) => {
       phone: phone, 
       address: address,
       status: 1, 
-      role: 'customer' 
+      role: 'Customer' 
     });
     await newAccount.save();
 

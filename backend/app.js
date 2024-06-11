@@ -8,7 +8,8 @@ const {authMiddleware} = require('./middlewares/authMiddleware');
 const productRoutes = require('./routes/productRoutes');
 const accountRoutes = require('./routes/accountRoutes');
 const scheduleRoutes = require('./routes/scheduleRoutes');
-
+const petRoutes = require('./routes/petRoutes'); 
+const serviceRoutes = require('./routes/serviceRoutes'); 
 
 const dotenv = require('dotenv');
 
@@ -29,11 +30,14 @@ app.use('/api/auth', authRoutes);
 // Product Routes
 app.use('/api/products', productRoutes);
 
-// Product Routes
-app.use('/api/accounts', accountRoutes); ;
-
 // Account Routes
 app.use('/api/accounts', accountRoutes);
+
+// Use pet routes
+app.use('/api/pets', petRoutes); 
+
+// Use service routes
+app.use('/api/services', serviceRoutes); 
 
 // Work Schedule Routes
 app.use('/api/schedules', scheduleRoutes);

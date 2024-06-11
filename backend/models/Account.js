@@ -7,7 +7,7 @@ const accountSchema = new mongoose.Schema({
   address: { type: String, required: true },
   email: { type: String, required: true },
   phone: { type: String, required: true },
-  status: { type: Number, required: true },
+  status: { type: Number, required: true, default: 1 },
   role: { type: String, required: true }
 }, { versionKey: false });
 

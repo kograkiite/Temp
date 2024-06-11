@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Table, Typography, Button, Input, Form, message, Select } from 'antd';
+import { Table, Typography, Button, Input, Form, message, Select, Modal, Skeleton } from 'antd';
 import axios from 'axios';
 
 const { Title } = Typography;
@@ -10,6 +10,7 @@ const AccountList = () => {
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(null); // null: view mode, id: edit mode
   const [form] = Form.useForm();
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -40,11 +41,13 @@ const AccountList = () => {
       address: record.address,
       role: record.role
     });
+    setIsModalVisible(true);
   };
 
   const handleCancelEdit = () => {
     setEditMode(null);
     form.resetFields();
+    setIsModalVisible(false);
   };
 
   const handleSaveEdit = async (id) => {
@@ -61,7 +64,8 @@ const AccountList = () => {
         email: values.email,
         phone: values.phone,
         address: values.address,
-        role: values.role
+        role: values.role,
+        status: values.status
       };
 
       await axios.patch(`http://localhost:3001/api/accounts/${id}`, updatedAccount, {
@@ -88,111 +92,46 @@ const AccountList = () => {
       title: 'Fullname',
       dataIndex: 'fullname',
       key: 'fullname',
-      render: (text, record) => (
-        editMode === record.account_id ? (
-          <Form.Item
-            name="fullname"
-            rules={[{ required: true, message: 'Please enter the fullname!' }]}
-          >
-            <Input placeholder="Fullname" />
-          </Form.Item>
-        ) : (
-          text
-        )
-      ),
     },
     {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
-      render: (text, record) => (
-        editMode === record.account_id ? (
-          <Form.Item
-            name="email"
-            rules={[{ required: true, message: 'Please enter the email!' }]}
-          >
-            <Input placeholder="Email" />
-          </Form.Item>
-        ) : (
-          text
-        )
-      ),
     },
     {
       title: 'Phone',
       dataIndex: 'phone',
       key: 'phone',
-      render: (text, record) => (
-        editMode === record.account_id ? (
-          <Form.Item
-            name="phone"
-            rules={[{ required: true, message: 'Please enter the phone!' }]}
-          >
-            <Input placeholder="Phone" />
-          </Form.Item>
-        ) : (
-          text
-        )
-      ),
     },
     {
       title: 'Address',
       dataIndex: 'address',
       key: 'address',
-      render: (text, record) => (
-        editMode === record.account_id ? (
-          <Form.Item
-            name="address"
-            rules={[{ required: true, message: 'Please enter the address!' }]}
-          >
-            <Input placeholder="Address" />
-          </Form.Item>
-        ) : (
-          text
-        )
-      ),
     },
     {
       title: 'Role',
       dataIndex: 'role',
       key: 'role',
-      render: (text, record) => (
-        editMode === record.account_id ? (
-          <Form.Item
-            name="role"
-            rules={[{ required: true, message: 'Please select the role!' }]}
-            className='w-52'
-          >
-            <Select placeholder="Select Role">
-              <Option value="">Select Role</Option>
-              <Option value="Customer">Customer</Option>
-              <Option value="Sale Staff">Sale Staff</Option>
-              <Option value="Caretaker Staff">Caretaker Staff</Option>
-              <Option value="Store Manager">Store Manager</Option>
-              <Option value="Administrator">Administrator</Option>
-            </Select>
-          </Form.Item>
-        ) : (
-          text
-        )
-      ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => (
+        <span style={{ color: status === 1 ? 'green' : 'red' }}>
+          {status === 1 ? 'Active' : 'Inactive'}
+        </span>
+      ), // Hiển thị giá trị 'Active' hoặc 'Inactive'
     },
     {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
         // Check if the role is "Administrator" and disable the edit button accordingly
-        record.role === 'admin' ? (
+        record.role === 'Administrator' ? (
           <Button type="primary" disabled>Edit</Button>
         ) : (
-          editMode === record.account_id ? (
-            <div>
-              <Button type="primary" onClick={() => handleSaveEdit(record.account_id)} style={{ marginRight: '8px' }}>Save</Button>
-              <Button onClick={handleCancelEdit}>Cancel</Button>
-            </div>
-          ) : (
-            <Button type="primary" onClick={() => handleEditClick(record)}>Edit</Button>
-          )
+          <Button type="primary" onClick={() => handleEditClick(record)}>Edit</Button>
         )
       ),
     },
@@ -203,15 +142,78 @@ const AccountList = () => {
       <Title level={2}>Account List</Title>
       <Form form={form}>
         <Table
-          dataSource={accountData}
+          dataSource={loading ? [] : accountData}
           columns={columns}
           rowKey="account_id"
           pagination={false}
           loading={loading}
         />
+        {loading && <Skeleton active />}
       </Form>
+
+      <Modal
+        title="Edit Account"
+        visible={isModalVisible}
+        onCancel={handleCancelEdit}
+        footer={[
+          <Button key="cancel" onClick={handleCancelEdit}>Cancel</Button>,
+          <Button key="submit" type="primary" onClick={() => handleSaveEdit(editMode)}>Save</Button>,
+        ]}
+      >
+        <Form form={form}>
+          {/* Các trường dữ liệu */}
+          <Form.Item
+            name="fullname"
+            rules={[{ required: true, message: 'Please enter the fullname!' }]}
+          >
+            <Input placeholder="Fullname" />
+          </Form.Item>
+          <Form.Item
+            name="email"
+            rules={[{ required: true, message: 'Please enter the email!' }]}
+          >
+            <Input placeholder="Email" />
+          </Form.Item>
+          <Form.Item
+            name="phone"
+            rules={[{ required: true, message: 'Please enter the phone!' }]}
+          >
+            <Input placeholder="Phone" />
+          </Form.Item>
+          <Form.Item
+            name="address"
+            rules={[{ required: true, message: 'Please enter the address!' }]}
+          >
+            <Input placeholder="Address" />
+          </Form.Item>
+          <Form.Item
+            name="role"
+            rules={[{ required: true, message: 'Please select the role!' }]}
+          >
+            <Select placeholder="Select Role">
+              {/* Tùy chọn cho vai trò */}
+              <Option value="Customer">Customer</Option>
+              <Option value="Sale Staff">Sale Staff</Option>
+              <Option value="Caretaker Staff">Caretaker Staff</Option>
+              <Option value="Store Manager">Store Manager</Option>
+              <Option value="Administrator">Administrator</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="status"
+            rules={[{ required: true, message: 'Please select the status!' }]}
+          >
+            <Select placeholder="Select Status">
+              {/* Tùy chọn cho trạng thái */}
+              <Option value={1}>Active</Option>
+              <Option value={0}>Inactive</Option>
+            </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };
 
 export default AccountList;
+

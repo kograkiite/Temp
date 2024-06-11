@@ -4,36 +4,37 @@ const mongoose = require('mongoose');
 
 //Generate a new product ID
 const generateProductId = async () => {
-  try {
-    const lastProduct = await Product.findOne().sort({ ProductID: -1 });
+  const lastProduct = await Product.findOne().sort({ ProductID: -1 });
 
-    if (lastProduct && lastProduct.ProductID) {
+  if (lastProduct && lastProduct.ProductID) {
       const lastProductId = parseInt(lastProduct.ProductID.slice(1)); // Extract numeric part of the last ProductID
       const newProductId = `P${("000" + (lastProductId + 1)).slice(-3)}`; // Increment the numeric part and format it to 3 digits
       return newProductId;
-    } else {
+  } else {
       return 'P001'; // Starting ID if there are no products
-    }
-  } catch (error) {
-    console.error('Error generating product ID:', error);
-    throw error; // Throw error to be caught by the calling function
   }
 };
 
-
-  //Create product (manager only)
-  exports.createProduct = async (req, res) => {
-    try {
-        const productId = await generateProductId(); // Generate a new ProductID
-        const { productName, price, petTypeId, description, imageURL } = req.body;
-        const product = new Product({ ProductID: productId, ProductName: productName, Price: price, PetTypeId: petTypeId, Description: description, ImageURL: imageURL });
-        await product.save();
-        res.status(201).json(product);
-    } catch (error) {
-        res.status(500).json({ message: 'Error creating product', error });
-    }
-  };
-
+// Create product (manager only)
+exports.createProduct = async (req, res) => {
+  try {
+      const productId = await generateProductId(); // Generate a new ProductID
+      const { productName, price, petTypeId, description, imageURL, status } = req.body;
+      const product = new Product({
+        ProductID: productId,
+        ProductName: productName,
+        Price: price,
+        PetTypeId: petTypeId,
+        Description: description,
+        ImageURL: imageURL,
+        Status: status
+      });
+      await product.save();
+      res.status(201).json(product);
+  } catch (error) {
+      res.status(500).json({ message: 'Error creating product', error });
+  }
+};
 
 //Get all product
   exports.getProducts = async (req, res) => {

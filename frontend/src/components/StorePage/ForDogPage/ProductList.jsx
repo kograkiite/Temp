@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, message } from 'antd';
+import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, message, Select } from 'antd';
 import axios from 'axios';
 
+const { Option } = Select;
 const { Title } = Typography;
 
 const ProductList = () => {
   const [productData, setProductData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [userRole] = useState(localStorage.getItem('role') || 'guest');
+  const [userRole] = useState(localStorage.getItem('role') || 'Guest');
   const [petTypeId] = useState('PT001');
   const [editMode, setEditMode] = useState(null); // null: view mode, id: edit mode
   const [addMode, setAddMode] = useState(false); // false: view mode, true: add mode
@@ -41,7 +42,8 @@ const ProductList = () => {
       ProductName: record.ProductName,
       Price: record.Price,
       Description: record.Description,
-      ImageURL: record.ImageURL // Add ImageURL to form
+      ImageURL: record.ImageURL,
+      Status: record.Status
     });
   };
 
@@ -50,28 +52,29 @@ const ProductList = () => {
     form.resetFields();
   };
 
-  const handleSaveEdit = async (id) => {
+  const handleSaveEdit = async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         message.error('Authorization token not found. Please log in.');
         return;
       }
-  
+
       const values = await form.validateFields(); // Validate form fields
       const updatedProduct = {
         ProductName: values.ProductName,
         Price: parseFloat(values.Price),
         Description: values.Description,
-        ImageURL: values.ImageURL
+        ImageURL: values.ImageURL,
+        Status: values.Status
       };
-      console.log(updatedProduct)
-      await axios.patch(`http://localhost:3001/api/products/${id}`, updatedProduct, {
+
+      await axios.patch(`http://localhost:3001/api/products/${editMode}`, updatedProduct, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
-  
+
       message.success('Product updated successfully', 0.5).then(() => {
         window.location.reload(); // Reload the page after successful update
       });
@@ -83,40 +86,6 @@ const ProductList = () => {
         message.error('Error updating product');
       }
     }
-  };
-  
-
-  const handleDeleteClick = (id) => {
-    Modal.confirm({
-        title: 'Are you sure you want to delete this product?',
-        onOk: async () => {
-            try {
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    message.error('Authorization token not found. Please log in.');
-                    return;
-                }
-                
-                await axios.delete(`http://localhost:3001/api/products/${id}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    },
-                });
-
-                
-                message.success('Product deleted successfully', 0.5).then(() => {
-                  window.location.reload(); 
-                });
-            } catch (error) {
-                console.error('Error deleting product:', error);
-                if (error.response && error.response.status === 401) {
-                    message.error('Unauthorized. Please log in.');
-                } else {
-                    message.error('Error deleting product');
-                }
-            }
-        },
-    });
   };
 
   const handleAddClick = () => {
@@ -135,22 +104,23 @@ const ProductList = () => {
         message.error('Authorization token not found. Please log in.');
         return;
       }
-      
+
       const values = await form.validateFields(); // Validate form fields
       const newProduct = {
         productName: values.ProductName,
         price: parseFloat(values.Price),
         description: values.Description,
         imageURL: values.ImageURL,
-        petTypeId: petTypeId // Bổ sung petTypeId vào giá trị sản phẩm mới
+        petTypeId: petTypeId,
+        status: values.Status
       };
-      console.log(newProduct)
+
       const response = await axios.post(`http://localhost:3001/api/products`, newProduct, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
-  
+
       if (response.status === 201) {
         message.success('Product added successfully', 0.5).then(() => {
           window.location.reload();
@@ -169,105 +139,77 @@ const ProductList = () => {
       }
     }
   };
-  
 
   const columns = [
+    {
+      title: 'Product ID',
+      dataIndex: 'ProductID',
+      key: 'ProductID',
+      render: (text, record) => (
+        <div className='hover:text-sky-600 hover:cursor-pointer' onClick={() => handleProductClick(record.ProductID)}>
+          {text}
+        </div>
+      ),
+    },
     {
       title: 'Product Name',
       dataIndex: 'ProductName',
       key: 'ProductName',
       render: (text, record) => (
-        editMode === record.ProductID ? (
-          <Form.Item
-            name="ProductName"
-            rules={[{ required: true, message: 'Please enter the product name!' }]}
-          >
-            <Input placeholder="Product Name" />
-          </Form.Item>
-        ) : (
-          <div className='hover:text-sky-600 hover:cursor-pointer' onClick={() => handleProductClick(record.ProductID)}>
-            {text}
-          </div>
-        )
+        <div className='hover:text-sky-600 hover:cursor-pointer' onClick={() => handleProductClick(record.ProductID)}>
+          {text}
+        </div>
       ),
     },
     {
       title: 'Price',
       dataIndex: 'Price',
       key: 'Price',
-      render: (text, record) => (
-        editMode === record.ProductID ? (
-          <Form.Item
-            name="Price"
-            rules={[{ required: true, message: 'Please enter the product price!' }]}
-          >
-            <Input placeholder="Price" />
-          </Form.Item>
-        ) : (
-          <span>{typeof text === 'number' ? `$${text.toFixed(2)}` : '-'}</span>
-        )
+      render: (text) => (
+        <span>{typeof text === 'number' ? `$${text.toFixed(2)}` : '-'}</span>
       ),
-    },    
+    },
     {
       title: 'Description',
       dataIndex: 'Description',
       key: 'Description',
-      render: (text, record) => (
-        editMode === record.ProductID ? (
-          <Form.Item
-            name="Description"
-            rules={[{ required: true, message: 'Please enter the product description!' }]}
-          >
-            <Input placeholder="Description" />
-          </Form.Item>
-        ) : text
-      ),
     },
     {
       title: 'Image URL',
       dataIndex: 'ImageURL',
       key: 'ImageURL',
       render: (text, record) => (
-        editMode === record.ProductID ? (
-          <Form.Item
-            name="ImageURL"
-            rules={[{ required: true, message: 'Please upload the product image!' }]}
-          >
-            <Input placeholder="Image URL" />
-          </Form.Item>
-        ) : (
-          <>
-            <Image src={text} alt={record.ProductName} style={{ width: '50px', cursor: 'pointer' }} />
-          </>
-        )
+        <Image src={text} alt={record.ProductName} style={{ width: '50px', cursor: 'pointer' }} />
+      ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'Status',
+      key: 'Status',
+      render: (text) => (
+        <span style={{ color: text === 'Available' ? 'green' : text === 'Unavailable' ? 'red' : 'black' }}>
+          {text}
+        </span>
       ),
     },
     {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
-        userRole === 'manager' && (
-          editMode === record.ProductID ? (
-            <div>
-              <Button type="primary" onClick={() => handleSaveEdit(record.ProductID)} style={{ marginRight: '8px' }}>Save</Button>
-              <Button onClick={handleCancelEdit}>Cancel</Button>
-            </div>
-          ) : (
-            <div>
-              <Button type="primary" onClick={() => handleEditClick(record)} style={{ marginRight: '8px' }}>Edit</Button>
-              <Button danger onClick={() => handleDeleteClick(record.ProductID)}>Delete</Button>
-            </div>
-          )
+        userRole === 'Store Manager' && (
+          <div>
+            <Button type="primary" onClick={() => handleEditClick(record)} style={{ marginRight: '8px' }}>Edit</Button>
+          </div>
         )
       ),
     },
   ];
 
   return (
-    <div className="p-36">
-      <Title level={2}>Product List</Title>
+    <div className="p-24">
+      <Title level={1} className='text-center'>Product for dogs</Title>
       <Form form={form}>
-        {userRole === 'manager' ? (
+        {userRole === 'Store Manager' ? (
           <>
             <Table
               dataSource={productData}
@@ -277,7 +219,7 @@ const ProductList = () => {
               loading={loading}
             />
             <div style={{ textAlign: 'right', marginTop: '16px' }}>
-              <Button type="primary" onClick={handleAddClick}>Add Product</Button>
+              <Button type="primary" onClick={handleAddClick} disabled={loading}>Add Product</Button>
             </div>
           </>
         ) : (
@@ -294,12 +236,19 @@ const ProductList = () => {
                 <Card
                   key={product.ProductID}
                   hoverable
-                  style={{ width: 240, margin: '16px' }}
-                  cover={<img alt={product.ProductName} src={product.ImageURL} />}
+                  className="w-72 mx-4 my-6 bg-white rounded-lg shadow-md transition-transform transform-gpu hover:scale-105"
                   onClick={() => handleProductClick(product.ProductID)}
                 >
-                  <Card.Meta title={product.ProductName} description={`$${product.Price.toFixed(2)}`} />
-                  <p>{product.Description}</p>
+                  <img 
+                    alt={product.ProductName} 
+                    src={product.ImageURL} 
+                    className="rounded-t-lg w-full h-44 object-cover" 
+                  />
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold">{product.ProductName}</h3>
+                    <p className="text-gray-600 mt-2">${product.Price.toFixed(2)}</p>
+                    <p className="text-gray-700 mt-2">{product.Description}</p>
+                  </div>
                 </Card>
               ))
             )}
@@ -317,7 +266,7 @@ const ProductList = () => {
         ]}
         style={{ textAlign: 'center' }}
       >
-        <Form form={form}>
+        <Form form={form} className='text-left'>
           <Form.Item
             name="ProductName"
             rules={[{ required: true, message: 'Please enter the product name!' }]}
@@ -342,6 +291,62 @@ const ProductList = () => {
           >
             <Input placeholder="Image URL" />
           </Form.Item>
+          <Form.Item
+              name="Status"
+              rules={[{ required: true, message: 'Please select the service status!' }]}
+            >
+              <Select placeholder="Select Status">
+                <Option value="Available">Available</Option>
+                <Option value="Unavailable">Unavailable</Option>
+              </Select>
+            </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title="Edit Product"
+        visible={editMode !== null}
+        onCancel={handleCancelEdit}
+        footer={[
+          <Button key="cancel" onClick={handleCancelEdit}>Cancel</Button>,
+          <Button key="submit" type="primary" onClick={handleSaveEdit}>Save</Button>,
+        ]}
+        style={{ textAlign: 'center' }}
+      >
+        <Form form={form} className='text-left'>
+          <Form.Item
+            name="ProductName"
+            rules={[{ required: true, message: 'Please enter the product name!' }]}
+          >
+            <Input placeholder="Product Name" />
+          </Form.Item>
+          <Form.Item
+            name="Price"
+            rules={[{ required: true, message: 'Please enter the product price!' }]}
+          >
+            <Input placeholder="Price" />
+          </Form.Item>
+          <Form.Item
+            name="Description"
+            rules={[{ required: true, message: 'Please enter the product description' }]}
+          >
+            <Input placeholder="Description" />
+          </Form.Item>
+          <Form.Item
+            name="ImageURL"
+            rules={[{ required: true, message: 'Please upload the product image!' }]}
+          >
+            <Input placeholder="Image URL" />
+          </Form.Item>
+          <Form.Item
+              name="Status"
+              rules={[{ required: true, message: 'Please select the service status!' }]}
+            >
+              <Select placeholder="Select Status">
+                <Option value="Available">Available</Option>
+                <Option value="Unavailable">Unavailable</Option>
+              </Select>
+            </Form.Item>
         </Form>
       </Modal>
     </div>
