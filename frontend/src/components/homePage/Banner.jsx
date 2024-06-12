@@ -11,10 +11,12 @@ const Banner = () => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
+  const [token, setToken] = useState(localStorage.getItem('token'))
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
   const { shoppingCart } = useShopping();
   const productCount = shoppingCart.length;
+  console.log(token)
 
   const handleVisibleChange = (visible) => {
     setVisible(visible);
