@@ -15,20 +15,12 @@ const generateProductId = async () => {
   }
 };
 
-// Create product (manager only)
+//Create product (manager only)
 exports.createProduct = async (req, res) => {
   try {
       const productId = await generateProductId(); // Generate a new ProductID
-      const { productName, price, petTypeId, description, imageURL, status } = req.body;
-      const product = new Product({
-        ProductID: productId,
-        ProductName: productName,
-        Price: price,
-        PetTypeId: petTypeId,
-        Description: description,
-        ImageURL: imageURL,
-        Status: status
-      });
+      const { productName, price, petTypeId, description, imageURL } = req.body;
+      const product = new Product({ ProductID: productId, ProductName: productName, Price: price, PetTypeId: petTypeId, Description: description, ImageURL: imageURL });
       await product.save();
       res.status(201).json(product);
   } catch (error) {

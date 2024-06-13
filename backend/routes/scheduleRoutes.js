@@ -4,12 +4,13 @@ const {authMiddleware} = require('../middlewares/authMiddleware');
 const router = express.Router();
 
 // Get all schedules
-router.get('/', authMiddleware, getSchedule);
+router.get('/', getSchedule);
 
 // Get schedules by role
 router.get('/role/:role', authMiddleware, getScheduleByRole);
 
 // Assign employee to specific slots
 router.post('/assign', authMiddleware, assignEmployeeToSlots);
+
 
 module.exports = router;

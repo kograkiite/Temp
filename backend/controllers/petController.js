@@ -18,15 +18,21 @@ const generatePetID = async () => {
 exports.createPet = async (req, res) => {
   try {
     const petID = await generatePetID(); 
-    const { PetName, Gender, Status, AccountID, PetTypeID } = req.body;
+    const { petName, gender, status, accountId, petTypeId } = req.body;
+
+    // Check if petTypeId exists in PetTypes collection
+    const petType = await PetType.findById(petTypeId);
+    if (!petType) {
+      return res.status(400).json({ message: 'Invalid pet type ID' });
+    }
 
     const newPet = new Pet({
       PetID: petID, 
-      PetName: PetName,
-      Gender: Gender,
-      Status: Status,
-      AccountID: AccountID,
-      PetTypeID: PetTypeID,
+      PetName: petName,
+      Gender: gender,
+      Status: status,
+      AccountID: accountId,
+      PetTypeID: petTypeId,
     });
     await newPet.save();
     res.status(201).json(newPet);
@@ -39,13 +45,7 @@ exports.createPet = async (req, res) => {
 // Get all pets
 exports.getAllPets = async (req, res) => {
   try {
-    const account_id = req.user.account_id; // accountId từ token đã được giải mã
-
-    if (!account_id) {
-      return res.status(400).json({ message: 'Account ID is missing' });
-    }
-
-    const pets = await Pet.find({ account_id: account_id }).populate('PetTypeID', 'TypeName Description');
+    const pets = await Pet.find().populate('PetTypeID', 'TypeName Description');
     res.status(200).json(pets);
   } catch (error) {
     console.error('Error fetching pets:', error);
@@ -56,7 +56,7 @@ exports.getAllPets = async (req, res) => {
 // Get a pet by ID
 exports.getPetById = async (req, res) => {
   try {
-    const pet = await Pet.findOne({ PetID: req.params.id });
+    const pet = await Pet.findOne({ PetID: req.params.id }).populate('PetTypeID', 'TypeName Description');
     if (!pet) return res.status(404).json({ message: 'Pet not found' });
     res.status(200).json(pet);
   } catch (error) {
@@ -65,25 +65,36 @@ exports.getPetById = async (req, res) => {
   }
 };
 
-// Update pet (manager only)
-  exports.updatePet = async (req, res) => {
-    const { id } = req.params;
-    const updateData = req.body;
-    delete updateData.PetID; 
+// Update a pet
+exports.updatePet = async (req, res) => {
+  try {
+    const pet = await Pet.findOne({ PetID: req.params.id });
+    if (!pet) return res.status(404).json({ message: 'Pet not found' });
 
-    try {
-      const pet = await Pet.findOneAndUpdate({ PetID: id }, updateData, { new: true }); // The { new: true } option returns the updated document
+    const { petName, gender, status, accountId, petTypeId } = req.body;
 
-      if (!pet) {
-        return res.status(404).json({ message: 'Pet not found' });
+    // Check if petTypeId exists in PetTypes collection if it's being updated
+    if (petTypeId && petTypeId !== pet.PetTypeID) {
+      const petType = await PetType.findById(petTypeId);
+      if (!petType) {
+        return res.status(400).json({ message: 'Invalid pet type ID' });
       }
-
-      res.json({ message: 'Pet updated successfully', pet });
-    } catch (error) {
-      console.error('Error updating pet:', error);
-      res.status(500).json({ message: 'Internal server error' });
     }
-  };
+
+    pet.PetName = petName || pet.PetName;
+    pet.Gender = gender || pet.Gender;
+    pet.Status = status || pet.Status;
+    pet.AccountID = accountId || pet.AccountID;
+    pet.PetTypeID = petTypeId || pet.PetTypeID;
+
+    await pet.save();
+    res.status(200).json({ message: 'Pet updated successfully', pet });
+  } catch (error) {
+    console.error('Error updating pet:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 
 // Delete a pet
 exports.deletePet = async (req, res) => {
@@ -94,24 +105,6 @@ exports.deletePet = async (req, res) => {
     res.status(200).json({ message: 'Pet deleted successfully' });
   } catch (error) {
     console.error('Error deleting pet:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
-
-// Get all pets by account_id
-exports.getPetsByAccountId = async (req, res) => {
-  try {
-    const account_id = req.params.account_id; // accountId từ request URL
-
-    if (!account_id) {
-      return res.status(400).json({ message: 'Account ID is missing' });
-    }
-
-    const pets = await Pet.find({ AccountID: account_id });
-
-    res.status(200).json(pets);
-  } catch (error) {
-    console.error('Error fetching pets:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };

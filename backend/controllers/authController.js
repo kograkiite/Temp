@@ -16,18 +16,16 @@ exports.login = async (req, res) => {
   try {
     const account = await Account.findOne({ email }); 
     if (account) {
-      if (account.status === 0) {
-        return res.status(403).json({ message: 'Account is locked' });
-      }
       const isMatch = await bcrypt.compare(password, account.password);
       if (isMatch) {
         // Create JWT token with unique payload
         const token = jwt.sign(
-          { id: account.account_id, email: account.email, fullname: account.fullname, role: account.role },
+          { id: account._id, email: account.email, fullname: account.fullname, role: account.role },
           JWT_SECRET,
           { expiresIn: JWT_EXPIRES_IN }
         );
-        return res.json({ message: 'Login successful', user: { id: account.account_id, email: account.email, role: account.role, fullname: account.fullname, phone: account.phone, address: account.address }, token });
+        return res.json({ message: 'Login successful', user: { id: account._id, email: account.email, role: account.role, fullname: account.fullname,  phone: account.phone, 
+          address: account.address }, token });
       } else {
         return res.status(401).json({ message: 'Invalid credentials' });
       }

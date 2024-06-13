@@ -6,7 +6,7 @@ const petSchema = new mongoose.Schema({
     Gender: { type: String, required: true },
     Status: { type: String, required: true },
     AccountID: { type: String, required: true },
-    PetTypeID: { type: String, ref: 'PetType', required: true }
+    PetTypeID: { type: mongoose.Schema.Types.String, ref: 'PetType', required: true }
 });
 
-module.exports = mongoose.model('Pet', petSchema, 'Pets');
+module.exports = mongoose.model('Pet', petSchema);

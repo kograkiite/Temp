@@ -18,6 +18,7 @@ const authMiddleware = (req, res, next) => {
       console.error('Failed to authenticate token', err);
       return res.status(401).json({ message: 'Failed to authenticate token' });
     }
+
     req.user = decoded; // Set the decoded payload to req.user
     next();
   });

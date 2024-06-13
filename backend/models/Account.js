@@ -7,11 +7,11 @@ const accountSchema = new mongoose.Schema({
   address: { type: String, required: true },
   email: { type: String, required: true },
   phone: { type: String, required: true },
-  status: { type: Number, required: true, default: 1 },
+  status: { type: Number, required: true },
   role: { type: String, required: true }
 }, { versionKey: false });
 
 // Specify the collection name as the third argument to mongoose.model
-const Account = mongoose.model('Account', accountSchema, 'Accounts'); 
+const Account = mongoose.model('Account', accountSchema, 'Users'); 
 
 module.exports = Account;
