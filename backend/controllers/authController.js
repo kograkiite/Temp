@@ -253,6 +253,27 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
+exports.checkToken = (req, res, next) => {
+  // Lấy token từ header, query string hoặc cookie
+  const token = req.header('x-auth-token') || req.query.token || req.cookies.token;
+
+  if (!token) {
+    return res.status(401).json({ message: 'Token not found. Authorization denied.' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: 'Token expired. Please log in again.' });
+    } else {
+      return res.status(400).json({ message: 'Invalid token. Please log in again.' });
+    }
+  }
+};
+
 exports.logout = (req, res) => {
   // When logout, clear the token in the client side
   res.status(200).json({ message: 'Logout successful' });
