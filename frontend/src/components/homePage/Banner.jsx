@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Layout, Menu, Button, Drawer, Badge, Popover } from 'antd';
 import { MenuOutlined, UserOutlined, ShoppingCartOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import useShopping from '../../hook/useShopping';
+import SubMenu from 'antd/es/menu/SubMenu';
 
 const { Header } = Layout;
 
@@ -11,12 +12,11 @@ const Banner = () => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
-  const [token, setToken] = useState(localStorage.getItem('token'))
+  const [token] = useState(localStorage.getItem('token'));
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
   const { shoppingCart } = useShopping();
   const productCount = shoppingCart.length;
-  console.log(token)
 
   const handleVisibleChange = (visible) => {
     setVisible(visible);
@@ -24,14 +24,14 @@ const Banner = () => {
 
   const checkTokenValidity = async () => {
     if (!token) {
-      return; // No token found, allow guest to browse
+      return;
     }
 
     try {
       const response = await fetch('http://localhost:3001/api/auth/check-token', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}` // Assuming token is defined in your component's state
+          'Authorization': `Bearer ${token}`
         }
       });
       if (response.ok) {
@@ -45,7 +45,7 @@ const Banner = () => {
           localStorage.clear();
           setRole('Guest');
           setUser(null);
-          navigate('/login')
+          navigate('/login');
           // Inform the user
           alert('Your session has expired. Please log in again.');
         } else {
@@ -58,7 +58,6 @@ const Banner = () => {
       // Handle error
     }
   };
-  
 
   useEffect(() => {
     checkTokenValidity();
@@ -85,14 +84,23 @@ const Banner = () => {
     localStorage.clear();
     setRole('Guest');
     setUser(null);
-    navigate('/')
+    navigate('/');
   };
 
   const userMenuItems = [
     { key: 'profile', icon: <UserOutlined />, label: 'Thông tin người dùng', onClick: () => navigate('/user-profile') },
     ...(role === 'Customer' ? [
       { key: 'pet-list', icon: <UnorderedListOutlined />, label: 'Danh sách thú cưng', onClick: () => navigate('/pet-list') },
-      { key: 'transaction-history', icon: <HistoryOutlined />, label: 'Lịch sử giao dịch', onClick: () => navigate('/transaction-history') },
+      { key: 'orders-history', icon: <HistoryOutlined />, label: 'Lịch sử đặt hàng', onClick: () => navigate('/orders-history') },
+      {
+        key: 'service-history',
+        icon: <HistoryOutlined />,
+        label: 'Lịch sử dịch vụ',
+        children: [
+          { key: 'spa-booking', label: 'Dịch vụ thú cưng', onClick: () => navigate('/spa-booking') },
+          { key: 'hotel-booking', label: 'Dịch vụ khách sạn', onClick: () => navigate('/hotel-booking') },
+        ],
+      },
     ] : []),
     { key: 'logout', icon: <LogoutOutlined />, label: 'Đăng xuất', onClick: handleLogout }
   ];
@@ -100,9 +108,19 @@ const Banner = () => {
   const renderUserMenu = () => (
     <Menu>
       {userMenuItems.map(item => (
-        <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>
-          {item.label}
-        </Menu.Item>
+        item.children ? (
+          <SubMenu key={item.key} icon={item.icon} title={item.label}>
+            {item.children.map(child => (
+              <Menu.Item key={child.key} onClick={child.onClick}>
+                {child.label}
+              </Menu.Item>
+            ))}
+          </SubMenu>
+        ) : (
+          <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>
+            {item.label}
+          </Menu.Item>
+        )
       ))}
     </Menu>
   );
@@ -114,8 +132,8 @@ const Banner = () => {
       menuItems = [
         { key: 'home', label: 'TRANG CHỦ', path: '/' },
         { key: 'about', label: 'GIỚI THIỆU', path: '/about' },
-        { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
-        { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
+        { key: 'spa-service', label: 'Dịch vụ thú cưng', path: '/spa-service', parent: 'DỊCH VỤ' },
+        { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'DỊCH VỤ' },
         { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog-products', parent: 'CỬA HÀNG' },
         { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat-products', parent: 'CỬA HÀNG' },
         { key: 'contact', label: 'LIÊN HỆ', path: '/contact' },
@@ -124,8 +142,8 @@ const Banner = () => {
       menuItems = [
         { key: 'home', label: 'TRANG CHỦ', path: '/' },
         { key: 'about', label: 'GIỚI THIỆU', path: '/about' },
-        { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
-        { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
+        { key: 'spa-service', label: 'Dịch vụ thú cưng', path: '/spa-service', parent: 'DỊCH VỤ' },
+        { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'DỊCH VỤ' },
         { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog-products', parent: 'CỬA HÀNG' },
         { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat-products', parent: 'CỬA HÀNG' },
         { key: 'contact', label: 'LIÊN HỆ', path: '/contact' },
@@ -134,22 +152,22 @@ const Banner = () => {
       menuItems = [
         { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
         { key: 'manage-accounts', label: 'QUẢN LÍ TÀI KHOẢN', path: '/manage-accounts' },
-        { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
-        { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
+        { key: 'spa-service', label: 'Dịch vụ thú cưng', path: '/spa-service', parent: 'DỊCH VỤ' },
+        { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'DỊCH VỤ' },
         { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog-products', parent: 'CỬA HÀNG' },
         { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat-products', parent: 'CỬA HÀNG' },
         { key: 'booking-list', label: 'QUẢN LÍ BOOKING', path: '/booking-list' },
       ];
-    } else if (['Sale staff', 'Caretaker staff', 'Store Manager'].includes(role)) {
+    } else if (['Sales Staff', 'Caretaker Staff', 'Store Manager'].includes(role)) {
       menuItems = [
         { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
-        { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
-        { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
+        { key: 'spa-service', label: 'Dịch vụ thú cưng', path: '/spa-service', parent: 'DỊCH VỤ' },
+        { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'DỊCH VỤ' },
         { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog-products', parent: 'CỬA HÀNG' },
         { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat-products', parent: 'CỬA HÀNG' },
         { key: 'booking-list', label: 'QUẢN LÍ BOOKING', path: '/booking-list' },
       ];
-    } 
+    }
 
     const verticalMenu = menuItems.reduce((acc, item) => {
       if (item.parent) {
@@ -185,11 +203,14 @@ const Banner = () => {
           <>
             <Menu.Item key="cart" onClick={() => navigate('/cart')}>GIỎ HÀNG</Menu.Item>
             <Menu.SubMenu key="user-profile" title="TÀI KHOẢN">
-              {userMenuItems.map(item => (
-                <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>
-                  {item.label}
-                </Menu.Item>
-              ))}
+              <Menu.Item onClick={() =>{navigate('/user-profile')}}>Thông tin người dùng</Menu.Item>
+              <Menu.Item onClick={() =>{navigate('/pet-list')}}>Danh sách thú cưng</Menu.Item>
+              <Menu.Item onClick={() =>{navigate('/orders-history')}}>Lịch sử đặt hàng</Menu.Item>
+              <Menu.SubMenu title="Lịch sử dịch vụ">
+                <Menu.Item onClick={() =>{navigate('/spa-booking')}}>Dịch vụ thú cưng</Menu.Item>
+                <Menu.Item onClick={() =>{navigate('/hotel-booking')}}>Dịch vụ khách sạn</Menu.Item>
+              </Menu.SubMenu>
+              <Menu.Item onClick={handleLogout}>Đăng xuất</Menu.Item>
             </Menu.SubMenu>
           </>
         )}
@@ -241,7 +262,6 @@ const Banner = () => {
                     <Badge count={productCount}>
                       <Button shape="circle" icon={<ShoppingCartOutlined />} onClick={() => navigate('/cart')} />
                     </Badge>
-                    
                   </>
                 )}
                 {role !== 'Guest' && (

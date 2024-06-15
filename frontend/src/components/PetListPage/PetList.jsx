@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Layout, Menu, Table, Button, Input, Select, Form, Typography, message, Modal, Spin, Grid } from 'antd';
 import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import axios from 'axios'; // Import axios for making API calls
+import SubMenu from 'antd/es/menu/SubMenu';
 
 const { Sider, Content } = Layout;
 const { Title } = Typography;
@@ -218,12 +219,24 @@ const PetList = () => {
                   Danh sách thú cưng
                 </Menu.Item>
                 <Menu.Item
-                  key="transaction-history"
+                  key="orders-history"
                   icon={<HistoryOutlined />}
-                  onClick={() => navigate('/transaction-history')}
+                  onClick={() => navigate('/orders-history')}
                 >
-                  Lịch sử giao dịch
+                  Lịch sử đặt hàng
                 </Menu.Item>
+                <SubMenu
+                  key="service-history"
+                  icon={<HistoryOutlined />}
+                  title="Lịch sử dịch vụ"
+                >
+                  <Menu.Item key="service-booking" onClick={() => navigate('/service-booking')}>
+                    Dịch vụ thú cưng
+                  </Menu.Item>
+                  <Menu.Item key="hotel-booking" onClick={() => navigate('/hotel-booking')}>
+                    Dịch vụ khách sạn
+                  </Menu.Item>
+                </SubMenu>
               </>
             )}
             <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>

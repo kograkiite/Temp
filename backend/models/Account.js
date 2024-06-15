@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const accountSchema = new mongoose.Schema({
-  account_id: { type: String, required: true, unique: true },
+  AccountID: { type: String, required: true, unique: true },
   fullname: { type: String, required: true },
   password: { type: String, required: true },
   address: { type: String, required: true },

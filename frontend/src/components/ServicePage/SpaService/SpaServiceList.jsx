@@ -6,7 +6,7 @@ import axios from 'axios';
 const { Title } = Typography;
 const { Option } = Select;
 
-const ServiceList = () => {
+const SpaServiceList = () => {
   const [serviceData, setServiceData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userRole] = useState(localStorage.getItem('role') || 'Guest');
@@ -31,7 +31,7 @@ const ServiceList = () => {
   }, []);
 
   const handleServiceClick = (id) => {
-    navigate(`/pet-service-detail/${id}`)
+    navigate(`/spa-service-detail/${id}`)
   };
 
   const handleEditClick = (record) => {
@@ -204,7 +204,7 @@ const ServiceList = () => {
 
   return (
     <div className="p-10">
-      <Title level={1} className="text-center">Services</Title>
+      <Title level={1} className="text-center">Pet Services</Title>
       <Form form={form}>
         {userRole === 'Store Manager' ? (
           <>
@@ -212,7 +212,6 @@ const ServiceList = () => {
               dataSource={serviceData}
               columns={columns}
               rowKey="ServiceID"
-              pagination={false}
               loading={loading}
               bordered
               scroll={{ x: 'max-content' }}
@@ -236,7 +235,7 @@ const ServiceList = () => {
                   key={service.ServiceID}
                   hoverable
                   className="bg-white rounded-lg shadow-md transition-transform transform-gpu hover:scale-105"
-                  onClick={() => handleEditClick(service.ServiceID)}
+                  onClick={() => handleServiceClick(service.ServiceID)}
                 >
                   <img 
                     alt={service.ServiceName} 
@@ -352,4 +351,4 @@ const ServiceList = () => {
   );
 };
 
-export default ServiceList;
+export default SpaServiceList;

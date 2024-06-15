@@ -1,16 +1,16 @@
+
 import Banner from '../components/HomePage/Banner'
 import Footer from '../components/HomePage/Footer'
-import ServiceList from '../components/ServicePage/PetService/ServiceList'
+import OrderHistory from '../components/OrderHistoryPage/OrderHistory'
 
-
-const PetServicePage = () => {
+const OrderHistoryPage = () => {
   return (
     <div>
         <Banner/>
-        <ServiceList/>
+        <OrderHistory/>
         <Footer/>
     </div>
   )
 }
 
-export default PetServicePage
+export default OrderHistoryPage

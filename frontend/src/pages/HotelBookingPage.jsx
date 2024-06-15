@@ -1,16 +1,15 @@
 
 import Banner from '../components/HomePage/Banner'
 import Footer from '../components/HomePage/Footer'
-import HotelList from '../components/ServicePage/PetHotel/HotelList'
-
-const PetHotelPage = () => {
+import HotelBooking from '../components/HotelBookingPage/HotelBooking'
+const HotelBookingPage = () => {
   return (
     <div>
         <Banner/>
-        <HotelList/>
+        <HotelBooking/>
         <Footer/>
     </div>
   )
 }
 
-export default PetHotelPage
+export default HotelBookingPage

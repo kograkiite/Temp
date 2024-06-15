@@ -8,6 +8,7 @@ import {
   HistoryOutlined,
   LogoutOutlined,
 } from '@ant-design/icons';
+import SubMenu from 'antd/es/menu/SubMenu';
 
 const { Title } = Typography;
 const { Sider, Content } = Layout;
@@ -22,7 +23,6 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const screens = useBreakpoint();
-
   useEffect(() => {
     const fetchUserData = async () => {
       setLoading(true);
@@ -82,10 +82,17 @@ const UserProfile = () => {
 
   const handleSave = () => {
     let newErrors = {};
+    if (!formData.fullname) {
+      newErrors.fullname = 'Họ và tên là bắt buộc';
+    } else if (!/^[a-zA-Z\s]*$/.test(formData.fullname)) {
+      newErrors.fullname = 'Họ và tên không được chứa ký tự đặc biệt';
+    }
 
-    // Validate inputs and update state
-    if (!formData.fullname) newErrors.fullname = 'Họ và tên là bắt buộc';
-    if (!formData.phone) newErrors.phone = 'Số điện thoại là bắt buộc';
+    if (!formData.phone) {
+      newErrors.phone = 'Số điện thoại là bắt buộc';
+    } else if (!/^\d{10}$/.test(formData.phone)) {
+      newErrors.phone = 'Số điện thoại phải chứa đúng 10 chữ số';
+    }
     if (!formData.address) newErrors.address = 'Địa chỉ là bắt buộc';
 
     if (Object.keys(newErrors).length === 0) {
@@ -108,10 +115,10 @@ const UserProfile = () => {
     localStorage.removeItem('role');
     localStorage.removeItem('account_id');
     localStorage.removeItem('fullname');
-    localStorage.removeItem('email'); 
-    localStorage.removeItem('user'); 
+    localStorage.removeItem('email');
+    localStorage.removeItem('user');
     setRole('Guest');
-    setUser(null); 
+    setUser(null);
     navigate('/');
     window.location.reload();
   };
@@ -139,12 +146,24 @@ const UserProfile = () => {
                   Danh sách thú cưng
                 </Menu.Item>
                 <Menu.Item
-                  key="transaction-history"
+                  key="orders-history"
                   icon={<HistoryOutlined />}
-                  onClick={() => navigate('/transaction-history')}
+                  onClick={() => navigate('/orders-history')}
                 >
-                  Lịch sử giao dịch
+                  Lịch sử đặt hàng
                 </Menu.Item>
+                <SubMenu
+                  key="service-history"
+                  icon={<HistoryOutlined />}
+                  title="Lịch sử dịch vụ"
+                >
+                  <Menu.Item key="service-booking" onClick={() => navigate('/service-booking')}>
+                    Dịch vụ thú cưng
+                  </Menu.Item>
+                  <Menu.Item key="hotel-booking" onClick={() => navigate('/hotel-booking')}>
+                    Dịch vụ khách sạn
+                  </Menu.Item>
+                </SubMenu>
               </>
             )}
             <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>

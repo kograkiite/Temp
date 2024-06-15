@@ -1,25 +1,28 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table, Typography, Button, Modal, Form, Select, Skeleton, message } from 'antd';
+import { Table, Typography, Alert, Button, Modal, Form, Select, message } from 'antd';
 
 const { Title } = Typography;
 const { Option } = Select;
 
 const Schedule = () => {
   const [schedules, setSchedules] = useState([]);
-  const [users, setUsers] = useState([]);
+  const [error, setError] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
+  const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [roleOfEmp, setRoleOfEmp] = useState('');
+  const [roleOfUser, setRoleOfUser] = useState(localStorage.getItem('role'));
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
+  const [accountID, setAccountID] = useState(user.id);
 
   useEffect(() => {
     const fetchSchedules = async () => {
-      setLoading(true);
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          message.error('Authorization token not found. Please log in.');
+          setError('Authorization token not found. Please log in.');
           return;
         }
 
@@ -32,9 +35,8 @@ const Schedule = () => {
         setSchedules(response.data);
       } catch (error) {
         console.error('Error fetching schedules:', error);
-        message.error('Error fetching schedules');
+        setError('Error fetching schedules');
       }
-      setLoading(false);
     };
 
     fetchSchedules();
@@ -42,7 +44,6 @@ const Schedule = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      setLoading(true);
       try {
         const token = localStorage.getItem('token');
         const response = await axios.get('http://localhost:3001/api/accounts/role', {
@@ -54,9 +55,8 @@ const Schedule = () => {
         setUsers(response.data.accounts);
       } catch (error) {
         console.error('Error fetching users:', error);
-        message.error('Error fetching users');
+        setError('Error fetching users');
       }
-      setLoading(false);
     };
 
     fetchUsers();
@@ -71,22 +71,79 @@ const Schedule = () => {
   ];
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
+  const handleRemoveEmployee = async (day, slot, employee) => {
+    if (roleOfUser !== 'Store Manager') {
+      message.error('Bạn không có quyền xóa lịch của nhân viên.');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Authorization token not found. Please log in.');
+        return;
+      }
+
+      await axios.post(
+        'http://localhost:3001/api/schedules/remove',
+        {
+          day,
+          start_time: slot.start,
+          end_time: slot.end,
+          accountId: employee.AccountID,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Refetch schedules after successful removal
+      const response = await axios.get('http://localhost:3001/api/schedules', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      message.success('Xóa lịch cho nhân viên thành công.');
+      setSchedules(response.data);
+    } catch (error) {
+      console.error('Error removing employee:', error);
+      if (error.response && error.response.data && error.response.data.message) {
+        message.error(error.response.data.message);
+      } else {
+        message.error('Error removing employee');
+      }
+    }
+  };
+
   const columns = [
     {
       title: 'Time',
       dataIndex: 'time',
       key: 'time',
+      fixed: 'left',
       render: (text) => <strong>{text}</strong>,
+      className: 'sticky left-0 bg-white',
     },
     ...days.map((day) => ({
       title: day,
       dataIndex: day,
       key: day,
-      render: (text) =>
+      render: (text, record) =>
         text && text.length > 0 ? (
           text.map((employee, index) => (
-            <div key={index}>
-              {employee.fullname} ({employee.role})
+            <div
+              key={index}
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+              className={employee.AccountID === accountID ? 'bg-yellow-200' : ''}
+            >
+              <div>{employee.fullname} ({employee.role})</div>
+              {roleOfUser === 'Store Manager' && (
+                <Button type="link" onClick={() => handleRemoveEmployee(day, { start: record.key, end: record.time.split(' - ')[1] }, employee)}>
+                  Remove
+                </Button>
+              )}
             </div>
           ))
         ) : (
@@ -110,17 +167,21 @@ const Schedule = () => {
   });
 
   const handleSchedule = async (values) => {
+    if (roleOfUser !== 'Store Manager') {
+      message.error('Bạn không có quyền lập lịch cho nhân viên.');
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        message.error('Authorization token not found. Please log in.');
+        setError('Authorization token not found. Please log in.');
         return;
       }
 
       const { day, timeSlot, fullname } = values;
       const [start_time, end_time] = timeSlot.split(' - ');
-      const accountId = selectedUser ? selectedUser.account_id : null;
-      const role = selectedUser ? selectedUser.role : null;
+      const accountId = selectedUser ? selectedUser.AccountID : null;
 
       await axios.post(
         'http://localhost:3001/api/schedules/assign',
@@ -129,7 +190,7 @@ const Schedule = () => {
           slots: [{ start_time, end_time }],
           accountId,
           fullname,
-          role,
+          role: roleOfEmp,
         },
         {
           headers: {
@@ -138,16 +199,16 @@ const Schedule = () => {
         }
       );
 
+      // Refetch schedules after successful assignment
       const response = await axios.get('http://localhost:3001/api/schedules', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
+      message.success('Lập lịch cho nhân viên thành công.');
       setSchedules(response.data);
       setIsModalVisible(false);
       form.resetFields();
-      message.success('Employee scheduled successfully');
     } catch (error) {
       console.error('Error scheduling employee:', error);
       if (error.response && error.response.data && error.response.data.message) {
@@ -161,7 +222,8 @@ const Schedule = () => {
   const handleFullnameChange = (value) => {
     const user = users.find((user) => user.fullname === value);
     setSelectedUser(user);
-    form.setFieldsValue({ account_id: user ? user.account_id : '' });
+    setRoleOfEmp(user ? user.role : '');
+    form.setFieldsValue({ AccountID: user ? user.AccountID : '', role: user ? user.role : '' });
   };
 
   return (
@@ -169,14 +231,13 @@ const Schedule = () => {
       <Title level={2} className="text-center text-red-500 mb-6">
         Lịch làm việc của nhân viên
       </Title>
-      <Button type="primary" onClick={() => setIsModalVisible(true)} className="mb-6 float-right">
-        Schedule Employee
-      </Button>
-      {loading ? (
-        <Skeleton active paragraph={{ rows: 10 }} />
-      ) : (
-        <Table columns={columns} dataSource={data} bordered pagination={false} scroll={{ x: 'max-content' }} />
+      {roleOfUser === 'Store Manager' && (
+        <Button type="primary" onClick={() => setIsModalVisible(true)} className="mb-6 float-right">
+          Schedule Employee
+        </Button>
       )}
+      {error && <Alert message={error} type="error" showIcon className="mb-6" />}
+      <Table columns={columns} dataSource={data} bordered pagination={false} scroll={{ x: 'max-content' }} />
       <Modal
         title="Schedule Employee"
         visible={isModalVisible}
@@ -205,15 +266,15 @@ const Schedule = () => {
           <Form.Item name="fullname" label="Full Name" rules={[{ required: true, message: 'Please select a full name' }]}>
             <Select placeholder="Select full name" onChange={handleFullnameChange}>
               {users.map((user) => (
-                <Option key={user.account_id} value={user.fullname}>
+                <Option key={user.AccountID} value={user.fullname}>
                   {user.fullname}
                 </Option>
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="account_id" label="Account ID">
+          <Form.Item name="role" label="Role">
             <Select disabled>
-              <Option value={selectedUser ? selectedUser.account_id : ''}>{selectedUser ? selectedUser.account_id : ''}</Option>
+              <Option value={roleOfEmp}>{roleOfEmp}</Option>
             </Select>
           </Form.Item>
           <Form.Item>
