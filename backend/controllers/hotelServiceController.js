@@ -1,31 +1,31 @@
-const Hotel = require('../models/Hotel');
+const HotelService = require('../models/HotelService'); 
 
-// Tạo một khách sạn mới
+// Create a new hotel
 exports.createHotel = async (req, res) => {
-    const hotel = new Hotel(req.body);
+    const hotel = new HotelService(req.body);
     try {
-        await hotel.save();
+        await HotelService.save();
         res.status(201).send(hotel);
     } catch (e) {
         res.status(400).send(e);
     }
 };
 
-// Lấy danh sách các khách sạn
+// Get a list of hotels
 exports.getHotels = async (req, res) => {
     try {
-        const hotels = await Hotel.find({});
+        const hotels = await HotelService.find({});
         res.send(hotels);
     } catch (e) {
         res.status(500).send(e);
     }
 };
 
-// Lấy một khách sạn theo ID
+// Get a hotel by ID
 exports.getHotelById = async (req, res) => {
     const _id = req.params.id;
     try {
-        const hotel = await Hotel.findById(_id);
+        const hotel = await HotelService.findById(_id);
         if (!hotel) {
             return res.status(404).send();
         }
@@ -35,7 +35,7 @@ exports.getHotelById = async (req, res) => {
     }
 };
 
-// Cập nhật một khách sạn theo ID
+// Update a hotel by ID
 exports.updateHotel = async (req, res) => {
     const updates = Object.keys(req.body);
     const allowedUpdates = ['HotelName', 'Description', 'Price'];
@@ -46,7 +46,7 @@ exports.updateHotel = async (req, res) => {
     }
 
     try {
-        const hotel = await Hotel.findById(req.params.id);
+        const hotel = await HotelService.findById(req.params.id);
         if (!hotel) {
             return res.status(404).send();
         }
@@ -59,10 +59,10 @@ exports.updateHotel = async (req, res) => {
     }
 };
 
-// Xóa một khách sạn theo ID
+// Delete a hotel by ID
 exports.deleteHotel = async (req, res) => {
     try {
-        const hotel = await Hotel.findByIdAndDelete(req.params.id);
+        const hotel = await HotelService.findByIdAndDelete(req.params.id);
         if (!hotel) {
             return res.status(404).send();
         }

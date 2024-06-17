@@ -81,12 +81,12 @@ exports.getAccountByRole = async (req, res) => {
 
 
   // Update an account by ID 
-  exports.updateAccountById = async (req, res) => {
-    const AccountID = req.params.id;
+exports.updateAccountById = async (req, res) => {
+    const accountId = req.params.id;
     const updates = req.body;
   
     try {
-      const account = await Account.findOne({AccountID: AccountID});
+      const account = await Account.findOne({AccountID: accountId});
   
       if (!account) {
         return res.status(404).json({ message: 'Account not found!' });

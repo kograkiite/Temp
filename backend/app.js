@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const bodyParser = require('body-parser');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const errorMiddleware = require('./middlewares/errorMiddleware');
@@ -10,8 +11,12 @@ const accountRoutes = require('./routes/accountRoutes');
 const scheduleRoutes = require('./routes/scheduleRoutes');
 const petRoutes = require('./routes/petRoutes'); 
 const serviceRoutes = require('./routes/serviceRoutes'); 
+const orderRoutes = require('./routes/orderRoutes');
 const hotelRoutes = require('./routes/hotelRoutes');
-const orderRoutes = require('./routes/orderRoutes')
+const hotelBookingRoutes = require('./routes/hotelBookingRoutes');
+const spaBookingRoutes = require('./routes/spaBookingRoutes');
+const commentRoutes = require('./routes/commentRoutes');
+
 
 const dotenv = require('dotenv');
 
@@ -23,8 +28,13 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true, 
+}));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -47,8 +57,17 @@ app.use('/api/hotels', hotelRoutes);
 // Work Schedule Routes
 app.use('/api/schedules', scheduleRoutes);
 
-// orders Routes
+// Order Routes
 app.use('/api/orders', orderRoutes);
+
+// Hotel booking Routes
+app.use('/api/Hotel-bookings', hotelBookingRoutes);
+
+// Spa booking Routes
+app.use('/api/Spa-bookings', spaBookingRoutes);
+
+// Comment Routes
+app.use('/api/comments', commentRoutes);
 
 // Apply authMiddleware to protected routes
 app.use('/protected', authMiddleware);

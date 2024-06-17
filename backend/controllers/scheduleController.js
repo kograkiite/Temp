@@ -45,7 +45,7 @@ exports.assignEmployeeToSlots = async (req, res) => {
       // Check if the employee is already assigned to this slot
       const employeeIndex = existingSlot.employees.findIndex(emp => emp.AccountID === accountId);
       if (employeeIndex !== -1) {
-        return res.status(400).json({ message: `Employee ${fullname} is already assigned to this slot` });
+        return res.status(400).json({ message: `Employee with account ID ${accountId} is already assigned to this slot` });
       }
 
       const employee = {AccountID: accountId, fullname: fullname, role: role};
@@ -98,6 +98,5 @@ exports.removeEmployeeFromSlot = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 

@@ -71,7 +71,7 @@ const Cart = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-44">
+    <div className="container px-4 mt-4 mb-4">
       <Title className="text-center" level={2}>Shopping Cart</Title>
       <Card className="shadow-lg rounded-lg p-6">
         {shoppingCart.length > 0 ? (
@@ -90,7 +90,7 @@ const Cart = () => {
           <Text className="text-2xl text-green-600 mr-4">
             Tổng tiền: ${totalAmount.toFixed(2)}
           </Text>
-          <Button type="primary" onClick={() => navigate('/payment')}>
+          <Button type="primary" onClick={() => navigate('/order')}>
             Thanh toán
           </Button>
         </div>
@@ -100,52 +100,3 @@ const Cart = () => {
 };
 
 export default Cart;
-// import { Table, InputNumber, Button, Typography, Card, Image, message } from 'antd';
-// import useShopping from '../../hook/useShopping';
-// import { useNavigate } from 'react-router-dom';
-
-// const { Title, Text } = Typography;
-
-// const Cart = ({ AccountID }) => {
-//   const { shoppingCart, handleUpdateQuantity, handleRemoveItem } = useShopping(AccountID);
-//   const navigate = useNavigate();
-
-//   // Calculate total amount whenever shoppingCart changes
-//   const totalAmount = shoppingCart.reduce((total, item) => {
-//     return total + item.Price * item.quantity;
-//   }, 0);
-
-//   const columns = [
-//     // Your columns configuration
-//   ];
-
-//   return (
-//     <div className="container mx-auto px-4 py-44">
-//       <Title className="text-center" level={2}>Shopping Cart</Title>
-//       <Card className="shadow-lg rounded-lg p-6">
-//         {shoppingCart.length > 0 ? (
-//           <Table
-//             dataSource={shoppingCart}
-//             columns={columns}
-//             rowKey="ProductID"
-//             pagination={false}
-//           />
-//         ) : (
-//           <Text className="text-center text-2xl text-gray-500">Giỏ của bạn đang trống.</Text>
-//         )}
-//       </Card>
-//       {shoppingCart.length > 0 && (
-//         <div className="mt-8 flex justify-end items-center">
-//           <Text className="text-2xl text-green-600 font-bold mr-4">
-//             Tổng tiền: ${totalAmount.toFixed(2)}
-//           </Text>
-//           <Button type="primary" onClick={() => navigate('/payment')}>
-//             Thanh toán
-//           </Button>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default Cart;

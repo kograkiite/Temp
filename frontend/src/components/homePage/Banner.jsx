@@ -4,7 +4,8 @@ import { Layout, Menu, Button, Drawer, Badge, Popover } from 'antd';
 import { MenuOutlined, UserOutlined, ShoppingCartOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import useShopping from '../../hook/useShopping';
 import SubMenu from 'antd/es/menu/SubMenu';
-
+import { useDispatch } from 'react-redux';
+import { setShoppingCart } from '../../redux/shoppingCart';
 const { Header } = Layout;
 
 const Banner = () => {
@@ -12,11 +13,12 @@ const Banner = () => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
-  const [token] = useState(localStorage.getItem('token'));
+  const token = localStorage.getItem('token');
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
   const { shoppingCart } = useShopping();
   const productCount = shoppingCart.length;
+  const dispatch = useDispatch()
 
   const handleVisibleChange = (visible) => {
     setVisible(visible);
@@ -26,7 +28,6 @@ const Banner = () => {
     if (!token) {
       return;
     }
-
     try {
       const response = await fetch('http://localhost:3001/api/auth/check-token', {
         method: 'POST',
@@ -35,27 +36,22 @@ const Banner = () => {
         }
       });
       if (response.ok) {
-        // Token is valid
         console.log('Token is valid');
       } else {
         if (response.status === 401) {
-          // Token is expired or invalid
           console.error('Token is expired or invalid');
           // Perform logout
           localStorage.clear();
+          dispatch(setShoppingCart([]));
           setRole('Guest');
           setUser(null);
           navigate('/login');
           // Inform the user
           alert('Your session has expired. Please log in again.');
-        } else {
-          // Other server errors
-          console.error('Token validation failed with status:', response.status);
         }
       }
     } catch (error) {
       console.error('Error checking token validity:', error);
-      // Handle error
     }
   };
 
@@ -82,6 +78,7 @@ const Banner = () => {
 
   const handleLogout = () => {
     localStorage.clear();
+    dispatch(setShoppingCart([]));
     setRole('Guest');
     setUser(null);
     navigate('/');
@@ -97,7 +94,7 @@ const Banner = () => {
         icon: <HistoryOutlined />,
         label: 'Lịch sử dịch vụ',
         children: [
-          { key: 'spa-booking', label: 'Dịch vụ thú cưng', onClick: () => navigate('/spa-booking') },
+          { key: 'spa-booking', label: 'Dịch vụ spa', onClick: () => navigate('/spa-booking') },
           { key: 'hotel-booking', label: 'Dịch vụ khách sạn', onClick: () => navigate('/hotel-booking') },
         ],
       },
