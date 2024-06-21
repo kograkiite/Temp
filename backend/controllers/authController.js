@@ -8,8 +8,8 @@ const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h';
 const EMAIL_USERNAME = process.env.EMAIL_USERNAME;
 const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
 const { OAuth2Client } = require('google-auth-library');
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, process.env.GOOGLE_CALLBACK_URL);
-let otps = {};
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 
 // Login api to authenticate the user and provide a JWT token
 exports.login = async (req, res) => {
@@ -259,57 +259,45 @@ exports.logout = (req, res) => {
   res.status(200).json({ message: 'Logout successful' });
 };
 
-// Google Auth
+
 exports.googleAuth = async (req, res) => {
-  const redirectUrl = client.generateAuthUrl({
-    access_type: 'offline',
-    scope: ['profile', 'email'],
-  });
-  res.redirect(redirectUrl);
-}
-
-// Google Auth Callback
-exports.googleAuthCallback = async (req, res) => {
-  const { code } = req.body; // Trích xuất mã 'code' từ yêu cầu
-
-  console.log('Authorization code received:', code); // In ra console để kiểm tra mã được nhận
+  const { token: googleToken } = req.body ;
 
   try {
-    // Đổi mã ủy quyền lấy token
-    const { tokens } = await client.getToken(code);
-    client.setCredentials(tokens);
-
     const ticket = await client.verifyIdToken({
-      idToken: tokens.id_token,
+      idToken: googleToken,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
-
-    const { email, name, sub: googleId } = ticket.getPayload();
+    const payload = ticket.getPayload();
+    const { name, email } = payload;
 
     let account = await Account.findOne({ email });
+
     if (!account) {
       account = new Account({
         AccountID: await generateAccountID(),
         fullname: name,
-        password: 'google-auth',
-        address: 'N/A',
-        email: email,
-        phone: 'N/A',
-        status: "Available",
+        password: '', // No password for Google accounts
+        address: '',
+        email,
+        phone: '',
+        status: 1,
         role: 'Customer',
       });
+      console.log(account);
       await account.save();
     }
 
-    const token = jwt.sign(
-      { id: account._id, email: account.email, fullname: account.fullname, role: account.role },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
+    const jwtToken = jwt.sign(
+      { id: account.AccountID, email: account.email, fullname: account.fullname, role: account.role },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN }
     );
-
-    res.redirect(`http://localhost:3001?token=${token}&user=${encodeURIComponent(JSON.stringify(account))}`);
+    return res.json({ message: 'Login successful', user: {  id: account.AccountID, email: account.email, role: account.role, fullname: account.fullname, phone: account.phone, address: account.address },
+      token: jwtToken
+    });
   } catch (error) {
-    console.error('Error during Google OAuth callback:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error(error);
+    res.status(400).json({ message: 'Error during authentication', error });
   }
 };
