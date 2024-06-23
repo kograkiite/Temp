@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Row, Col, Radio, Button, Form, Typography, Alert, Image, Input } from 'antd';
+import { Row, Col, Radio, Typography, Alert, Image, Input } from 'antd';
+import { loadScript } from '@paypal/paypal-js'
+const PAYPAL_CLIENT_ID = import.meta.env.REACT_APP_PAYPAL_CLIENT_ID
 
 const { Title, Text } = Typography;
 
-const Payment = () => {
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cod');
+const Order = () => {
   const [selectedShippingMethod, setSelectedShippingMethod] = useState('nationwide');
   const [orderDetails, setOrderDetails] = useState({
     fullname: '',
@@ -37,16 +38,30 @@ const Payment = () => {
       shippingCost: 3, // default shipping cost for nationwide
       cartItems: shoppingCart,
     }));
-  }, []);
 
-  const handlePayment = () => {
-    if (!selectedPaymentMethod) {
-      Alert.error('Vui lòng chọn phương thức thanh toán.');
-      return;
-    }
-    Alert.success('Đơn hàng đã được thanh toán thành công.');
-    // After successful payment, handle order saving to the database here.
-  };
+    loadScript({ "client-id": PAYPAL_CLIENT_ID }).then((paypal) => {
+      paypal.Buttons({
+        createOrder: (data, actions) => {
+          return actions.order.create({
+            purchase_units: [{
+              amount: {
+                value: (orderDetails.totalAmount + orderDetails.shippingCost).toFixed(2),
+              },
+            }],
+          });
+        },
+        onApprove: (data, actions) => {
+          return actions.order.capture().then(() => {
+            Alert.success('Đơn hàng đã được thanh toán thành công.');
+            // After successful payment, handle order saving to the database here.
+          });
+        },
+        onError: () => {
+          Alert.error('Đã xảy ra lỗi trong quá trình thanh toán với PayPal.');
+        }
+      }).render('#paypal-button-container');
+    });
+  }, [orderDetails.totalAmount, orderDetails.shippingCost]);
 
   const handleShippingChange = (e) => {
     const shippingMethod = e.target.value;
@@ -62,10 +77,6 @@ const Payment = () => {
     }));
   };
 
-  const handleCancel = () => {
-    navigate('/cart');
-  };
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setOrderDetails({
@@ -73,7 +84,6 @@ const Payment = () => {
       [name]: value,
     });
   };
-
   return (
     <div>
         <Title className="text-center mt-4 mb-4" level={2}>Order</Title>
@@ -115,7 +125,7 @@ const Payment = () => {
                     <Row key={index} className="mb-4" gutter={[16, 16]}>
                       <Col span={4}>
                         <Image 
-                          src={item.imageUrl} 
+                          src={item.ImageURL} 
                           alt={item.ProductName} 
                           className="w-16 h-16 object-cover rounded" 
                         />
@@ -139,20 +149,6 @@ const Payment = () => {
             </Col>
 
             <Col xs={24} md={8}>
-              {/* Payment Method */}
-              <div className="p-8 bg-white rounded-lg shadow-md">
-                <Title level={3} className="mb-6">Phương thức thanh toán</Title>
-                <Form onFinish={handlePayment}>
-                  <Radio.Group
-                    value={selectedPaymentMethod}
-                    onChange={(e) => setSelectedPaymentMethod(e.target.value)}
-                  >
-                    <Radio value="vnpay" className="font-medium block mb-2">VNPay</Radio>
-                    <Radio value="cod" className="font-medium block mb-2">Thanh toán khi nhận hàng (COD)</Radio>
-                  </Radio.Group>
-                </Form>
-              </div>
-
               {/* Shipping Method */}
               <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
                 <Title level={3} className="mb-6">Phương thức vận chuyển</Title>
@@ -184,20 +180,7 @@ const Payment = () => {
                   </div>
                 </div>
                 <div className="text-right">
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    className="mr-2"
-                    onClick={handlePayment}
-                  >
-                    Thanh toán
-                  </Button>
-                  <Button
-                    type="default"
-                    onClick={handleCancel}
-                  >
-                    Hủy
-                  </Button>
+                  <div id="paypal-button-container" className="mt-4"></div>
                 </div>
               </div>
             </Col>
@@ -207,4 +190,4 @@ const Payment = () => {
   );
 };
 
-export default Payment;
+export default Order;

@@ -1,16 +1,15 @@
-
-import BookingList from '../components/BookingListPage/BookingList'
 import Banner from '../components/HomePage/Banner'
 import Footer from '../components/HomePage/Footer'
+import ProductList from '../components/StorePage/ForCatPage/ProductList'
 
-const BookingListPage = () => {
+const ProductForCatPage = () => {
   return (
     <div>
         <Banner/>
-        <BookingList/>
+        <ProductList/>
         <Footer/>
     </div>
   )
 }
 
-export default BookingListPage
+export default ProductForCatPage

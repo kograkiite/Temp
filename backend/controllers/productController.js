@@ -1,5 +1,6 @@
 const Product = require('../models/Product');
 const mongoose = require('mongoose');
+const cloudinary = require('../config/cloudinary');
 
 
 //Generate a new product ID
@@ -18,13 +19,28 @@ const generateProductId = async () => {
 //Create product (manager only)
 exports.createProduct = async (req, res) => {
   try {
-      const productId = await generateProductId(); // Generate a new ProductID
-      const { productName, price, petTypeId, description, imageURL } = req.body;
-      const product = new Product({ ProductID: productId, ProductName: productName, Price: price, PetTypeID: petTypeId, Description: description, Quantity: quantity, ImageURL: imageURL, Status: 'Available' });
-      await product.save();
-      res.status(201).json(product);
+    const productId = await generateProductId(); // Generate a new ProductID
+    const { productName, price, quantity, petTypeId, description, status } = req.body;
+
+    let productData = {
+      ProductID: productId,
+      ProductName: productName,
+      Price: price,
+      PetTypeID: petTypeId,
+      Description: description,
+      Quantity: quantity,
+      Status: status,
+    };
+
+    if (req.file && req.file.path) {
+      productData.ImageURL = req.file.path;
+    }
+
+    const product = new Product(productData);
+    const savedProduct = await product.save();
+    res.status(201).json(savedProduct);
   } catch (error) {
-      res.status(500).json({ message: 'Error creating product', error });
+    res.status(500).json({ message: 'Error creating product', error });
   }
 };
 
@@ -55,9 +71,6 @@ exports.createProduct = async (req, res) => {
   }
 };
 
-
-
-
  //Get product by pet type
  exports.getProductsByPetType = async (req, res) => {
   try {
@@ -79,6 +92,23 @@ exports.createProduct = async (req, res) => {
     delete updateData.productId;// remove the product id to prevent updating it
   
     try {
+       // Check if a new file is uploaded
+    if (req.file && req.file.path) {
+      const product = await Product.findOne({ ProductID: id });
+
+      if (!product) {
+        return res.status(404).json({ message: 'Product not found' });
+      }
+
+      // Delete the old image from Cloudinary if it exists
+      if (product.ImageURL) {
+        const publicId = product.ImageURL.split('/').pop().split('.')[0]; // Extract the public ID from the URL
+        await cloudinary.uploader.destroy(publicId);
+      }
+
+      // Update the image URL with the new one
+      updateData.ImageURL = req.file.path;
+    }
       // Find the product by ID and update it with the new data
       const product = await Product.findOneAndUpdate({ ProductID: id }, updateData, { new: true }); // The { new: true } option returns the updated document
   
@@ -97,7 +127,20 @@ exports.createProduct = async (req, res) => {
   //Delete product (manager only)
   exports.deleteProduct = async (req, res) => {
     try {
-      const product = await Product.findOneAndDelete({ ProductID: req.params.id });
+        // Find the product by ID
+    const product = await Product.findOne({ ProductID: req.params.id });
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    // Delete the image from Cloudinary if it exists
+    if (product.ImageURL) {
+      const publicId = product.ImageURL.split('/').pop().split('.')[0]; // Extract the public ID from the URL
+      await cloudinary.uploader.destroy(publicId);
+    }
+
+    // Delete the product
+      await Product.findOneAndDelete({ ProductID: req.params.id });
       if (!product) {
         return res.status(404).json({ message: 'Product not found' });
       }

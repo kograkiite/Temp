@@ -9,18 +9,20 @@ const { Title } = Typography;
 const ProductList = () => {
   const [productData, setProductData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false); // State for API call status
   const [userRole] = useState(localStorage.getItem('role') || 'Guest');
-  const [petTypeId] = useState('PT002');
+  const [petTypeID] = useState('PT002');
   const [editMode, setEditMode] = useState(null); // null: view mode, id: edit mode
   const [addMode, setAddMode] = useState(false); // false: view mode, true: add mode
   const [form] = Form.useForm();
+  const [productImg, setProductImg] = useState(""); // For image upload
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get('http://localhost:3001/api/products');
-        const filteredProducts = response.data.filter(product => product.PetTypeID === petTypeId);
+        const filteredProducts = response.data.filter(product => product.PetTypeID === petTypeID);
         setProductData(filteredProducts);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -30,62 +32,10 @@ const ProductList = () => {
     };
 
     fetchProducts();
-  }, [petTypeId]);
+  }, [petTypeID]);
 
   const handleProductClick = (id) => {
     navigate(`/product-detail/${id}`);
-  };
-
-  const handleEditClick = (record) => {
-    setEditMode(record.ProductID);
-    form.setFieldsValue({
-      ProductName: record.ProductName,
-      Price: record.Price,
-      Description: record.Description,
-      ImageURL: record.ImageURL,
-      Status: record.Status
-    });
-  };
-
-  const handleCancelEdit = () => {
-    setEditMode(null);
-    form.resetFields();
-  };
-
-  const handleSaveEdit = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        message.error('Authorization token not found. Please log in.');
-        return;
-      }
-
-      const values = await form.validateFields(); // Validate form fields
-      const updatedProduct = {
-        ProductName: values.ProductName,
-        Price: parseFloat(values.Price),
-        Description: values.Description,
-        ImageURL: values.ImageURL,
-        Status: values.Status
-      };
-
-      await axios.patch(`http://localhost:3001/api/products/${editMode}`, updatedProduct, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      message.success('Product updated successfully', 0.5).then(() => {
-        window.location.reload(); // Reload the page after successful update
-      });
-    } catch (error) {
-      console.error('Error updating product:', error);
-      if (error.response && error.response.status === 401) {
-        message.error('Unauthorized. Please log in.');
-      } else {
-        message.error('Error updating product');
-      }
-    }
   };
 
   const handleAddClick = () => {
@@ -95,32 +45,40 @@ const ProductList = () => {
   const handleCancelAdd = () => {
     setAddMode(false);
     form.resetFields();
+    setProductImg(""); // Reset image state
   };
 
   const handleSaveAdd = async () => {
     try {
+      setSaving(true); // Start saving
       const token = localStorage.getItem('token');
       if (!token) {
         message.error('Authorization token not found. Please log in.');
         return;
       }
-
-      const values = await form.validateFields(); // Validate form fields
-      const newProduct = {
-        productName: values.ProductName,
-        price: parseFloat(values.Price),
-        description: values.Description,
-        imageURL: values.ImageURL,
-        petTypeID: petTypeId,
-        status: values.Status
-      };
-
-      const response = await axios.post(`http://localhost:3001/api/products`, newProduct, {
+  
+      const values = await form.validateFields();
+      const formData = new FormData();
+      formData.append('productName', values.ProductName);
+      formData.append('price', parseFloat(values.Price));
+      formData.append('description', values.Description);
+      formData.append('quantity', parseInt(values.Quantity, 10));
+      formData.append('petTypeId', petTypeID);
+      formData.append('status', values.Status);
+      if (productImg) {
+        formData.append('image', productImg);
+      } else {
+        message.error('Please upload the product image!');
+        return;
+      }
+      message.warning('Processing...')
+      const response = await axios.post('http://localhost:3001/api/products', formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
         },
       });
-
+      
       if (response.status === 201) {
         message.success('Product added successfully', 0.5).then(() => {
           window.location.reload();
@@ -130,14 +88,103 @@ const ProductList = () => {
       }
     } catch (error) {
       console.error('Error adding product:', error);
-      if (error.response && error.response.status === 401) {
-        message.error('Unauthorized. Please log in.');
-      } else if (error.response && error.response.data && error.response.data.message) {
-        message.error(`Error adding product: ${error.response.data.message}`);
+      if (error.response) {
+        if (error.response.status === 401) {
+          message.error('Unauthorized. Please log in.');
+        } else if (error.response.data && error.response.data.message) {
+          message.error(`Error adding product: ${error.response.data.message}`);
+        } else {
+          message.error('Error adding product');
+        }
+      } else if (error.request) {
+        message.error('Error adding product: Network or server issue');
       } else {
-        message.error('Error adding product');
+        message.error(`Error adding product: ${error.message}`);
       }
+    } finally {
+      setSaving(false); // End saving
     }
+  };
+
+  const handleEditClick = (record) => {
+    setEditMode(record.ProductID);
+    form.setFieldsValue({
+      ProductName: record.ProductName,
+      Price: record.Price,
+      Description: record.Description,
+      Quantity: record.Quantity,
+      Status: record.Status,
+    });
+    setProductImg(""); // Reset image state
+  };
+
+  const handleCancelEdit = () => {
+    setEditMode(null);
+    form.resetFields();
+    setProductImg(""); // Reset image state
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      setSaving(true); // Start saving
+      const token = localStorage.getItem('token');
+      if (!token) {
+        message.error('Authorization token not found. Please log in.');
+        return;
+      }
+
+      const values = await form.validateFields();
+      const formData = new FormData();
+      formData.append('productName', values.ProductName);
+      formData.append('price', parseFloat(values.Price));
+      formData.append('description', values.Description);
+      formData.append('quantity', parseInt(values.Quantity, 10));
+      formData.append('status', values.Status);
+      if (productImg) {
+        formData.append('image', productImg);
+      }
+      message.warning('Processing...')
+      // for (let [key, value] of formData.entries()) {
+      //   console.log(`${key}: ${value}`);
+      // }
+      const response = await axios.patch(`http://localhost:3001/api/products/${editMode}`, formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      if (response.status === 200) {
+        message.success('Product updated successfully', 0.5).then(() => {
+          window.location.reload();
+        });
+      } else {
+        message.error('Failed to update product: Unexpected server response');
+      }
+    } catch (error) {
+      console.error('Error updating product:', error);
+      if (error.response) {
+        if (error.response.status === 401) {
+          message.error('Unauthorized. Please log in.');
+        } else if (error.response.data && error.response.data.message) {
+          message.error(`Error updating product: ${error.response.data.message}`);
+        } else {
+          message.error('Error updating product');
+        }
+      } else if (error.request) {
+        message.error('Error updating product: Network or server issue');
+      } else {
+        message.error(`Error updating product: ${error.message}`);
+      }
+    } finally {
+      setSaving(false); // End saving
+    }
+  };
+
+  const handleProductImageUpload = (e) => {
+    const file = e.target.files[0];
+    setProductImg(file);
+    form.setFieldsValue({ Image: file });
   };
 
   const columns = [
@@ -193,6 +240,11 @@ const ProductList = () => {
       ),
     },
     {
+      title: 'Quantity',
+      dataIndex: 'Quantity',
+      key: 'Quantity',
+    },
+    {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
@@ -204,7 +256,7 @@ const ProductList = () => {
       ),
     },
   ];
-  console.log(productData)
+
   return (
     <div className="p-10">
       <Title level={1} className='text-center'>Product for cats</Title>
@@ -212,14 +264,14 @@ const ProductList = () => {
         {userRole === 'Store Manager' ? (
           <>
             <Table
-               dataSource={productData}
-               columns={columns}
-               rowKey="ProductID"
-               loading={loading}
-               bordered
-               scroll={{ x: 'max-content' }}
+              dataSource={productData}
+              columns={columns}
+              rowKey="ProductID"
+              loading={loading}
+              bordered
+              scroll={{ x: 'max-content' }}
             />
-                        <div className="flex justify-end mt-4">
+            <div className="flex justify-end mt-4">
               <Button type="primary" onClick={handleAddClick} disabled={loading}>Add Product</Button>
             </div>
           </>
@@ -258,12 +310,14 @@ const ProductList = () => {
       </Form>
 
       <Modal
-        title="Add New Product"
-        visible={addMode}
-        onCancel={handleCancelAdd}
+        title={editMode ? "Edit Product" : "Add New Product"}
+        visible={addMode || editMode !== null}
+        onCancel={editMode ? handleCancelEdit : handleCancelAdd}
         footer={[
-          <Button key="cancel" onClick={handleCancelAdd}>Cancel</Button>,
-          <Button key="submit" type="primary" onClick={handleSaveAdd}>Add</Button>,
+          <Button key="cancel" onClick={editMode ? handleCancelEdit : handleCancelAdd} disabled={saving}>Cancel</Button>,
+          <Button key="submit" type="primary" onClick={editMode ? handleSaveEdit : handleSaveAdd} disabled={saving}>
+            {editMode ? "Save" : "Add"}
+          </Button>,
         ]}
         style={{ textAlign: 'center' }}
       >
@@ -287,67 +341,29 @@ const ProductList = () => {
             <Input placeholder="Description" />
           </Form.Item>
           <Form.Item
-            name="ImageURL"
+            name="Image"
             rules={[{ required: true, message: 'Please upload the product image!' }]}
           >
-            <Input placeholder="Image URL" />
+            <Input type="file" onChange={handleProductImageUpload} />
+            {productImg && (
+              <Image src={URL.createObjectURL(productImg)} alt="Product Preview" style={{ width: '100px', marginTop: '10px' }} />
+            )}
           </Form.Item>
           <Form.Item
-              name="Status"
-              rules={[{ required: true, message: 'Please select the service status!' }]}
-            >
-              <Select placeholder="Select Status">
-                <Option value="Available">Available</Option>
-                <Option value="Unavailable">Unavailable</Option>
-              </Select>
-            </Form.Item>
-        </Form>
-      </Modal>
-
-      <Modal
-        title="Edit Product"
-        visible={editMode !== null}
-        onCancel={handleCancelEdit}
-        footer={[
-          <Button key="cancel" onClick={handleCancelEdit}>Cancel</Button>,
-          <Button key="submit" type="primary" onClick={handleSaveEdit}>Save</Button>,
-        ]}
-        style={{ textAlign: 'center' }}
-      >
-        <Form form={form} className='text-left'>
-          <Form.Item
-            name="ProductName"
-            rules={[{ required: true, message: 'Please enter the product name!' }]}
+            name="Quantity"
+            rules={[{ required: true, message: 'Please enter the product quantity' }]}
           >
-            <Input placeholder="Product Name" />
+            <Input placeholder="Quantity" />
           </Form.Item>
           <Form.Item
-            name="Price"
-            rules={[{ required: true, message: 'Please enter the product price!' }]}
+            name="Status"
+            rules={[{ required: true, message: 'Please select the product status' }]}
           >
-            <Input placeholder="Price" />
+            <Select placeholder="Status">
+              <Option value="Available">Available</Option>
+              <Option value="Unavailable">Unavailable</Option>
+            </Select>
           </Form.Item>
-          <Form.Item
-            name="Description"
-            rules={[{ required: true, message: 'Please enter the product description' }]}
-          >
-            <Input placeholder="Description" />
-          </Form.Item>
-          <Form.Item
-            name="ImageURL"
-            rules={[{ required: true, message: 'Please upload the product image!' }]}
-          >
-            <Input placeholder="Image URL" />
-          </Form.Item>
-          <Form.Item
-              name="Status"
-              rules={[{ required: true, message: 'Please select the service status!' }]}
-            >
-              <Select placeholder="Select Status">
-                <Option value="Available">Available</Option>
-                <Option value="Unavailable">Unavailable</Option>
-              </Select>
-            </Form.Item>
         </Form>
       </Modal>
     </div>
@@ -355,4 +371,3 @@ const ProductList = () => {
 };
 
 export default ProductList;
-

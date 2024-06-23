@@ -3,7 +3,7 @@ import Footer from '../components/HomePage/Footer'
 import ProductList from '../components/StorePage/ForDogPage/ProductList'
 
 
-const ForDogPage = () => {
+const ProductForDogPage = () => {
   return (
     <div>
         <Banner/>
@@ -13,4 +13,4 @@ const ForDogPage = () => {
   )
 }
 
-export default ForDogPage
+export default ProductForDogPage

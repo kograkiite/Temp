@@ -8,8 +8,10 @@ import AboutPage from './pages/AboutPage'
 import ContactPage from './pages/ContactPage'
 import HotelServicePage from './pages/HotelServicePage'
 import SpaServicePage from './pages/SpaServicePage'
-import ForDogPage from './pages/ForDogPage'
-import ForCatPage from './pages/ForCatPage'
+import ProductForDogPage from './pages/ProductForDogPage'
+import ProductForCatPage from './pages/ProductForCatPage'
+import ServiceForDogPage from './pages/ServiceForDogPage'
+import ServiceForCatPage from './pages/ServiceForCatPage'
 import LoginPage from './pages/LoginPage'
 import UserProfilePage from './pages/UserProfilePage'
 import ChangePasswordPage from './pages/ChangePasswordPage'
@@ -19,9 +21,6 @@ import OrderHistoryPage from './pages/OrderHistoryPage'
 import CartPage from './pages/CartPage'
 import OrderPage from './pages/OrderPage'
 import ManageAccountPage from './pages/ManageAccountPage'
-import BookingListPage from './pages/BookingListPage'
-import BookingDetailPage from './pages/BookingDetailPage'
-import BookingFeedbackPage from './pages/BookingFeedbackPage'
 import SpaServiceDetailPage from './pages/SpaServiceDetailPage'
 import RegisterPage from './pages/RegisterPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
@@ -34,7 +33,10 @@ import HotelBookingPage from './pages/HotelBookingPage'
 import OrderHistoryDetail from './pages/OrderHistoryDetailPage'
 import SpaBookingDetailPage from './pages/SpaBookingDetailPage'
 import HotelBookingDetailPage from './pages/HotelBookingDetailPage'
-
+import ManageOrderPage from './pages/ManageOrderPage'
+import ManageSpaBookingPage from './pages/ManageSpaBookingPage'
+import ManageHotelBookingsList from './pages/ManageHotelBookingsList'
+console.log(process.env.PAYPAL_CLIENT_ID)
 function App() {
   return (
     <>
@@ -45,8 +47,10 @@ function App() {
       <Route path='/login' element={<LoginPage/>}/>
       <Route path='/register' element={<RegisterPage/>}/>
       <Route path='/forgot-password' element={<ForgotPasswordPage/>}/>
-      <Route path='/for-dog-products' element={<ForDogPage/>}/>
-      <Route path='/for-cat-products' element={<ForCatPage/>}/>
+      <Route path='/products-for-dog' element={<ProductForDogPage/>}/>
+      <Route path='/products-for-cat' element={<ProductForCatPage/>}/>
+      <Route path='/services-for-dog' element={<ServiceForDogPage/>}/>
+      <Route path='/services-for-cat' element={<ServiceForCatPage/>}/>
       <Route path='/spa-service' element={<SpaServicePage/>}/>
       <Route path='/hotel-service' element={<HotelServicePage/>}/>
       <Route path='/user-profile' element={<UserProfilePage/>}/>
@@ -58,9 +62,6 @@ function App() {
       <Route path='/cart' element={<CartPage/>}/>
       <Route path='/order' element={<OrderPage/>}/>
       <Route path='/manage-accounts' element={<ManageAccountPage/>}/>
-      <Route path='/booking-list' element={<BookingListPage/>}/>
-      <Route path='/booking-detail/:id' element={<BookingDetailPage/>}/>
-      <Route path='/booking-feedback' element={<BookingFeedbackPage/>}/>
       <Route path='/reset-password/:accountId/:token' element={<ResetPasswordPage/>}/>
       <Route path='/staff-schedule' element={<SchedulePage/>}/>
       <Route path='/pet-booking' element={<PetBooking/>}/>
@@ -69,6 +70,9 @@ function App() {
       <Route path='/orders-history-detail/:id' element={<OrderHistoryDetail/>}/>
       <Route path='/spa-booking-detail/:id' element={<SpaBookingDetailPage/>}/>
       <Route path='/hotel-booking-detail/:id' element={<HotelBookingDetailPage/>}/>
+      <Route path='/manage-orders' element={<ManageOrderPage/>}/>
+      <Route path='/manage-spa-bookings' element={<ManageSpaBookingPage/>}/>
+      <Route path='/manage-hotel-bookings' element={<ManageHotelBookingsList/>}/>
     </Routes>
     </>
   )
