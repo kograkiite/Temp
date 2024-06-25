@@ -9,17 +9,18 @@ const productRoutes = require('./routes/productRoutes');
 const accountRoutes = require('./routes/accountRoutes');
 const scheduleRoutes = require('./routes/scheduleRoutes');
 const petRoutes = require('./routes/petRoutes'); 
-const serviceRoutes = require('./routes/serviceRoutes'); 
+const spaServiceRoutes = require('./routes/spaServiceRoutes'); 
 const orderRoutes = require('./routes/orderRoutes');
 const hotelRoutes = require('./routes/hotelRoutes');
 const hotelBookingRoutes = require('./routes/hotelBookingRoutes');
 const spaBookingRoutes = require('./routes/spaBookingRoutes');
 const commentRoutes = require('./routes/commentRoutes');
+const orderDetailsRoutes = require('./routes/orderDetailsRoutes');
 
 
 const dotenv = require('dotenv');
 
-dotenv.config();
+require('dotenv').config();
 
 const app = express();
 
@@ -50,7 +51,7 @@ app.use('/api/accounts', accountRoutes);
 app.use('/api/pets', petRoutes); 
 
 // Use service routes
-app.use('/api/services', serviceRoutes); 
+app.use('/api/services', spaServiceRoutes); 
 
 // Use hotel routes
 app.use('/api/hotels', hotelRoutes);
@@ -60,6 +61,9 @@ app.use('/api/schedules', scheduleRoutes);
 
 // Order Routes
 app.use('/api/orders', orderRoutes);
+
+// Order Details Routes
+app.use('/api/order-details', orderDetailsRoutes);
 
 // Hotel booking Routes
 app.use('/api/Hotel-bookings', hotelBookingRoutes);

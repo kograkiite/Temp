@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Layout, Spin, message } from "antd";
+import { Table, Button, Typography, Layout, Spin, message, Modal } from "antd";
 import axios from 'axios';
 
 const { Text } = Typography;
+const { confirm } = Modal;
 
 const OrderList = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [sortOrder, setSortOrder] = useState('desc');
-  const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
+  const [role] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false);
 
   const getOrderHistory = async () => {
@@ -58,21 +59,50 @@ const OrderList = () => {
     setSortOrder(prevSortOrder => prevSortOrder === 'desc' ? 'asc' : 'desc');
   };
 
+  const showConfirm = (orderId, newStatus) => {
+    confirm({
+      title: 'Are you sure you want to update the order status?',
+      content: `Change status to "${newStatus}"?`,
+      onOk() {
+        handleUpdateStatus(orderId, newStatus);
+      },
+      onCancel() {
+        console.log('Cancelled');
+      },
+    });
+  };
+
   const handleUpdateStatus = async (orderId, newStatus) => {
     const token = localStorage.getItem('token');
     try {
-      await axios.put(`http://localhost:3001/api/orders/${orderId}`, 
+      await axios.put(
+        `http://localhost:3001/api/orders/${orderId}`, 
         { Status: newStatus }, 
         {
-            headers: {
+          headers: {
             Authorization: `Bearer ${token}`,
-            },
-        });
+          },
+        }
+      );
       message.success('Order status updated successfully');
       fetchOrderHistory(); // Refresh order list after update
     } catch (error) {
       console.error('Error updating order status:', error);
       message.error('Failed to update order status');
+    }
+  };
+
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case 'Processing':
+      case 'Delivering':
+        return { color: 'orange' };
+      case 'Shipped':
+        return { color: 'green' };
+      case 'Canceled':
+        return { color: 'red' };
+      default:
+        return {};
     }
   };
 
@@ -82,10 +112,10 @@ const OrderList = () => {
         case 'Processing':
           return (
             <div>
-              <Button type="primary" className="w-36 mr-2" onClick={() => handleUpdateStatus(record.id, 'Delivering')}>
+              <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Delivering')}>
                 Delivering
               </Button>
-              <Button danger className="w-36" onClick={() => handleUpdateStatus(record.id, 'Canceled')}>
+              <Button danger className="w-36" onClick={() => showConfirm(record.id, 'Canceled')}>
                 Cancel
               </Button>
             </div>
@@ -93,10 +123,10 @@ const OrderList = () => {
         case 'Delivering':
           return (
             <div>
-              <Button type="primary" className="w-36 mr-2" onClick={() => handleUpdateStatus(record.id, 'Shipped')}>
+              <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Shipped')}>
                 Shipped
               </Button>
-              <Button danger className="w-36" onClick={() => handleUpdateStatus(record.id, 'Canceled')}>
+              <Button danger className="w-36" onClick={() => showConfirm(record.id, 'Canceled')}>
                 Cancel
               </Button>
             </div>
@@ -140,6 +170,9 @@ const OrderList = () => {
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
+      render: (text, record) => (
+        <Text style={getStatusStyle(record.status)}>{record.status}</Text>
+      )
     },
     {
       title: 'Chi tiết',

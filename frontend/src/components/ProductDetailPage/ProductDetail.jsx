@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Input, Image, Form, message, Typography, Skeleton, Select, Breadcrumb, List, Rate } from 'antd';
+import { Button, Input, Image, Form, message, Typography, Skeleton, Select, List, Rate } from 'antd';
 import useShopping from '../../hook/useShopping';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
@@ -15,6 +16,7 @@ const ProductDetail = () => {
     const [loading, setLoading] = useState(true);
     const [editMode, setEditMode] = useState(false);
     const [form] = Form.useForm();
+    const navigate = useNavigate();
     const userRole = localStorage.getItem('role') || 'Guest';
 
     const fetchProductDetail = async () => {
@@ -39,8 +41,9 @@ const ProductDetail = () => {
                 }
             };
             const response = await axios.get(`http://localhost:3001/api/comments/product/${id}`, config);
-            if (response.data && response.data.comments[0] && response.data.comments[0].CommentDetails) {
-                const commentsData = response.data.comments[0].CommentDetails;
+            if (response.data && response.data.comments) {
+                const commentsData = response.data.comments;
+                console.log(commentsData)
                 const updatedComments = await Promise.all(
                     commentsData.map(async (comment) => {
                         // Fetch account information for each comment
@@ -139,28 +142,18 @@ const ProductDetail = () => {
         const totalRating = comments.reduce((acc, curr) => acc + curr.Rating, 0);
         return totalRating / comments.length;
     };
-
-    
-    const PetTypeID = productData.PetTypeID;
     return (
         productData && (
             <div>
-                <div className="flex flex-col md:flex-row m-5 px-4 md:px-32">
-                    <Breadcrumb style={{ marginBottom: '20px' }}>
-                        <Breadcrumb.Item>
-                            <Link to="/">Trang chủ</Link>
-                        </Breadcrumb.Item>
-                        <Breadcrumb.Item>
-                            {PetTypeID === 'PT001' ? (
-                                <Link to="/for-dog-products">Sản phẩm cho chó</Link>
-                            ) : PetTypeID === 'PT002' ? (
-                                <Link to="/for-cat-products">Sản phẩm cho mèo</Link>
-                            ) : (
-                                <Link to="/for-other-products">Danh sách sản phẩm</Link>
-                            )}
-                        </Breadcrumb.Item>
-                        <Breadcrumb.Item>{productData.ProductName}</Breadcrumb.Item>
-                    </Breadcrumb>
+                <div className="flex flex-row md:flex-row m-5 px-4 md:px-32">
+                    <Button
+                        onClick={() => navigate(-1)}
+                        className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-300"
+                        icon={<ArrowLeftOutlined />}
+                        size="large"
+                    >
+                        Quay về
+                    </Button>
                 </div>
                 <div className="flex flex-col md:flex-row m-5 px-4 md:px-32">
                     <div className="w-full md:w-1/2 flex justify-center">
@@ -173,6 +166,13 @@ const ProductDetail = () => {
                                     name="ProductName"
                                     label="Tên sản phẩm"
                                     rules={[{ required: true, message: 'Hãy nhập tên sản phẩm!' }]}
+                                >
+                                    <Input disabled={!editMode} />
+                                </Form.Item>
+                                <Form.Item
+                                    name="Quantity"
+                                    label="Số lượng tồn kho"
+                                    rules={[{ required: true, message: 'Hãy nhập số lượng tồn kho!' }]}
                                 >
                                     <Input disabled={!editMode} />
                                 </Form.Item>
@@ -211,6 +211,7 @@ const ProductDetail = () => {
                         ) : (
                             <div>
                                 <Title level={3}>{productData.ProductName}</Title>
+                                <Paragraph>{`Số lượng tồn kho: ${productData.Quantity}`}</Paragraph>
                                 <Paragraph>{`Giá: ${productData.Price}`}</Paragraph>
                                 <Paragraph>{`Mô tả: ${productData.Description}`}</Paragraph>
                             </div>
@@ -277,7 +278,7 @@ const ProductDetail = () => {
                             <List.Item key={item.AccountID}>
                                 <List.Item.Meta
                                     title={item.username}  // Display username here
-                                    description={item.Comment}
+                                    description={item.CommentContent}
                                 />
                                 <Rate disabled defaultValue={item.Rating} />
                             </List.Item>
