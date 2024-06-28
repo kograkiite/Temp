@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Table, Button, Typography, Layout, Spin, message, Modal } from "antd";
 import axios from 'axios';
+import moment from "moment";
 
 const { Text } = Typography;
 const { confirm } = Modal;
@@ -34,24 +35,23 @@ const OrderList = () => {
   }, [sortOrder]);
 
   const fetchOrderHistory = async () => {
-    setLoading(true);
+    setLoading(true); // Start loading indicator
     try {
       const data = await getOrderHistory();
       const formattedData = data.map(order => ({
         id: order.OrderID,
-        date: new Date(order.OrderDate),
-        description: order.Address,
-        amount: order.TotalPrice,
-        status: order.Status
+        date: order.OrderDate,
+        status: order.Status,
+        amount: order.TotalPrice
       }));
-      const sortedData = sortOrder === 'desc' 
-        ? formattedData.sort((a, b) => b.date - a.date) 
-        : formattedData.sort((a, b) => a.date - b.date);
-      setOrders(sortedData);
+      const sortedData = sortOrder === 'desc'
+        ? formattedData.sort((a, b) => moment(b.date).diff(a.date))
+        : formattedData.sort((a, b) => moment(a.date).diff(b.date));
+      setOrders(sortedData); // Sắp xếp theo ngày
     } catch (error) {
       console.error('Error fetching order history:', error);
     } finally {
-      setLoading(false);
+      setLoading(false); // Stop loading indicator
     }
   };
 
@@ -150,13 +150,8 @@ const OrderList = () => {
       dataIndex: 'date',
       key: 'date',
       render: (text, record) => (
-        <Text>{new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(record.date)}</Text>
-      )
-    },
-    {
-      title: 'Mô tả',
-      dataIndex: 'description',
-      key: 'description',
+        <Text>{moment(record.date).format('DD/MM/YYYY HH:mm')}</Text> // Format date using moment.js
+      ),
     },
     {
       title: 'Số tiền',
@@ -178,7 +173,7 @@ const OrderList = () => {
       title: 'Chi tiết',
       key: 'detail',
       render: (text, record) => (
-        <Button type="link" onClick={() => navigate(`/orders-history-detail/${record.id}`)}>Chi tiết</Button>
+        <Button type="link" onClick={() => navigate(`/order-history-detail/${record.id}`)}>Chi tiết</Button>
       ),
     },
     {

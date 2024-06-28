@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Table, Button, Typography, Layout, Menu, Grid, Spin } from "antd";
 import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import axios from 'axios';
+import moment from 'moment';
 
 const { Text } = Typography;
 const { Sider } = Layout;
@@ -18,7 +19,6 @@ const OrderHistory = () => {
   const screens = useBreakpoint();
   const [user] = useState(JSON.parse(localStorage.getItem('user')))
   const AccountID = user.id
-
   const getOrderHistory = async () => {
     const token = localStorage.getItem('token');
     try {
@@ -45,14 +45,13 @@ const OrderHistory = () => {
       const data = await getOrderHistory();
       const formattedData = data.map(order => ({
         id: order.OrderID,
-        date: new Date(order.OrderDate),
-        description: order.Address,
-        amount: order.TotalPrice,
-        status: order.Status
+        date: order.OrderDate,
+        status: order.Status,
+        amount: order.TotalPrice
       }));
-      const sortedData = sortOrder === 'desc' 
-        ? formattedData.sort((a, b) => b.date - a.date) 
-        : formattedData.sort((a, b) => a.date - b.date);
+      const sortedData = sortOrder === 'desc'
+        ? formattedData.sort((a, b) => moment(b.date).diff(a.date))
+        : formattedData.sort((a, b) => moment(a.date).diff(b.date));
       setOrders(sortedData); // Sắp xếp theo ngày
     } catch (error) {
       console.error('Error fetching order history:', error);
@@ -86,13 +85,8 @@ const OrderHistory = () => {
       dataIndex: 'date',
       key: 'date',
       render: (text, record) => (
-        <Text>{new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(record.date)}</Text>
-      )
-    },
-    {
-      title: 'Mô tả',
-      dataIndex: 'description',
-      key: 'description',
+        <Text>{moment(record.date).format('DD/MM/YYYY HH:mm')}</Text> // Format date using moment.js
+      ),
     },
     {
       title: 'Số tiền',
@@ -129,7 +123,7 @@ const OrderHistory = () => {
       title: 'Chi tiết',
       key: 'detail',
       render: (text, record) => (
-        <Button type="link" onClick={() => navigate(`/orders-history-detail/${record.id}`)}>Chi tiết</Button>
+        <Button type="link" onClick={() => navigate(`/order-history-detail/${record.id}`)}>Chi tiết</Button>
       ),
     },
   ];
@@ -171,7 +165,7 @@ const OrderHistory = () => {
                 <Menu.Item
                   key="orders-history"
                   icon={<HistoryOutlined />}
-                  onClick={() => navigate('/orders-history')}
+                  onClick={() => navigate('/order-history')}
                 >
                   Lịch sử đặt hàng
                 </Menu.Item>

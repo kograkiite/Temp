@@ -11,11 +11,10 @@ const scheduleRoutes = require('./routes/scheduleRoutes');
 const petRoutes = require('./routes/petRoutes'); 
 const spaServiceRoutes = require('./routes/spaServiceRoutes'); 
 const orderRoutes = require('./routes/orderRoutes');
-const hotelRoutes = require('./routes/hotelRoutes');
-const hotelBookingRoutes = require('./routes/hotelBookingRoutes');
 const spaBookingRoutes = require('./routes/spaBookingRoutes');
 const commentRoutes = require('./routes/commentRoutes');
 const orderDetailsRoutes = require('./routes/orderDetailsRoutes');
+const SpaBookingDetailsRoutes = require('./routes/spaBookingDetailsRoutes');
 
 
 const dotenv = require('dotenv');
@@ -53,8 +52,6 @@ app.use('/api/pets', petRoutes);
 // Use service routes
 app.use('/api/services', spaServiceRoutes); 
 
-// Use hotel routes
-app.use('/api/hotels', hotelRoutes);
 
 // Work Schedule Routes
 app.use('/api/schedules', scheduleRoutes);
@@ -65,14 +62,15 @@ app.use('/api/orders', orderRoutes);
 // Order Details Routes
 app.use('/api/order-details', orderDetailsRoutes);
 
-// Hotel booking Routes
-app.use('/api/Hotel-bookings', hotelBookingRoutes);
 
 // Spa booking Routes
 app.use('/api/Spa-bookings', spaBookingRoutes);
 
 // Comment Routes
 app.use('/api/comments', commentRoutes);
+
+// Spa Booking Details Routes
+app.use('/api/spa-booking-details', SpaBookingDetailsRoutes);
 
 // Apply authMiddleware to protected routes
 app.use('/protected', authMiddleware);
