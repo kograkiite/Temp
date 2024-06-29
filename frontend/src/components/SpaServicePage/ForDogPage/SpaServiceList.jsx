@@ -4,7 +4,8 @@ import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, m
 import axios from 'axios';
 
 const { Option } = Select;
-const { Title } = Typography;
+const { Title, Paragraph } = Typography;
+const { TextArea } = Input;
 
 const SpaServiceList = () => {
   const [serviceData, setServiceData] = useState([]);
@@ -60,7 +61,7 @@ const SpaServiceList = () => {
       const values = await form.validateFields();
       const formData = new FormData();
       formData.append('ServiceName', values.ServiceName);
-      formData.append('Price', parseFloat(values.Price));
+      // formData.append('Price', parseFloat(values.Price));
       formData.append('Description', values.Description);
       formData.append('PetTypeID', petTypeID);
       formData.append('Status', values.Status);
@@ -112,7 +113,7 @@ const SpaServiceList = () => {
     setEditMode(record.ServiceID);
     form.setFieldsValue({
       ServiceName: record.ServiceName,
-      Price: record.Price,
+      // Price: record.Price,
       Description: record.Description,
       Status: record.Status,
     });
@@ -136,10 +137,10 @@ const SpaServiceList = () => {
 
       const values = await form.validateFields();
       const formData = new FormData();
-      formData.append('serviceName', values.ServiceName);
-      formData.append('price', parseFloat(values.Price));
-      formData.append('description', values.Description);
-      formData.append('status', values.Status);
+      formData.append('ServiceName', values.ServiceName);
+      // formData.append('price', parseFloat(values.Price));
+      formData.append('Description', values.Description);
+      formData.append('Status', values.Status);
       if (serviceImg) {
         formData.append('image', serviceImg);
       }
@@ -208,18 +209,24 @@ const SpaServiceList = () => {
         </div>
       ),
     },
-    {
-      title: 'Price',
-      dataIndex: 'Price',
-      key: 'Price',
-      render: (text) => (
-        <span>{typeof text === 'number' ? `$${text.toFixed(2)}` : '-'}</span>
-      ),
-    },
+    // {
+    //   title: 'Price',
+    //   dataIndex: 'Price',
+    //   key: 'Price',
+    //   render: (text) => (
+    //     <span>{typeof text === 'number' ? `$${text.toFixed(2)}` : '-'}</span>
+    //   ),
+    // },
     {
       title: 'Description',
       dataIndex: 'Description',
       key: 'Description',
+      ellipsis: true, // Enable ellipsis if description is too long
+      render: (text) => (
+        <Paragraph style={{ whiteSpace: 'pre-line' }} ellipsis={{ rows: 1, expandable: true, symbol: 'more' }}>
+          {text}
+        </Paragraph>
+      ),
     },
     {
       title: 'Image URL',
@@ -251,7 +258,6 @@ const SpaServiceList = () => {
       ),
     },
   ];
-
   return (
     <div className="p-10">
       <Title level={1} className="text-center">Services for Dogs</Title>
@@ -287,15 +293,16 @@ const SpaServiceList = () => {
                   className="bg-white rounded-lg shadow-md transition-transform transform-gpu hover:scale-105"
                   onClick={() => handleServiceClick(service.ServiceID)}
                 >
-                  <img 
+                  <Image 
                     alt={service.ServiceName} 
                     src={service.ImageURL} 
+                    preview={false}
                     className="rounded-t-lg w-full h-44 object-cover" 
                   />
                   <div className="p-4">
                     <h3 className="text-2xl font-semibold">{service.ServiceName}</h3>
-                    <p className="text-green-600 mt-2 text-3xl">${service.Price.toFixed(2)}</p>
-                    <p className="text-gray-500 mt-2">{service.Description}</p>
+                    {/* <p className="text-green-600 mt-2 text-3xl">${service.Price.toFixed(2)}</p> */}
+                    {/* <p className="text-gray-500 mt-2">{service.Description}</p> */}
                   </div>
                 </Card>
               ))
@@ -316,37 +323,39 @@ const SpaServiceList = () => {
         ]}
         style={{ textAlign: 'center' }}
       >
-        <Form form={form} className="text-left">
+        <Form form={form} className="text-left" layout='vertical'>
           <Form.Item
             name="ServiceName"
+            label="Service Name"
             rules={[{ required: true, message: 'Please enter the service name!' }]}
+            className="mb-4"
           >
-            <Input placeholder="Service Name" />
-          </Form.Item>
-          <Form.Item
-            name="Price"
-            rules={[{ required: true, message: 'Please enter the service price!' }]}
-          >
-            <Input placeholder="Price" />
+            <Input placeholder="Service Name" className="w-full p-2 border border-gray-300 rounded" />
           </Form.Item>
           <Form.Item
             name="Description"
+            label="Description"
             rules={[{ required: true, message: 'Please enter the service description' }]}
+            className="mb-4"
           >
-            <Input placeholder="Description" />
+            <TextArea rows={10} placeholder="Description" style={{ whiteSpace: 'pre-wrap' }} className="w-full p-2 border border-gray-300 rounded" />
           </Form.Item>
           <Form.Item
             name="Image"
+            label="Image"
             rules={[{ required: true, message: 'Please upload the service image!' }]}
+            className="mb-4"
           >
-            <Input type="file" onChange={handleServiceImageUpload} />
+            <Input type="file" onChange={handleServiceImageUpload} className="w-full p-2 border border-gray-300 rounded" />
             {serviceImg && (
-              <Image src={URL.createObjectURL(serviceImg)} alt="Service Preview" style={{ width: '100px', marginTop: '10px' }} />
+              <Image src={URL.createObjectURL(serviceImg)} alt="Service Preview" style={{ width: '100px', marginTop: '10px' }} className="block" />
             )}
           </Form.Item>
           <Form.Item
             name="Status"
+            label="Status"
             rules={[{ required: true, message: 'Please select the service status' }]}
+            className="mb-4"
           >
             <Select placeholder="Select Status">
               <Option value="Available">Available</Option>

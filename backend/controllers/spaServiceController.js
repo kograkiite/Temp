@@ -12,7 +12,7 @@ exports.createService = async (req, res) => {
       ServiceName: ServiceName,
       Description: Description,
       PetTypeID: PetTypeID,
-      Price: Price,
+      // Price: Price,
       Status: Status,
     });
 
@@ -56,7 +56,6 @@ exports.updateService = async (req, res) => {
   const { id } = req.params;
   const updateData = req.body;
   delete updateData.serviceId; // Ensure ServiceID is not updated accidentally
-
   try {
     if (req.file && req.file.path) {
       const service = await SpaService.findOne({ ServiceID: id });
