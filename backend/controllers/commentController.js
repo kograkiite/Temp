@@ -9,7 +9,7 @@ const { generateCommentID } = require('../utils/idGenerators');
 // Create a new comment
 exports.createComment = async (req, res) => {
   const { ProductID, AccountID, Rating, CommentContent } = req.body;
-  console.log(req.body)
+  
   try {
     const comment = await Comment.findOne({ AccountID: AccountID, ProductID: ProductID });
 

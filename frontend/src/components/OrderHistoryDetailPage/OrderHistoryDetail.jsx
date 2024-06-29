@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Spin, Card, Typography, Table, Button, Modal, Rate, Input, message } from 'antd';
+import { Spin, Card, Typography, Table, Button, Modal, Rate, Input, message, Image } from 'antd';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import 'tailwindcss/tailwind.css';
@@ -85,18 +85,19 @@ const OrderHistoryDetail = () => {
   
       // Fetch product details for each product in order detail
       const productsWithDetails = await Promise.all(
-        orderDetailData.Products.map(async (product) => {
+        orderDetailData.Items.map(async (product) => {
           const productDetails = await getProductById(product.ProductID);
           return {
             ...product,
             ProductName: productDetails.ProductName,
             Price: productDetails.Price,
             Quantity: product.Quantity,
+            ImageURL: productDetails.ImageURL
           };
         })
       );
   
-      setOrderDetail({ ...orderDetailData, Products: productsWithDetails });
+      setOrderDetail({ ...orderDetailData, Items: productsWithDetails });
     } catch (error) {
       console.error('Error fetching order details:', error);
     } finally {
@@ -138,7 +139,7 @@ const OrderHistoryDetail = () => {
           }
       
           // Update inventory quantities for each product in order detail
-          await updateInventoryQuantities(orderDetail.Products);
+          await updateInventoryQuantities(orderDetail.Items);
       
           // Fetch updated order details
           fetchOrderDetails(order.OrderID);
@@ -154,48 +155,48 @@ const OrderHistoryDetail = () => {
   };
 
   // Function to update inventory quantities for products
-const updateInventoryQuantities = async (products) => {
-  try {
-    // Iterate over each product in the order detail
-    for (const product of products) {
-      const productId = product.ProductID;
-      const quantity = product.Quantity;
+  const updateInventoryQuantities = async (products) => {
+    try {
+      // Iterate over each product in the order detail
+      for (const product of products) {
+        const productId = product.ProductID;
+        const quantity = product.Quantity;
 
-      // Make API call to get current inventory quantity
-      const inventoryResponse = await axios.get(`http://localhost:3001/api/products/${productId}`);
+        // Make API call to get current inventory quantity
+        const inventoryResponse = await axios.get(`http://localhost:3001/api/products/${productId}`);
 
-      if (inventoryResponse.status !== 200) {
-        throw new Error(`Failed to fetch inventory for ProductID ${productId}`);
-      }
-
-      const currentInventory = inventoryResponse.data.Quantity;
-
-      // Calculate new inventory quantity after cancellation
-      const newQuantity = currentInventory + quantity;
-
-      // Make API call to update the inventory
-      const updateResponse = await axios.patch(
-        `http://localhost:3001/api/products/${productId}`,
-        { Quantity: newQuantity },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json',
-          },
+        if (inventoryResponse.status !== 200) {
+          throw new Error(`Failed to fetch inventory for ProductID ${productId}`);
         }
-      );
 
-      if (updateResponse.status !== 200) {
-        throw new Error(`Failed to update inventory for ProductID ${productId}`);
+        const currentInventory = inventoryResponse.data.Quantity;
+
+        // Calculate new inventory quantity after cancellation
+        const newQuantity = currentInventory + quantity;
+
+        // Make API call to update the inventory
+        const updateResponse = await axios.patch(
+          `http://localhost:3001/api/products/${productId}`,
+          { Quantity: newQuantity },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        if (updateResponse.status !== 200) {
+          throw new Error(`Failed to update inventory for ProductID ${productId}`);
+        }
+
+        console.log(`Inventory updated successfully for ProductID ${productId}`);
       }
-
-      console.log(`Inventory updated successfully for ProductID ${productId}`);
+    } catch (error) {
+      console.error('Error updating inventory:', error);
+      message.error('Đã xảy ra lỗi khi cập nhật số lượng tồn kho.');
     }
-  } catch (error) {
-    console.error('Error updating inventory:', error);
-    message.error('Đã xảy ra lỗi khi cập nhật số lượng tồn kho.');
-  }
-};
+  };
 
 
   const handleSubmit = async () => {
@@ -261,6 +262,16 @@ const updateInventoryQuantities = async (products) => {
   };
 
   const columns = [
+    {
+      title: 'Hình ảnh',
+      dataIndex: 'ImageURL',
+      key: 'ImageURL',
+      render: (text, record) => (
+        <div className="flex items-center">
+          <Image src={record.ImageURL} alt={record.ProductName} width={80} />
+        </div>
+      ),
+    },
     {
       title: 'Tên sản phẩm',
       dataIndex: 'ProductName',
@@ -329,7 +340,7 @@ const updateInventoryQuantities = async (products) => {
           <Text strong>Địa chỉ:</Text> <Text>{orderDetail.Address}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Phí ship: $2</Text>
+          <Text strong>Phí ship: </Text> <Text>$2</Text>
         </div>
         <div className="mb-4">
           <Text strong>Tổng giá:</Text> <Text className="text-green-600">${order.TotalPrice}</Text>
@@ -339,13 +350,13 @@ const updateInventoryQuantities = async (products) => {
         </div>
         
         <Table
-          dataSource={orderDetail.Products}
+          dataSource={orderDetail.Items}
           columns={columns}
           rowKey="ProductID"
           bordered
         />
         {/* Render the cancel button conditionally */}
-        {role === 'Customer' && order.Status === 'Processing' && (
+        {(role === 'Customer' || role === 'Sales Staff') && order.Status === 'Processing' && (
           <Button danger className="float-end" onClick={handleCancelOrder} disabled={isSubmitting}>
             Hủy đơn hàng
           </Button>

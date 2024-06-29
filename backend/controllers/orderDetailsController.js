@@ -6,9 +6,9 @@ exports.createOrderDetail = async (req, res) => {
   try {
     // Generate a new OrderDetailsID
     const newId = await generateOrderDetailsID();
+
     // Create new order detail
     const orderDetail = new OrderDetails({ ...req.body, OrderDetailsID: newId });
-    console.log(orderDetail)
     await orderDetail.save();
     
     res.status(201).json(orderDetail);
@@ -30,7 +30,7 @@ exports.getOrderDetails = async (req, res) => {
 // Get order detail by ID
 exports.getOrderDetailById = async (req, res) => {
   try {
-    const orderDetail = await OrderDetails.findOne({ OrderDetailsID: req.params.id }).populate('Products.ProductID', 'ProductName Price')
+    const orderDetail = await OrderDetails.findOne({ OrderDetailsID: req.params.id }).populate('Products.ProductID', 'ProductName Price');
     if (!orderDetail) {
       return res.status(404).json({ error: 'Order Detail not found' });
     }

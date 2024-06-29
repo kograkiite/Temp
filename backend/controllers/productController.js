@@ -80,8 +80,8 @@ exports.getProductsByPetType = async (req, res) => {
 exports.updateProduct = async (req, res) => {
   const { id } = req.params;
   const updateData = req.body;
-  delete updateData.ProductID; // Loại bỏ ProductID nếu không muốn cập nhật trường này
-  console.log(updateData)
+  delete updateData.ProductID; // Remove the product ID to prevent updating it
+
   try {
     // Check if a new file is uploaded
     if (req.file && req.file.path) {
@@ -100,7 +100,7 @@ exports.updateProduct = async (req, res) => {
       // Update the image URL with the new one
       updateData.ImageURL = req.file.path;
     }
-    console.log(updateData)
+
     // Find the product by ID and update it with the new data
     const product = await Product.findOneAndUpdate({ ProductID: id }, updateData, { new: true });
 
@@ -114,7 +114,6 @@ exports.updateProduct = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
-
 
 // Delete product (manager only)
 exports.deleteProduct = async (req, res) => {
