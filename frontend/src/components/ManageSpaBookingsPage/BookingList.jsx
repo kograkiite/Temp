@@ -1,10 +1,12 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Layout, message, Spin, Modal } from "antd";
+import { Table, Button, Typography, Layout, message, Spin, Modal, Input, DatePicker } from "antd";
 import axios from 'axios';
+import moment from "moment";
 
 const { Text } = Typography;
+const { Search } = Input;
 
 const getSpaBookings = async () => {
   const token = localStorage.getItem('token');
@@ -21,32 +23,69 @@ const getSpaBookings = async () => {
   }
 };
 
+const getSpaBookingDetail = async (id) => {
+  const token = localStorage.getItem('token');
+  try {
+    const response = await axios.get(`http://localhost:3001/api/spa-booking-details/booking/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching spa booking detail:', error);
+    throw error;
+  }
+};
+
 const SpaBooking = () => {
   const navigate = useNavigate();
   const [spaBookings, setSpaBookings] = useState([]);
+  const [filteredSpaBookings, setFilteredSpaBookings] = useState([]);
   const [sortOrder, setSortOrder] = useState('desc');
   const [role] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false);
-
-  // State for status update modal
   const [updateStatusModalVisible, setUpdateStatusModalVisible] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState(null);
   const [pendingStatus, setPendingStatus] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedDate, setSelectedDate] = useState(null); // State for selected date filter
 
   useEffect(() => {
     fetchSpaBookings();
   }, [sortOrder]);
 
+  useEffect(() => {
+    // Filter spaBookings based on searchQuery and selectedDate
+    let filteredData = spaBookings.filter(booking =>
+      booking.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      booking.phone.includes(searchQuery)
+    );
+
+    if (selectedDate) {
+      filteredData = filteredData.filter(booking =>
+        moment(booking.date).isSame(selectedDate, 'day')
+      );
+    }
+
+    setFilteredSpaBookings(filteredData);
+  }, [searchQuery, spaBookings, selectedDate]);
+
   const fetchSpaBookings = async () => {
     setLoading(true);
     try {
       const data = await getSpaBookings();
-      const formattedData = data.map(booking => ({
-        id: booking.BookingID,
-        date: new Date(booking.CreateDate),
-        TotalPrice: booking.TotalPrice,
-        status: booking.Status,
-        reviewed: booking.Reviewed,
+      const formattedData = await Promise.all(data.map(async (booking) => {
+        const detail = await getSpaBookingDetail(booking.BookingID);
+        return {
+          id: booking.BookingID,
+          date: new Date(booking.CreateDate),
+          TotalPrice: booking.TotalPrice,
+          status: booking.Status,
+          reviewed: booking.Reviewed,
+          customerName: detail.CustomerName,
+          phone: detail.Phone,
+        };
       }));
       const sortedData = sortOrder === 'desc'
         ? formattedData.sort((a, b) => b.date - a.date)
@@ -119,16 +158,8 @@ const SpaBooking = () => {
       dataIndex: 'date',
       key: 'date',
       render: (text, record) => (
-        <Text>
-          {new Intl.DateTimeFormat('en-GB', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: 'numeric',
-            minute: 'numeric'
-          }).format(record.date)}
-        </Text>
-      )
+        <Text>{moment(record.date).format('DD/MM/YYYY HH:mm')}</Text> // Format date using moment.js
+      ),
     },
     {
       title: 'Status',
@@ -145,6 +176,16 @@ const SpaBooking = () => {
       )
     },
     {
+      title: 'Customer Name',
+      dataIndex: 'customerName',
+      key: 'customerName',
+    },
+    {
+      title: 'Phone',
+      dataIndex: 'phone',
+      key: 'phone',
+    },
+    {
       title: 'Actions',
       key: 'actions',
       render: (text, record) => renderActions(record),
@@ -157,18 +198,41 @@ const SpaBooking = () => {
     setUpdateStatusModalVisible(true);
   };
 
+  const handleSearch = (value) => {
+    setSearchQuery(value);
+  };
+
+  const handleDateChange = (date) => {
+    if (date) {
+      setSelectedDate(date.toDate());
+    } else {
+      setSelectedDate(null);
+    }
+  };
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24 }}>
           <h2 className="text-5xl text-center font-semibold mb-4">Spa Service Booking History</h2>
-          <Button onClick={handleSortOrder} className="mb-4">
-            Sort by date: {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
-          </Button>
+          <Layout className="flex flex-row justify-between mb-4">
+            <Button onClick={handleSortOrder}>
+              Sort by date: {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
+            </Button>
+            <DatePicker
+              onChange={handleDateChange}
+              style={{ width: 200 }}
+            />
+            <Search
+              placeholder="Search by customer name or phone"
+              onChange={(e) => handleSearch(e.target.value)}
+              style={{ width: 300 }}
+            />
+          </Layout>
           <Spin spinning={loading}>
             <Table
               columns={columns}
-              dataSource={spaBookings}
+              dataSource={filteredSpaBookings}
               rowKey="id"
               scroll={{ x: '100%' }}
             />

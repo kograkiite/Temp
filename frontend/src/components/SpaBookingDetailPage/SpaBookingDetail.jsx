@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Spin, Card, Typography, Table, Button, Image } from 'antd';
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
@@ -99,6 +99,11 @@ const SpaBookingDetail = () => {
     {
       title: 'Tên dịch vụ',
       dataIndex: 'ServiceName',
+      render: (text, record) => (
+        <Link className="text-blue-500 hover:text-blue-800" to={`/spa-service-detail/${record.ServiceID}`}>
+          {text}
+        </Link>
+      ),
     },
   ];
 
@@ -117,7 +122,19 @@ const SpaBookingDetail = () => {
           Chi tiết đặt dịch vụ Spa #{spaBooking.BookingID}
         </Title>
         <div className="mb-4">
-          <Text strong>Ngày tạo:</Text> <Text>{new Date(spaBooking.CreateDate).toLocaleDateString()}</Text>
+          <Text strong>Ngày tạo: </Text> 
+          <Text>
+              {new Date(spaBooking.CreateDate).toLocaleDateString('vi-VN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+              })}{' '}
+              {new Date(spaBooking.CreateDate).toLocaleTimeString('vi-VN', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+              })}
+          </Text>
         </div>
         <div className="mb-4">
           <Text strong>Tên khách hàng: </Text>

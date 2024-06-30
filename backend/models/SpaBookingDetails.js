@@ -19,5 +19,5 @@ const spaBookingDetailsSchema = new Schema({
   Feedback: { type: String, required: false },
 });
 
-const SpaBooking = mongoose.model('SpaBookingDetails', spaBookingDetailsSchema, 'SpaBookingDetails');
-module.exports = SpaBooking;
+const SpaBookingDetails = mongoose.model('SpaBookingDetails', spaBookingDetailsSchema, 'SpaBookingDetails');
+module.exports = SpaBookingDetails;
