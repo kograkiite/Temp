@@ -134,18 +134,18 @@ const idGenerators = {
     let newId;
 
     while (!isUnique) {
-      // Generate a new BookingID
-      const lastBooking = await SpaBooking.findOne().sort({ BookingID: -1 });
+      // Generate a new BookingDetailID
+      const lastBooking = await SpaBooking.findOne().sort({ BookingDetailID: -1 });
 
-      if (lastBooking && lastBooking.BookingID) {
-        const lastId = parseInt(lastBooking.BookingID.slice(2));
+      if (lastBooking && lastBooking.BookingDetailID) {
+        const lastId = parseInt(lastBooking.BookingDetailID.slice(2));
         newId = `SB${("000" + (lastId + 1)).slice(-3)}`;
       } else {
         newId = 'SB001'; // Starting ID if there are no bookings
       }
 
       // Check if the generated BookingDetailID already exists
-      const existingBooking = await SpaBooking.findOne({ BookingID: newId });
+      const existingBooking = await SpaBooking.findOne({ BookingDetailID: newId });
       if (!existingBooking) {
         isUnique = true;
       }
@@ -188,7 +188,6 @@ const idGenerators = {
       }
     }
 
-    return newId;
-  },
+  }
 };
 module.exports = idGenerators;

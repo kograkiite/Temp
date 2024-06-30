@@ -178,9 +178,10 @@ const Banner = () => {
       }
       return acc;
     }, []);
+    
 
     return (
-      <Menu mode={isVertical ? "vertical" : "horizontal"} onClick={closeMenu} className={isVertical ? '' : 'flex justify-center items-center bg-cyan-400'} disabledOverflow={true}>
+      <Menu mode={isVertical ? "inline" : "horizontal"} onClick={closeMenu} className={isVertical ? '' : 'flex justify-center items-center bg-cyan-400'} disabledOverflow={true}>
         {verticalMenu.map(item => (
           item.children ? (
             <Menu.SubMenu key={item.key} title={item.label}>
@@ -202,30 +203,22 @@ const Banner = () => {
               <Menu.Item onClick={() => { navigate('/user-profile') }}>Thông tin người dùng</Menu.Item>
               <Menu.Item onClick={() => { navigate('/pet-list') }}>Danh sách thú cưng</Menu.Item>
               <Menu.Item onClick={() => { navigate('/order-history') }}>Lịch sử đặt hàng</Menu.Item>
-              <Menu.SubMenu title="Lịch sử dịch vụ">
-                <Menu.Item onClick={() => { navigate('/spa-booking') }}>Dịch vụ thú cưng</Menu.Item>
-              </Menu.SubMenu>
-              <Menu.Item onClick={handleLogout}>Đăng xuất</Menu.Item>
+              <Menu.Item onClick={() => { navigate('/spa-booking') }}>Lịch sử dịch vụ</Menu.Item>
             </Menu.SubMenu>
+            <Menu.Item onClick={handleLogout}>ĐĂNG XUẤT</Menu.Item>
           </>
         )}
         {role === 'Administrator' && isVertical && (
-          <Menu.SubMenu key="user-profile" title="TÀI KHOẢN">
-            {userMenuItems.map(item => (
-              <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>
-                {item.label}
-              </Menu.Item>
-            ))}
-          </Menu.SubMenu>
+          <>
+            <Menu.Item onClick={() => { navigate('/user-profile') }}>TÀI KHOẢN</Menu.Item>
+            <Menu.Item onClick={handleLogout}>ĐĂNG XUẤT</Menu.Item> 
+          </>
         )}
-        {['Sale staff', 'Caretaker staff', 'Store Manager'].includes(role) && isVertical && (
-          <Menu.SubMenu key="user-profile" title="TÀI KHOẢN">
-            {userMenuItems.map(item => (
-              <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>
-                {item.label}
-              </Menu.Item>
-            ))}
-          </Menu.SubMenu>
+        {['Sales Staff', 'Caretaker Staff', 'Store Manager'].includes(role) && isVertical && (
+          <>
+            <Menu.Item onClick={() => { navigate('/user-profile') }}>TÀI KHOẢN</Menu.Item>
+            <Menu.Item onClick={handleLogout}>ĐĂNG XUẤT</Menu.Item> 
+          </>
         )}
       </Menu>
     );
@@ -237,7 +230,7 @@ const Banner = () => {
         <div className="flex items-center">
           {/* <img className="ml-20 h-20 w-20 cursor-pointer" src="/src/assets/image/iconPet.png" onClick={clickTitle} alt="Pet Service Logo" /> */}
           <span
-            className="text-5xl ml-10 px-10 cursor-pointer text-white"
+            className="text-4xl lg:text-7xl md:text-5xl cursor-pointer text-white"
             style={{ fontFamily: 'Playground' }}
             onClick={clickTitle}
           >

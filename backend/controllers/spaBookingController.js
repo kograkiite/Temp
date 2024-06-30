@@ -5,7 +5,7 @@ const { generateSpaBookingID } = require('../utils/idGenerators');
 exports.createSpaBooking = async (req, res) => {
   try {
     const newId = await generateSpaBookingID(); // Generate a new unique BookingDetailID
-    const spaBooking = new SpaBooking({ ...req.body, BookingID: newId });
+    const spaBooking = new SpaBooking({ ...req.body, BookingDetailID: newId });
     await spaBooking.save();
     res.status(201).json(spaBooking);
   } catch (err) {
@@ -18,7 +18,7 @@ exports.createSpaBooking = async (req, res) => {
 exports.getSpaBookings = async (req, res) => {
   try {
     // Populate references
-    const spaBookings = await SpaBooking.find();
+    const spaBookings = await SpaBooking.find().populate('AccountID PetID BookingDetails.ServiceID');
     res.status(200).json(spaBookings);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -28,7 +28,8 @@ exports.getSpaBookings = async (req, res) => {
 // Get spa booking by ID
 exports.getSpaBookingById = async (req, res) => {
   try {
-    const spaBooking = await SpaBooking.findOne({ BookingID: req.params.id });
+    // Populate references
+    const spaBooking = await SpaBooking.findOne({ BookingDetailID: req.params.id });
     if (!spaBooking) {
       return res.status(404).json({ error: 'Spa Booking not found' });
     }
@@ -56,11 +57,11 @@ exports.getSpaBookingsByAccountID = async (req, res) => {
 exports.updateSpaBooking = async (req, res) => {
   try {
     // Create an object that excludes BookingDetailID
-    const { BookingID, ...updateData } = req.body;
-    
+    const { BookingDetailID, ...updateData } = req.body;
+
     // Perform the update without BookingDetailID
     const spaBooking = await SpaBooking.findOneAndUpdate(
-      { BookingID: req.params.id },
+      { BookingDetailID: req.params.id },
       { $set: req.body },
       { new: true }
     );
