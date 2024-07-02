@@ -10,6 +10,7 @@ const { Sider, Content } = Layout;
 const { Title } = Typography;
 const { Option } = Select;
 const { useBreakpoint } = Grid;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const PetList = () => {
   const navigate = useNavigate();
@@ -38,7 +39,7 @@ const PetList = () => {
         return;
       }
 
-      const response = await axios.get(`http://localhost:3001/api/pets/account/${accountID}`, {
+      const response = await axios.get(`${API_URL}/api/pets/account/${accountID}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -75,7 +76,7 @@ const PetList = () => {
       };
       console.log('Updating pet with data:', petUpdateData);
 
-      await axios.patch(`http://localhost:3001/api/pets/${editPetId}`, petUpdateData, {
+      await axios.patch(`${API_URL}/api/pets/${editPetId}`, petUpdateData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -115,7 +116,7 @@ const PetList = () => {
     try {
       const token = localStorage.getItem('token');
 
-      await axios.delete(`http://localhost:3001/api/pets/${id}`, {
+      await axios.delete(`${API_URL}/api/pets/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -140,7 +141,7 @@ const PetList = () => {
       console.log(newPet);
 
       const response = await axios.post(
-        'http://localhost:3001/api/pets',
+        `${API_URL}/api/pets`,
         newPet,
         {
           headers: {
@@ -276,16 +277,22 @@ const PetList = () => {
             ]}
           >
             <Form form={form} layout="vertical">
-              <Form.Item name="PetName" rules={[{ required: true, message: t('name') + t('can_not_blank') }]}>
+              <Form.Item name="PetName" 
+              rules={[{ required: true, message: t('name') + " " + t('can_not_blank') }]}
+              label="Tên thú cưng">
                 <Input placeholder={t('name')} />
               </Form.Item>
-              <Form.Item name="PetTypeID" rules={[{ required: true, message: t('pet_type') + t('can_not_blank') }]}>
+              <Form.Item name="PetTypeID" 
+              rules={[{ required: true, message: t('pet_type')+ " " + t('can_not_blank') }]}
+              label="Loại thú cưng">
                 <Select placeholder={t('choose_pet_type')}>
                   <Option value="PT001">{t('dog')}</Option>
                   <Option value="PT002">{t('cat')}</Option>
                 </Select>
               </Form.Item>
-              <Form.Item name="Gender" rules={[{ required: true, message: t('gender') + t('can_not_blank') }]}>
+              <Form.Item name="Gender" 
+              rules={[{ required: true, message: t('gender')+ " " + t('can_not_blank') }]}
+              label="Giới tính">
                 <Select placeholder={t('choose_gender')}>
                   {genders.map((gender, index) => (
                     <Option key={index} value={gender}>
@@ -294,13 +301,19 @@ const PetList = () => {
                   ))}
                 </Select>
               </Form.Item>
-              <Form.Item name="Status" rules={[{ required: true, message: t('status') + t('can_not_blank') }]}>
+              <Form.Item name="Status" 
+              rules={[{ required: true, message: t('status')+ " " + t('can_not_blank') }]}
+              label="Trạng thái">
                 <Input placeholder={t('status')} />
               </Form.Item>
-              <Form.Item name="Weight" rules={[{ required: true, message: t('weight') + t('can_not_blank') }]}>
+              <Form.Item name="Weight" 
+              rules={[{ required: true, message: t('weight')+ " " + t('can_not_blank') }]}
+              label="Cân nặng thú cưng">
                 <Input placeholder={t('weight')} type="number" />
               </Form.Item>
-              <Form.Item name="Age" rules={[{ required: true, message: t('age') + t('can_not_blank') }]}>
+              <Form.Item name="Age" 
+              rules={[{ required: true, message: t('age')+ " " + t('can_not_blank') }]}
+              label="Tuổi thú cưng">
                 <Input placeholder={t('age')} type="number" />
               </Form.Item>
             </Form>
@@ -333,16 +346,16 @@ const PetList = () => {
               <Form.Item name="PetID" hidden>
                 <Input type="hidden" />
               </Form.Item>
-              <Form.Item name="PetName" rules={[{ required: true, message: t('name') + t('can_not_blank') }]}>
+              <Form.Item name="PetName" label="Tên thú cưng" rules={[{ required: true, message: t('name') + t('can_not_blank') }]}>
                 <Input placeholder={t('name')} />
               </Form.Item>
-              <Form.Item name="PetTypeID" rules={[{ required: true, message: t('pet_type') + t('can_not_blank') }]}>
+              <Form.Item name="PetTypeID" label="Loại thú cưng" rules={[{ required: true, message: t('pet_type') + t('can_not_blank') }]}>
                 <Select placeholder={t('choose_pet_type')}>
                   <Option value="PT001">{t('dog')}</Option>
                   <Option value="PT002">{t('cat')}</Option>
                 </Select>
               </Form.Item>
-              <Form.Item name="Gender" rules={[{ required: true, message: t('gender') + t('can_not_blank') }]}>
+              <Form.Item name="Gender" label="Giới tính" rules={[{ required: true, message: t('gender') + t('can_not_blank') }]}>
                 <Select placeholder={t('choose_gender')}>
                   {genders.map((gender, index) => (
                     <Option key={index} value={gender}>
@@ -351,13 +364,13 @@ const PetList = () => {
                   ))}
                 </Select>
               </Form.Item>
-              <Form.Item name="Status" rules={[{ required: true, message: t('status') + t('can_not_blank') }]}>
+              <Form.Item name="Status" label="Trạng thái" rules={[{ required: true, message: t('status') + t('can_not_blank') }]}>
                 <Input placeholder={t('status')} />
               </Form.Item>
-              <Form.Item name="Weight" rules={[{ required: true, message: t('weight') + t('can_not_blank') }]}>
+              <Form.Item name="Weight" label="Cân nặng thú cưng" rules={[{ required: true, message: t('weight') + t('can_not_blank') }]}>
                 <Input placeholder={t('weight')} type="number" />
               </Form.Item>
-              <Form.Item name="Age" rules={[{ required: true, message: t('age') + t('can_not_blank') }]}>
+              <Form.Item name="Age" label="Tuổi thú cưng" rules={[{ required: true, message: t('age') + t('can_not_blank') }]}>
                 <Input placeholder={t('age')} type="number" />
               </Form.Item>
             </Form>

@@ -15,6 +15,7 @@ import { GlobalOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
 const { Header } = Layout;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const Banner = () => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
@@ -27,6 +28,7 @@ const Banner = () => {
   const { shoppingCart } = useShopping();
   const productCount = shoppingCart.length;
   const dispatch = useDispatch();
+  const { i18n } = useTranslation();
   const { t } = useTranslation();
   const handleVisibleChange = (visible) => {
     setVisible(visible);
@@ -37,7 +39,7 @@ const Banner = () => {
       return;
     }
     try {
-      const response = await fetch('http://localhost:3001/api/auth/check-token', {
+      const response = await fetch(`${API_URL}/api/auth/check-token`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -92,7 +94,7 @@ const Banner = () => {
   
     if (cartItems.length > 0) {
       try {
-        const response = await axios.post('http://localhost:3001/api/cart', {
+        const response = await axios.post(`${API_URL}/api/cart`, {
           AccountID: accountID, // Use accountID variable instead of undefined response.AccountID
           Items: cartItems, // Pass the parsed cartItems directly
         }, {
@@ -150,16 +152,11 @@ const Banner = () => {
   );
 
   const renderMenuItems = (isVertical) => {
-    const { t, i18n } = useTranslation();
-    const navigate = useNavigate();
-
-
     let menuItems = [];
 
     if (role === 'Guest') {
       menuItems = [
         { key: 'home', label: t('HOME'), path: '/' },
-        { key: 'about', label: t('INTRODUCTION'), path: '/about' },
         { key: 'dog-service', label: t('for_dog'), path: '/services-for-dog', parent: t('pet_service') },
         { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
         { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
@@ -168,7 +165,6 @@ const Banner = () => {
     } else if (role === 'Customer') {
       menuItems = [
         { key: 'home', label: t('HOME'), path: '/' },
-        { key: 'about', label: t('INTRODUCTION'), path: '/about' },
         { key: 'dog-service', label: t('for_dog'), path: '/services-for-dog', parent: t('pet_service') },
         { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
         { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
@@ -184,6 +180,7 @@ const Banner = () => {
         { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
         { key: 'manage-spa-booking', label: t('spa_booking'), path: '/manage-spa-bookings', parent: t('MANAGEMENT') },
         { key: 'manage-order', label: t('order'), path: '/manage-orders', parent: t('MANAGEMENT') },
+        { key: 'statistics', label: t('statistics'), path: '/statistics' },
       ];
     } else if (['Sales Staff', 'Caretaker Staff', 'Store Manager'].includes(role)) {
       menuItems = [
@@ -194,6 +191,7 @@ const Banner = () => {
         { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
         { key: 'manage-spa-booking', label: t('spa_booking'), path: '/manage-spa-bookings', parent: t('MANAGEMENT') },
         { key: 'manage-order', label: t('order'), path: '/manage-orders', parent: t('MANAGEMENT') },
+        { key: 'statistics', label: t('statistics'), path: '/statistics' },
       ];
     }
 

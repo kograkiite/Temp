@@ -3,7 +3,6 @@ const Cart = require('../models/Cart');
 exports.getCart = async (req, res) => {
   try {
     const cart = await Cart.findOne({ AccountID: req.params.AccountID });
-    if (!cart) return res.status(404).json({ message: 'Cart not found' });
     res.json(cart);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -12,21 +11,22 @@ exports.getCart = async (req, res) => {
 
 // Add item to cart
 exports.addToCart = async (req, res) => {
-  const { AccountID, ProductID, ProductName, Price, Quantity, ImageURL } = req.body;
-
+  const { AccountID, Items } = req.body;
   try {
     let cart = await Cart.findOne({ AccountID: AccountID });
 
     if (!cart) {
-      cart = new Cart({ AccountID: AccountID, items: [] });
+      cart = new Cart({ AccountID: AccountID, Items: [] });
     }
 
-    const existingItem = cart.items.find(item => item.ProductID === ProductID);
-    if (existingItem) {
-      existingItem.Quantity += Quantity;
-    } else {
-      cart.items.push({ ProductID: ProductID, ProductName: ProductName, Price: Price, Quantity: Quantity, ImageURL: ImageURL });
-    }
+    Items.forEach(({ ProductID, ProductName, Price, Quantity, ImageURL }) => {
+      const existingItem = cart.Items.find(item => item.ProductID === ProductID);
+      if (existingItem) {
+        existingItem.Quantity = Quantity;
+      } else {
+        cart.Items.push({ ProductID: ProductID, ProductName: ProductName, Price: Price, Quantity: Quantity, ImageURL: ImageURL });
+      }
+    });
 
     await cart.save();
     res.status(201).json(cart);
@@ -34,6 +34,7 @@ exports.addToCart = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 // Update item Quantity in cart
 exports.updateCartItem = async (req, res) => {

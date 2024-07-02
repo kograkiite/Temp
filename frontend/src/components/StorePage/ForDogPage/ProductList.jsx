@@ -8,6 +8,7 @@ const { Option } = Select;
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
 const { Search } = Input;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const ProductList = () => {
   const [productData, setProductData] = useState([]);
@@ -27,7 +28,7 @@ const ProductList = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/products');
+        const response = await axios.get(`${API_URL}/api/products`);
         const filteredProducts = response.data.filter(product => product.PetTypeID === petTypeID);
         setProductData(filteredProducts);
       } catch (error) {
@@ -85,7 +86,7 @@ const ProductList = () => {
         return;
       }
       message.warning(t('processing'));
-      const response = await axios.post('http://localhost:3001/api/products', formData, {
+      const response = await axios.post(`${API_URL}/api/products`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
@@ -160,7 +161,7 @@ const ProductList = () => {
       for (let pair of formData.entries()) {
         console.log(pair[0] + ', ' + pair[1]);
       }
-      const response = await axios.patch(`http://localhost:3001/api/products/${editMode}`, formData, {
+      const response = await axios.patch(`${API_URL}/api/products/${editMode}`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
@@ -226,7 +227,7 @@ const ProductList = () => {
       dataIndex: 'Price',
       key: 'Price',
       render: (text) => (
-        <span>{typeof text === 'number' ? `$${text.toFixed(2)}` : '-'}</span>
+        <span>{typeof text === 'number' ? `${text.toLocaleString('en-US')}` : '-'}</span>
       ),
     },
     {
@@ -331,7 +332,7 @@ const ProductList = () => {
                   />
                   <div className="p-4">
                     <h3 className="text-2xl font-semibold">{product.ProductName}</h3>
-                    <p className="text-green-600 mt-2 text-3xl">${product.Price.toFixed(2)}</p>
+                    <h2 className="text-green-600 mt-2 text-4xl">{product.Price.toLocaleString('en-US')}</h2>
                     <p className="text-gray-500 mt-2">{product.Description}</p>
                   </div>
                 </Card>
