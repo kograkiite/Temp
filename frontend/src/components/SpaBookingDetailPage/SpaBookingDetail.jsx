@@ -3,53 +3,9 @@ import { useEffect, useState } from "react";
 import { Spin, Card, Typography, Table, Button, Image } from 'antd';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 const { Title, Text } = Typography;
-
-const getSpaBookingById = async (id) => {
-  const token = localStorage.getItem('token');
-  try {
-    const response = await axios.get(`http://localhost:3001/api/Spa-bookings/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching spa booking:', error);
-    throw error;
-  }
-}
-
-const getSpaBookingDetail = async (id) => {
-  const token = localStorage.getItem('token');
-  try {
-    const response = await axios.get(`http://localhost:3001/api/spa-booking-details/booking/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching spa booking detail:', error);
-    throw error;
-  }
-}
-
-const getSpaServiceByID = async (id) => {
-  const token = localStorage.getItem('token');
-  try {
-    const response = await axios.get(`http://localhost:3001/api/services/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching spa service detail:', error);
-    throw error;
-  }
-}
 
 const SpaBookingDetail = () => {
   const [spaBooking, setSpaBooking] = useState(null);
@@ -58,6 +14,52 @@ const SpaBookingDetail = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams();
+  const { t } = useTranslation();
+
+  const getSpaBookingById = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`http://localhost:3001/api/Spa-bookings/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching spa booking:', error);
+      throw error;
+    }
+  }
+  
+  const getSpaBookingDetail = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`http://localhost:3001/api/spa-booking-details/booking/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching spa booking detail:', error);
+      throw error;
+    }
+  }
+  
+  const getSpaServiceByID = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`http://localhost:3001/api/services/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching spa service detail:', error);
+      throw error;
+    }
+  }
 
   useEffect(() => {
     const fetchSpaBooking = async () => {
@@ -115,73 +117,71 @@ const SpaBookingDetail = () => {
         icon={<ArrowLeftOutlined />}
         size="large"
       >
-        Quay về
+        {t('back')}
       </Button>
       <Card className="p-10 max-w-4xl mx-auto mt-4 shadow-lg rounded-lg">
-        <Title level={2} className="mb-4 text-center">
-          Chi tiết đặt dịch vụ Spa #{spaBooking.BookingID}
-        </Title>
+        <Title level={2} className="mb-4 text-center">{t('spa_booking_detail_title')} #{spaBooking.BookingID}</Title>
         <div className="mb-4">
-          <Text strong>Ngày tạo: </Text> 
+          <Text strong>{t('date_create')}: </Text>
           <Text>
-              {new Date(spaBooking.CreateDate).toLocaleDateString('vi-VN', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-              })}{' '}
-              {new Date(spaBooking.CreateDate).toLocaleTimeString('vi-VN', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-              })}
+            {new Date(spaBooking.CreateDate).toLocaleDateString('vi-VN', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+            })}{' '}
+            {new Date(spaBooking.CreateDate).toLocaleTimeString('vi-VN', {
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false
+            })}
           </Text>
         </div>
         <div className="mb-4">
-          <Text strong>Tên khách hàng: </Text>
+          <Text strong>{t('customer_name')}: </Text>
           <Text>{spaBookingDetail.CustomerName}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>SĐT: </Text>
+          <Text strong>{t('phone')}: </Text>
           <Text>{spaBookingDetail.Phone}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Tên thú cưng: </Text>
+          <Text strong>{t('pet_name')}: </Text>
           <Text>{spaBookingDetail.PetName}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Giới tính thú cưng: </Text>
+          <Text strong>{t('pet_gender')}: </Text>
           <Text>{spaBookingDetail.PetGender}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Trạng thái thú cưng: </Text>
+          <Text strong>{t('pet_status')}: </Text>
           <Text>{spaBookingDetail.PetStatus}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Loại thú cưng: </Text>
+          <Text strong>{t('pet_type')}: </Text>
           <Text>{petTypeName}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Cân nặng thú cưng: </Text>
+          <Text strong>{t('pet_weight')}: </Text>
           <Text>{spaBookingDetail.PetWeight} kg</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Tuổi thú cưng: </Text>
-          <Text>{spaBookingDetail.PetAge} tuổi</Text>
+          <Text strong>{t('pet_age')}: </Text>
+          <Text>{spaBookingDetail.PetAge} {t('years_old')}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Ngày đặt lịch: </Text>
+          <Text strong>{t('book_date')}: </Text>
           <Text>{spaBookingDetail.BookingDate}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Thời gian đặt lịch: </Text>
+          <Text strong>{t('book_time')}: </Text>
           <Text>{spaBookingDetail.BookingTime}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Trạng thái: </Text> 
+          <Text strong>{t('status')}: </Text>
           <Text className={
             spaBooking.Status === 'Completed' ? 'text-green-600' :
-            spaBooking.Status === 'Pending' || spaBooking.Status === 'Processing' ? 'text-orange-400' :
-            'text-red-600'
+              spaBooking.Status === 'Pending' || spaBooking.Status === 'Processing' ? 'text-orange-400' :
+                'text-red-600'
           }>
             {spaBooking.Status}
           </Text>
@@ -190,17 +190,17 @@ const SpaBookingDetail = () => {
           <Text strong>Tổng giá:</Text> <Text className="text-green-600">${spaBooking.TotalPrice}</Text>
         </div> */}
         <div className="mb-4">
-          <Text strong>Dịch vụ đã đặt:</Text>
+          <Text strong>{t('booked_services')}:</Text>
         </div>
         <Table
-          dataSource={serviceData ? [serviceData] : []} 
+          dataSource={serviceData ? [serviceData] : []}
           columns={columns}
           scroll={{ x: 'max-content' }}
-          pagination={false} 
+          pagination={false}
         />
         {spaBookingDetail.Feedback && (
           <div className="mt-4">
-            <Text strong>Đánh giá: </Text>
+            <Text strong>{t('feedback')}: </Text>
             <Text>{spaBookingDetail.Feedback}</Text>
           </div>
         )}

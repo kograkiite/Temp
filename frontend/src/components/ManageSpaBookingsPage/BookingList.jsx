@@ -4,45 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { Table, Button, Typography, Layout, message, Spin, Modal, Input, DatePicker } from "antd";
 import axios from 'axios';
 import moment from "moment";
+import { useTranslation } from 'react-i18next';
 
 const { Text, Title } = Typography;
 const { Search } = Input;
 
-const getSpaBookings = async (bookingDate, dateCreated) => {
-  const token = localStorage.getItem('token');
-  try {
-    const response = await axios.get(`http://localhost:3001/api/Spa-bookings/`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      params: {
-        bookingDate: bookingDate ? moment(bookingDate).format('YYYY-MM-DD') : undefined,
-        dateCreated: dateCreated ? moment(dateCreated).format('YYYY-MM-DD') : undefined,
-      }
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching spa bookings:', error);
-    throw error;
-  }
-};
 
-const getSpaBookingDetail = async (id) => {
-  const token = localStorage.getItem('token');
-  try {
-    const response = await axios.get(`http://localhost:3001/api/spa-booking-details/booking/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching spa booking detail:', error);
-    throw error;
-  }
-};
-
-const SpaBooking = () => {
+const SpaBooking = () => {  
   const navigate = useNavigate();
   const [spaBookings, setSpaBookings] = useState([]);
   const [saving, setSaving] = useState(false);
@@ -50,6 +18,43 @@ const SpaBooking = () => {
   const [sortOrder, setSortOrder] = useState('desc');
   const [role] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
+
+  const getSpaBookings = async (bookingDate, dateCreated) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`http://localhost:3001/api/Spa-bookings/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          bookingDate: bookingDate ? moment(bookingDate).format('YYYY-MM-DD') : undefined,
+          dateCreated: dateCreated ? moment(dateCreated).format('YYYY-MM-DD') : undefined,
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching spa bookings:', error);
+      throw error;
+    }
+  };
+  
+  const getSpaBookingDetail = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`http://localhost:3001/api/spa-booking-details/booking/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching spa booking detail:', error);
+      throw error;
+    }
+  };
+
+  // State for status update modal
   const [updateStatusModalVisible, setUpdateStatusModalVisible] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState(null);
   const [pendingStatus, setPendingStatus] = useState('');
@@ -128,13 +133,13 @@ const SpaBooking = () => {
           },
         }
       );
-      message.success(`Booking status updated successfully to "${pendingStatus}"`);
+      message.success(`${t('booking_success_update_to')} "${pendingStatus}"`);
       setSaving(false)
       setUpdateStatusModalVisible(false);
       fetchSpaBookings(); // Refresh bookings after update
     } catch (error) {
       console.error('Error updating booking status:', error);
-      message.error('Failed to update booking status');
+      message.error(t('fail_update_status'));
       setSaving(false)
     }
   };
@@ -144,15 +149,15 @@ const SpaBooking = () => {
       if (record.status === 'Pending') {
         return (
           <>
-            <Button type="primary" className="mr-2 w-40" onClick={() => showUpdateStatusModal(record.id, 'Processing')}>Processing</Button>
-            <Button danger className="w-40" onClick={() => showUpdateStatusModal(record.id, 'Canceled')}>Cancel</Button>
+            <Button type="primary" className="mr-2 w-40" onClick={() => showUpdateStatusModal(record.id, 'Processing')}>{t('processing')}</Button>
+            <Button danger className="w-40" onClick={() => showUpdateStatusModal(record.id, 'Canceled')}>{t('cancel')}</Button>
           </>
         );
       } else if (record.status === 'Processing') {
         return (
           <>
-            <Button type="primary" className="mr-2 w-40" onClick={() => showUpdateStatusModal(record.id, 'Completed')}>Completed</Button>
-            <Button danger className="w-40" onClick={() => showUpdateStatusModal(record.id, 'Canceled')}>Cancel</Button>
+            <Button type="primary" className="mr-2 w-40" onClick={() => showUpdateStatusModal(record.id, 'Completed')}>{t('completed')}</Button>
+            <Button danger className="w-40" onClick={() => showUpdateStatusModal(record.id, 'Canceled')}>{t('cancel')}</Button>
           </>
         );
       }
@@ -170,7 +175,7 @@ const SpaBooking = () => {
       ),
     },
     {
-      title: 'Date',
+      title: t('date'),
       dataIndex: 'date',
       key: 'date',
       render: (text, record) => (
@@ -186,31 +191,32 @@ const SpaBooking = () => {
       ),
     },
     {
-      title: 'Status',
+      title: t('status'),
       dataIndex: 'status',
       key: 'status',
       render: (text, record) => (
         <Text className={
           record.status === 'Completed' ? 'text-green-600' :
-          record.status === 'Pending' || record.status === 'Processing' ? 'text-orange-400' :
-          'text-red-600'
+            record.status === 'Pending' ? 'text-yellow-500' :
+            record.status === 'Processing' ? 'text-orange-600' :
+              'text-red-600'
         }>
           {record.status}
         </Text>
       )
     },
     {
-      title: 'Customer Name',
+      title: t('customer_name'),
       dataIndex: 'customerName',
       key: 'customerName',
     },
     {
-      title: 'Phone',
+      title: t('phone'),
       dataIndex: 'phone',
       key: 'phone',
     },
     {
-      title: 'Actions',
+      title: t('actions'),
       key: 'actions',
       render: (text, record) => renderActions(record),
     },
@@ -280,15 +286,15 @@ const SpaBooking = () => {
             />
           </Spin>
           <Modal
-            title={`Update Status (${pendingStatus})`}
+            title={`${t('update_status')} (${pendingStatus})`}
             visible={updateStatusModalVisible}
             onCancel={() => setUpdateStatusModalVisible(false)}
             footer={[
-              <Button key="cancel" onClick={() => setUpdateStatusModalVisible(false)} disabled={saving}>Cancel</Button>,
-              <Button key="submit" type="primary" onClick={handleUpdateStatus} disabled={saving}>Confirm</Button>,
+              <Button key="cancel" onClick={() => setUpdateStatusModalVisible(false)} disabled={saving}>{t('cancel')}</Button>,
+              <Button key="submit" type="primary" onClick={handleUpdateStatus} disabled={saving}>{t('confirm')}</Button>,
             ]}
           >
-            <p>Are you sure you want to update the status to "{pendingStatus}"?</p>
+            <p>{t('ask_update')} "{pendingStatus}"?</p>
           </Modal>
         </div>
       </Layout>

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Table, Button, Typography, Layout, Spin, message, Modal, Input, DatePicker } from "antd";
 import axios from 'axios';
 import moment from "moment";
+import { useTranslation } from 'react-i18next';
 
 const { Text, Title } = Typography;
 const { confirm } = Modal;
@@ -18,6 +19,7 @@ const OrderList = () => {
   const [selectedDate, setSelectedDate] = useState(null); // State for selected date filter
   const [confirmLoading, setConfirmLoading] = useState(false); // State to track modal loading state
   const [filteredOrderByDate, setFilteredOrderByDate] = useState([]);
+  const { t } = useTranslation();
   const getOrderHistory = async () => {
     const token = localStorage.getItem('token');
     try {
@@ -101,7 +103,7 @@ const OrderList = () => {
 
   const showConfirm = (orderId, newStatus) => {
     confirm({
-      title: 'Are you sure you want to update the order status?',
+      title: t('inform_update'),
       content: `Change status to "${newStatus}"?`,
       confirmLoading: confirmLoading, // Pass confirmLoading state to modal
       onOk() {
@@ -118,15 +120,15 @@ const OrderList = () => {
     const token = localStorage.getItem('token');
     try {
       await axios.put(
-        `http://localhost:3001/api/orders/${orderId}`, 
-        { Status: newStatus }, 
+        `http://localhost:3001/api/orders/${orderId}`,
+        { Status: newStatus },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      message.success('Order status updated successfully');
+      message.success(t('updated_successfully'));
       fetchOrderHistory(); // Refresh order list after update
     } catch (error) {
       console.error('Error updating order status:', error);
@@ -136,38 +138,24 @@ const OrderList = () => {
     }
   };
 
-  const getStatusStyle = (status) => {
-    switch (status) {
-      case 'Processing':
-      case 'Delivering':
-        return { color: 'orange' };
-      case 'Shipped':
-        return { color: 'green' };
-      case 'Canceled':
-        return { color: 'red' };
-      default:
-        return {};
-    }
-  };
-
   const renderUpdateButton = (record) => {
     if (role === 'Sales Staff') {
       switch (record.status) {
         case 'Processing':
           return (
             <div>
-              <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Delivering')} disabled={confirmLoading}>
-                Delivering
+              <Button type="primary" className="w-40 mr-2" onClick={() => showConfirm(record.id, 'Delivering')} disabled={confirmLoading}>
+                {t('delivering')}
               </Button>
-              <Button danger className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Canceled')} disabled={confirmLoading}>
-                Cancel
+              <Button danger className="w-40 mr-2" onClick={() => showConfirm(record.id, 'Canceled')} disabled={confirmLoading}>
+                {t('cancel')}
               </Button>
             </div>
           );
         case 'Delivering':
           return (
             <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Shipped')} disabled={confirmLoading}>
-              Shipped
+              {t('delivered')}
             </Button>
           );
         default:
@@ -188,7 +176,7 @@ const OrderList = () => {
       ),
     },
     {
-      title: 'Ngày',
+      title: t('date'),
       dataIndex: 'date',
       key: 'date',
       render: (text, record) => (
@@ -196,17 +184,17 @@ const OrderList = () => {
       ),
     },
     {
-      title: 'Tên khách hàng',
+      title: t('customer_name'),
       dataIndex: 'customerName',
       key: 'customerName',
     },
     {
-      title: 'Số điện thoại',
+      title: t('phone'),
       dataIndex: 'phone',
       key: 'phone',
     },
     {
-      title: 'Số tiền',
+      title: t('amount'),
       dataIndex: 'amount',
       key: 'amount',
       render: (text, record) => (
@@ -214,15 +202,22 @@ const OrderList = () => {
       )
     },
     {
-      title: 'Trạng thái',
+      title: t('status'),
       dataIndex: 'status',
       key: 'status',
       render: (text, record) => (
-        <Text style={getStatusStyle(record.status)}>{record.status}</Text>
+        <Text className={
+          record.status === 'Shipped' ? 'text-green-600' :
+            record.status === 'Pending' ? 'text-yellow-500' :
+            record.status === 'Processing' ? 'text-orange-600' :
+              'text-red-600'
+        }>
+          {record.status}
+        </Text>
       )
     },
     {
-      title: 'Cập nhật trạng thái',
+      title: t('update_status'),
       key: 'updateStatus',
       render: (text, record) => renderUpdateButton(record),
     },
@@ -244,10 +239,10 @@ const OrderList = () => {
     <Layout style={{ minHeight: '80vh' }}>
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-          <Title className="text-5xl text-center font-semibold">Danh sách đặt hàng</Title>
+          <Title className="text-5xl text-center font-semibold">{t('ordered_list')}</Title>
           <Layout className="flex lg:flex-row sm:flex-col justify-between mb-4 mt-10">
             <Button onClick={handleSortOrder} style={{ width: 170 }}>
-              Sort by date: {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
+              {t('sort_by_date')}: {sortOrder === 'desc' ? t('newest') : t('oldest')}
             </Button>
             <div>
               <Text>Lọc theo ngày tạo đơn: </Text>

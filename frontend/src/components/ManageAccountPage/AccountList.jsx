@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Table, Typography, Button, Input, Form, message, Select, Modal, Skeleton } from 'antd';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -12,6 +13,7 @@ const AccountList = () => {
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false); // State to track save button loading
+  const { t } = useTranslation();
   const [searchText, setSearchText] = useState(''); // State for search query
   const [filterRole, setFilterRole] = useState(null); // State for role filter
   const [filterStatus, setFilterStatus] = useState(null); // State for status filter
@@ -81,15 +83,15 @@ const AccountList = () => {
         },
       });
 
-      message.success('Account updated successfully', 0.5).then(() => {
+      message.success(t('account_updated_successfully'), 0.5).then(() => {
         window.location.reload(); // Reload the page after successful update
       });
     } catch (error) {
-      console.error('Error updating account:', error);
+      console.error(t('error_updating_account'), error);
       if (error.response && error.response.status === 401) {
-        message.error('Unauthorized. Please log in.');
+        message.error(t('unauthorized'));
       } else {
-        message.error('Error updating account');
+        message.error(t('account_updated_successfully'));
       }
     } finally {
       setSaveLoading(false); // Reset save loading state
@@ -110,7 +112,7 @@ const AccountList = () => {
 
   const columns = [
     {
-      title: 'Fullname',
+      title: t('fullname'),
       dataIndex: 'fullname',
       key: 'fullname',
     },
@@ -120,17 +122,17 @@ const AccountList = () => {
       key: 'email',
     },
     {
-      title: 'Phone',
+      title: t('phone'),
       dataIndex: 'phone',
       key: 'phone',
     },
     {
-      title: 'Address',
+      title: t('address'),
       dataIndex: 'address',
       key: 'address',
     },
     {
-      title: 'Role',
+      title: t('role'),
       dataIndex: 'role',
       key: 'role',
       filteredValue: filterRole ? [filterRole] : null,
@@ -138,7 +140,7 @@ const AccountList = () => {
       render: (text) => text,
     },
     {
-      title: 'Status',
+      title: t('status'),
       dataIndex: 'status',
       key: 'status',
       filteredValue: filterStatus !== null && filterStatus !== undefined ? [filterStatus.toString()] : null, // Kiểm tra filterStatus trước khi sử dụng
@@ -150,12 +152,12 @@ const AccountList = () => {
       ),
     },
     {
-      title: 'Actions',
+      title: t('actions'),
       key: 'actions',
       render: (_, record) => (
         // Check if the role is "Administrator" and disable the edit button accordingly
         record.role === 'Administrator' ? (
-          <Button type="primary" disabled>Edit</Button>
+          <Button type="primary" disabled>{t('edit')}</Button>
         ) : (
           <Button type="primary" onClick={() => handleEditClick(record)}>Edit</Button>
         )
@@ -182,67 +184,36 @@ const AccountList = () => {
 
   return (
     <div className="p-4 sm:p-8">
-      <Title level={2} className="text-center">Account List</Title>
-      <div className='flex flex-row justify-end items-center'>
+      <Title level={2} className="text-center">{t('Account List')}</Title>
+      <div className='flex flex-row justify-end items-center mb-2'>
         <Input.Search
-            placeholder="Search by fullname, email, or phone"
-            allowClear
-            onChange={(e) => handleSearch(e.target.value)} // Handle search on change
-            style={{ width: 250, marginRight: 8 }} // Adjust width as per your requirement
-          />
-        <Select
-            placeholder="Filter by Role"
-            allowClear
-            style={{ width: 130, marginRight: 8 }}
-            onChange={handleRoleFilter}
-          >
-            <Option value="Customer">Customer</Option>
-            <Option value="Sales Staff">Sales Staff</Option>
-            <Option value="Caretaker Staff">Caretaker Staff</Option>
-            <Option value="Store Manager">Store Manager</Option>
-            <Option value="Administrator">Administrator</Option>
-          </Select>
-          <Select
-            placeholder="Filter by Status"
-            allowClear
-            style={{ width: 135 }}
-            onChange={handleStatusFilter}
-          >
-            <Option value={1}>Active</Option>
-            <Option value={0}>Inactive</Option>
-          </Select>
-      </div>
-      {/* <div className='flex flex-row justify-between items-center mb-4'>
-        <Input.Search
-          placeholder="Search by fullname, email, or phone"
+          placeholder={t('Search by fullname, email, or phone')}
           allowClear
-          onChange={(e) => handleSearch(e.target.value)} // Handle search on change
-          style={{ width: 250 }} // Adjust width as per your requirement
+          onChange={(e) => handleSearch(e.target.value)}
+          style={{ width: 250, marginRight: 8 }} 
         />
-      <div>
-          <Select
-            placeholder="Filter by Role"
-            allowClear
-            style={{ width: 150, marginRight: 8 }}
-            onChange={handleRoleFilter}
-          >
-            <Option value="Customer">Customer</Option>
-            <Option value="Sales Staff">Sales Staff</Option>
-            <Option value="Caretaker Staff">Caretaker Staff</Option>
-            <Option value="Store Manager">Store Manager</Option>
-            <Option value="Administrator">Administrator</Option>
-          </Select>
-          <Select
-            placeholder="Filter by Status"
-            allowClear
-            style={{ width: 150 }}
-            onChange={handleStatusFilter}
-          >
-            <Option value={1}>Active</Option>
-            <Option value={0}>Inactive</Option>
-          </Select>
-        </div>
-      </div> */}
+        <Select
+          placeholder={t('Filter by Role')}
+          allowClear
+          style={{ width: 130, marginRight: 8 }}
+          onChange={handleRoleFilter}
+        >
+          <Option value="Customer">{t('Customer')}</Option>
+          <Option value="Sales Staff">{t('Sales Staff')}</Option>
+          <Option value="Caretaker Staff">{t('Caretaker Staff')}</Option>
+          <Option value="Store Manager">{t('Store Manager')}</Option>
+          <Option value="Administrator">{t('Administrator')}</Option>
+        </Select>
+        <Select
+          placeholder={t('Filter by Status')}
+          allowClear
+          style={{ width: 135 }}
+          onChange={handleStatusFilter}
+        >
+          <Option value={1}>{t('Active')}</Option>
+          <Option value={0}>{t('Inactive')}</Option>
+        </Select>
+      </div>
       <Table
         dataSource={loading ? [] : filteredData}
         columns={columns}
@@ -259,7 +230,7 @@ const AccountList = () => {
         visible={isModalVisible}
         onCancel={handleCancelEdit}
         footer={[
-          <Button key="cancel" onClick={handleCancelEdit} disabled={saveLoading}>Cancel</Button>,
+          <Button key="cancel" onClick={handleCancelEdit} disabled={saveLoading}>{t('cancel')}</Button>,
           <Button key="submit" type="primary" onClick={() => handleSaveEdit(editMode)} disabled={saveLoading}>Save</Button>,
         ]}
       >
@@ -267,31 +238,31 @@ const AccountList = () => {
           {/* Fields */}
           <Form.Item
             name="fullname"
-            rules={[{ required: true, message: 'Please enter the fullname!' }]}
+            rules={[{ required: true, message: t('please_enter') + t('fullname') + '!' }]}
           >
             <Input placeholder="Fullname" />
           </Form.Item>
           <Form.Item
             name="email"
-            rules={[{ required: true, message: 'Please enter the email!' }]}
+            rules={[{ required: true, message: t('please_enter') + 'email' + '!'}]}
           >
             <Input placeholder="Email" />
           </Form.Item>
           <Form.Item
             name="phone"
-            rules={[{ required: true, message: 'Please enter the phone!' }]}
+            rules={[{ required: true, message: t('please_enter') + t('phone') + '!'}]}
           >
             <Input placeholder="Phone" />
           </Form.Item>
           <Form.Item
             name="address"
-            rules={[{ required: true, message: 'Please enter the address!' }]}
+            rules={[{ required: true, message: t('please_enter') + t('adress') + '!' }]}
           >
             <Input placeholder="Address" />
           </Form.Item>
           <Form.Item
             name="role"
-            rules={[{ required: true, message: 'Please select the role!' }]}
+            rules={[{ required: true, message: t('please_enter') + t('role') + '!' }]}
           >
             <Select placeholder="Select Role">
               {/* Options for roles */}
@@ -304,11 +275,11 @@ const AccountList = () => {
           </Form.Item>
           <Form.Item
             name="status"
-            rules={[{ required: true, message: 'Please select the status!' }]}
+            rules={[{ required: true, message: t('please_select_the_status') }]}
           >
             <Select placeholder="Select Status">
-              <Option value={1}>Active</Option>
-              <Option value={0}>Inactive</Option>
+              <Option value={1}>{t('active')}</Option>
+              <Option value={0}>{t('inactive')}</Option>
             </Select>
           </Form.Item>
         </Form>
