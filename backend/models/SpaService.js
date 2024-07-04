@@ -6,9 +6,9 @@ const serviceSchema = new mongoose.Schema({
     Description: { type: String, required: true },
     ImageURL: { type: String, required: false },
     PetTypeID : { type: String, required: true, ref: 'PetType' },
-    // Price: { type: Number, required: true },
+    Price: { type: Number, required: true },
     Status: { type: String }
-});
+} , { versionKey: false });
 
 const SpaService = mongoose.model('SpaService', serviceSchema, 'SpaServices');
 
