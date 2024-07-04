@@ -56,6 +56,7 @@ exports.countAvailableAccounts = async (req, res) => {
             ProductName: productDetails ? productDetails.ProductName : 'Unknown',
             Price: productDetails ? productDetails.Price : 0,
             ImageURL: productDetails ? productDetails.ImageURL : '',
+            Description: productDetails ? productDetails.Description : 'Unknown',
           };
         })
       );
