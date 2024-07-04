@@ -420,5 +420,8 @@
     "shippedOrders": "Shipped Orders",
     "completedSpaBookings": "Completed Spa Bookings",
     "totalActiveUsers": "Total Active Users",
-    "mostPopularProduct": "Most Popular Product"
+    "mostPopularProduct": "Most Popular Product",
+    "account": "ACCOUNT",
+    "pet_name": "Pet Name",
+    "add_pet_modal_title": "Add Pet"
 }
