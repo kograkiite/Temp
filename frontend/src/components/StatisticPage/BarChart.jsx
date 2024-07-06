@@ -1,21 +1,23 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Chart } from "react-google-charts";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 const API_URL = import.meta.env.REACT_APP_API_URL;
-
-export const options = {
-  chart: {
-    title: "Company Performance",
-    subtitle: "Total Services Booked, Total Ordered",
-  },
-  colors: ["rgb(53, 138, 148)", "rgb(37, 11, 165)", "#188310"],
-};
 
 export default function BarChart() {
   const [data, setData] = useState([
     ["Day of week", "Total Services Booked", "Total Ordered"],
   ]);
+  const { t } = useTranslation();
+
+  const options = {
+    chart: {
+      title: t("company_performance"),
+      subtitle: t("services_booked_ordered"),
+    },
+    colors: ["rgb(53, 138, 148)", "rgb(37, 11, 165)", "#188310"],
+  };
 
   useEffect(() => {
     const fetchData = async () => {

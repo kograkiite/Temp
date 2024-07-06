@@ -10,6 +10,7 @@ const CartSchema = new mongoose.Schema({
     Price: { type: Number, required: true },
     Quantity: {type: Number, required: true},
     ImageURL: { type: String, required: false },
+    Status: { type: String, required: true },
   }],
 } , { versionKey: false });
 

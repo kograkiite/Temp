@@ -429,5 +429,12 @@
     "totalActiveUsers": "Tổng số người dùng hoạt động",
     "mostPopularProduct": "Sản phẩm phổ biến nhất",
     "account": "TÀI KHOẢN",
-    "add_pet_modal_title": "Thêm Thú Cưng"
+    "add_pet_modal_title": "Thêm Thú Cưng",
+    "noDataAvailable": "Không Có Dữ Liệu",
+    "totalEarnings": "Tổng tiền thu",
+    "company_performance": "Hiệu Suất Công Ty",
+    "services_booked_ordered": "Tổng Dịch Vụ Đã Đặt, Tổng Đơn Hàng",
+    "voucher": "Mã giảm giá",
+    "enter_voucher_code": "Nhập mã giảm giá ở đây",
+    "apply_voucher": "Áp dụng"
 }

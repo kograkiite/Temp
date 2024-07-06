@@ -1,6 +1,6 @@
 const Order = require('../models/Order');
 PAYPAL_CLIENT_ID=process.env.PAYPAL_CLIENT_ID;
-PAYPAL_CLIENT_SECRET=process.env.PAYPAL_CLIENT_SECRET;
+PAYPAL_SECRET=process.env.PAYPAL_SECRET;
 const { generateOrderID } = require('../utils/idGenerators');
 const crypto = require('crypto-js');
 
@@ -13,7 +13,6 @@ exports.createOrder = async (req, res) => {
     const savedOrder = await newOrder.save();
     res.status(201).json(savedOrder);
   } catch (error) {
-    console.error('Error creating order:', error);
     res.status(400).json({ message: error.message });
   }
 };
@@ -33,10 +32,8 @@ exports.getOrderById = async (req, res) => {
   try {
     const order = await Order.findOne({ OrderID: req.params.id });
     if (order) {
-      // Decrypt PaypalOrderID if it exists
       if (order.PaypalOrderID) {
         const decryptedOrderID = crypto.AES.decrypt(order.PaypalOrderID, process.env.PAYPAL_CLIENT_SECRET).toString(crypto.enc.Utf8);
-        console.log(decryptedOrderID)
         order.PaypalOrderID = decryptedOrderID;
       }
       res.status(200).json(order);
@@ -44,7 +41,6 @@ exports.getOrderById = async (req, res) => {
       res.status(404).json({ message: 'Order not found' });
     }
   } catch (error) {
-    console.error('Error fetching order by ID:', error);
     res.status(500).json({ message: error.message });
   }
 };
