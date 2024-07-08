@@ -18,6 +18,7 @@ const ProductDetail = () => {
     const [comments, setComments] = useState([]);
     const [Quantity, setQuantity] = useState(1);
     const [loading, setLoading] = useState(true);
+    const [productImg, setProductImg] = useState(""); // For image upload
     const [editMode, setEditMode] = useState(false);
     const { shoppingCart } = useShopping();
     const [form] = Form.useForm();
@@ -79,26 +80,13 @@ const ProductDetail = () => {
 
     const handleDecrease = () => setQuantity(Quantity > 1 ? Quantity - 1 : 1);
 
-    const handleOrderNow = async () => {
-        if (!localStorage.getItem('user')) {
-            showLoginModal();
-            return;
-        }
-        if (productData) {
-            if (Quantity > productData.Quantity) {
-                message.error(t('quantity_out_of_inventory'));
-                return;
-            }
-
-            const productWithQuantity = { ...productData, Quantity };
-            await handleAddItem(productWithQuantity);
-            const totalAmount = productData.Price;
-            localStorage.setItem('totalAmount', totalAmount.toFixed(2));
-            navigate('/order');
-        }
-    };
-
     const { handleAddItem } = useShopping();
+
+    const handleProductImageUpload = (e) => {
+        const file = e.target.files[0];
+        setProductImg(file);
+        form.setFieldsValue({ Image: file });
+    };
 
     const handleAddToCart = () => {
         if (!localStorage.getItem('user')) {
@@ -162,6 +150,7 @@ const ProductDetail = () => {
 
     const handleCancelEdit = async () => {
         setEditMode(false);
+        setProductImg("");
         await fetchProductDetail();
     };
 
@@ -229,7 +218,7 @@ const ProductDetail = () => {
                 </div>
                 {/* Product detail */}
                 <div className="flex flex-col md:flex-row m-5 px-4 md:px-32">
-                    <div className="w-full md:w-1/2 flex justify-center">
+                    <div className="w-full lg:w-1/2 h-full lg:h-1/2 flex justify-center">
                         <Image src={productData.ImageURL} alt={productData.ProductName} />
                     </div>
                     <div className="w-full md:w-1/2 p-5 md:ml-10">
@@ -254,7 +243,7 @@ const ProductDetail = () => {
                                     label={t('price')}
                                     rules={[{ required: true, message: t('please_enter_price') }]}
                                 >
-                                    <Input type="number" disabled={!editMode} />
+                                    <Input suffix='đ' type="number" disabled={!editMode} />
                                 </Form.Item>
                                 <Form.Item
                                     name="Description"
@@ -264,11 +253,15 @@ const ProductDetail = () => {
                                     <TextArea disabled={!editMode} rows={10} placeholder={t('description')} style={{ whiteSpace: 'pre-wrap' }} />
                                 </Form.Item>
                                 <Form.Item
-                                    name="ImageURL"
+                                    name="Image"
                                     label={t('image')}
-                                    rules={[{ required: true, message: t('please_upload_image') }]}
+                                    rules={[{ required: editMode == null, message: t('Please upload the product image!') }]}
+                                    className="mb-4"
                                 >
-                                    <Input disabled={!editMode} />
+                                    <Input disabled={!editMode} type="file" onChange={handleProductImageUpload} className="w-full p-2 border border-gray-300 rounded" />
+                                    {productImg && (
+                                    <Image src={URL.createObjectURL(productImg)} alt="Product Preview" style={{ width: '100px', marginTop: '10px' }} className="block" />
+                                    )}
                                 </Form.Item>
                                 <Form.Item
                                     name="Status"
@@ -285,8 +278,8 @@ const ProductDetail = () => {
                             <div>
                                 <Title level={3}>{productData.ProductName}</Title>
                                 <Paragraph>{`${t('quantity_in_stock')}: ${productData.Quantity}`}</Paragraph>
-                                <Paragraph className="text-green-600 text-4xl">{productData.Price.toLocaleString('en-US')}</Paragraph>
-                                <Paragraph>{`${t('description')}: ${productData.Description}`}</Paragraph>
+                                <Paragraph className="text-green-600 text-4xl">{productData.Price.toLocaleString('en-US')}đ</Paragraph>
+                                <Paragraph style={{ whiteSpace: 'pre-line' }} ellipsis={{ rows: 5, expandable: true, symbol: 'more' }}>{`${t('description')}: ${productData.Description}`}</Paragraph>
                             </div>
                         )}
 
@@ -308,12 +301,6 @@ const ProductDetail = () => {
                                         disabled={(productData.Status === 'Unavailable' || productData.Quantity === 0)}
                                     >
                                         {t('add_to_cart')}
-                                    </Button>
-                                    <Button type="primary"
-                                        onClick={handleOrderNow}
-                                        disabled={(productData.Status === 'Unavailable' || productData.Quantity === 0)}
-                                    >
-                                        {t('order_now')}
                                     </Button>
                                 </div>
                                 {(productData.Status === 'Unavailable' || productData.Quantity === 0) && (

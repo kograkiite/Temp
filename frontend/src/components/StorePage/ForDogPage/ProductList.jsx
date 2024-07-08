@@ -96,6 +96,8 @@ const ProductList = () => {
       if (response.status === 201) {
         message.success(t('product_added_successfully'))
         fetchProducts();
+        form.resetFields();
+        setProductImg("");
         setAddMode(false);
       } else {
         message.error(t('failed_to_add_product'));
@@ -170,6 +172,7 @@ const ProductList = () => {
 
       if (response.status === 200) {
         message.success(t('product_updated_successfully'))
+        form.resetFields();
         fetchProducts();
         setEditMode(null);
       } else {
@@ -213,6 +216,16 @@ const ProductList = () => {
       ),
     },
     {
+      title: t('image_url'),
+      dataIndex: 'ImageURL',
+      key: 'ImageURL',
+      fixed: 'left',
+      className: 'sticky left-0 bg-white',
+      render: (text, record) => (
+        <Image src={text} alt={record.ProductName} style={{ width: '50px', cursor: 'pointer' }} />
+      ),
+    },
+    {
       title: t('product_name'),
       dataIndex: 'ProductName',
       key: 'ProductName',
@@ -227,7 +240,7 @@ const ProductList = () => {
       dataIndex: 'Price',
       key: 'Price',
       render: (text) => (
-        <span>{typeof text === 'number' ? `${text.toLocaleString('en-US')}` : '-'}</span>
+        <span>{typeof text === 'number' ? `${text.toLocaleString('en-US')}` : '-'}đ</span>
       ),
     },
     {
@@ -239,14 +252,6 @@ const ProductList = () => {
         <Paragraph style={{ whiteSpace: 'pre-line' }} ellipsis={{ rows: 1, expandable: true, symbol: 'more' }}>
           {text}
         </Paragraph>
-      ),
-    },
-    {
-      title: t('image_url'),
-      dataIndex: 'ImageURL',
-      key: 'ImageURL',
-      render: (text, record) => (
-        <Image src={text} alt={record.ProductName} style={{ width: '50px', cursor: 'pointer' }} />
       ),
     },
     {
@@ -267,6 +272,8 @@ const ProductList = () => {
     {
       title: t('actions'),
       key: 'actions',
+      fixed: 'right',
+      className: 'sticky right-0 bg-white',
       render: (_, record) => (
         userRole === 'Store Manager' && (
           <div>
@@ -334,7 +341,7 @@ const ProductList = () => {
                   />
                   <div className="p-4">
                     <h3 className="text-2xl font-semibold">{product.ProductName}</h3>
-                    <p className="text-green-600 mt-2 text-3xl">{product.Price.toLocaleString('en-US')}</p>
+                    <p className="text-green-600 mt-2 text-3xl">{product.Price.toLocaleString('en-US')}đ</p>
                     {/* <p className="text-gray-500 mt-2">{product.Description}</p> */}
                   </div>
                 </Card>

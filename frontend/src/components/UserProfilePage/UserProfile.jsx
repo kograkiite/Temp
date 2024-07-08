@@ -93,8 +93,6 @@ const UserProfile = () => {
     let newErrors = {};
     if (!formData.fullname) {
       newErrors.fullname = t('fullname_required');
-    } else if (!/^[a-zA-Z\s]*$/.test(formData.fullname)) {
-      newErrors.fullname = t('no_special_character');
     }
 
     if (!formData.phone) {
@@ -186,9 +184,13 @@ const UserProfile = () => {
                   </Menu.Item>
                 </>
               )}
-              <Menu.Item key="statistic" icon={<LineChartOutlined />} onClick={() => navigate('/statistics')}>
-                {t('statistic_title')}
-              </Menu.Item>
+              {role !== 'Customer' && (
+                <>
+                  <Menu.Item key="statistic" icon={<LineChartOutlined />} onClick={() => navigate('/statistics')}>
+                    {t('statistic_title')}
+                  </Menu.Item>
+                </>
+              )}
               <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
                 {t('log_out')}
               </Menu.Item>

@@ -19,7 +19,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import BarChart from "./BarChart";
-
 const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const { Title } = Typography;
@@ -151,9 +150,13 @@ const Statistics = () => {
                 </Menu.Item>
               </>
             )}
-            <Menu.Item key="statistic" icon={<LineChartOutlined />} onClick={() => navigate('/statistics')}>
-              {t('statistic_title')}
-            </Menu.Item>
+            {role !== 'Customer' && (
+                <>
+                  <Menu.Item key="statistic" icon={<LineChartOutlined />} onClick={() => navigate('/statistics')}>
+                    {t('statistic_title')}
+                  </Menu.Item>
+                </>
+              )}
             <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
               {t('log_out')}
             </Menu.Item>
@@ -215,7 +218,7 @@ const Statistics = () => {
                       title={t('totalEarnings')}
                       value={totalEarnings}
                       precision={2}
-                      prefix="$"
+                      suffix='đ'
                       valueStyle={{ color: "#3f8600" }}
                       formatter={formatter}
                     />
