@@ -39,7 +39,8 @@ exports.addToCart = async (req, res) => {
 
 // Update item Quantity in cart
 exports.updateCartItem = async (req, res) => {
-  const { AccountID, ProductID, Quantity, Status } = req.body;
+  const { AccountID, ProductID, Quantity, Status } = req.body; 
+  console.log(req.body)
   try {
     const cart = await Cart.findOne({ AccountID });
 

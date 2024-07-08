@@ -112,7 +112,6 @@ exports.countOrdersAndBookingsByDayInWeek = async (req, res) => {
         $sort: { _id: 1 },
       },
     ]);
-
     const bookings = await SpaBooking.aggregate([
       {
         $match: {
@@ -183,7 +182,6 @@ exports.calculateEarnings = async (req, res) => {
         },
       },
     ]);
-
     const bookings = await SpaBooking.aggregate([
       {
         $match: {
@@ -203,7 +201,8 @@ exports.calculateEarnings = async (req, res) => {
     ]);
 
     const totalOrderEarnings = orders.length > 0 ? orders[0].totalEarnings : 0;
-    const totalBookingEarnings = bookings.length > 0 ? bookings[0].totalEarnings : 0;
+    const totalBookingEarnings =
+      bookings.length > 0 ? bookings[0].totalEarnings : 0;
 
     const totalEarnings = totalOrderEarnings + totalBookingEarnings;
 
