@@ -1,14 +1,11 @@
 const Comment = require('../models/Comment');
-const Product = require('../models/Product');
-const mongoose = require('mongoose');
-const { Schema } = mongoose;
 
 // Import generateCommentID from utils/idGenerators
 const { generateCommentID } = require('../utils/idGenerators');
 
 // Create a new comment
 exports.createComment = async (req, res) => {
-  const { ProductID, AccountID, Rating, CommentContent } = req.body;
+  const { ProductID, AccountID, Rating, CommentContent, isReplied, CommentDate } = req.body;
   
   try {
     const comment = await Comment.findOne({ AccountID: AccountID, ProductID: ProductID });
@@ -20,6 +17,8 @@ exports.createComment = async (req, res) => {
         AccountID,
         Rating,
         CommentContent,
+        isReplied,
+        CommentDate,
       });
       await newComment.save();
 
@@ -53,12 +52,12 @@ exports.getCommentsByProductId = async (req, res) => {
 // Update a comment by CommentID
 exports.updateComment = async (req, res) => {
   const { CommentID } = req.params;
-  const { ProductID, CommentContent } = req.body;
+  const { ProductID, CommentContent, isReplied } = req.body;
 
   try {
     const updatedComment = await Comment.findOneAndUpdate(
       { CommentID: CommentID },
-      { ProductID, CommentContent },
+      { ProductID, CommentContent, isReplied },
       { new: true }
     );
 
