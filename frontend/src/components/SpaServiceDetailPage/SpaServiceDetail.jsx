@@ -246,6 +246,7 @@ const SpaServiceDetail = () => {
 
             if (diffHours < 3) {
                 message.error(t('3_hours_rule'));
+                setOperationLoading(false);
                 return;
             }
 
@@ -432,8 +433,9 @@ const SpaServiceDetail = () => {
                                 name="CustomerName"
                                 label={t('customer_name')}
                                 rules={[{ required: true, message: t('unavailaplz_enter_customer_nameble') }]}
+                                initialValue={user.fullname}
                             >
-                                <Input placeholder={t('enter_name')} />
+                                <Input value={user.fullname} placeholder={t('enter_name')} />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>
@@ -441,6 +443,7 @@ const SpaServiceDetail = () => {
                                 name="Phone"
                                 label={t('phone')}
                                 rules={[{ required: true, message: t('plz_enter_phone_number') }]}
+                                initialValue={user.phone}
                             >
                                 <Input placeholder={t('enter_phone')} />
                             </Form.Item>

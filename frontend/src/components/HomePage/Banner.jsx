@@ -176,7 +176,7 @@ const Banner = () => {
         { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
         { key: 'manage-spa-booking', label: t('spa_booking'), path: '/manage-spa-bookings', parent: t('MANAGEMENT') },
         { key: 'manage-order', label: t('order'), path: '/manage-orders', parent: t('MANAGEMENT') },
-        { key: 'manage-voucher', label: t('voucher'), path: '/manage-voucher', parent: t('MANAGEMENT') },
+        // { key: 'manage-voucher', label: t('voucher'), path: '/manage-voucher', parent: t('MANAGEMENT') },
       ];
     } else if (['Sales Staff', 'Caretaker Staff', 'Store Manager'].includes(role)) {
       menuItems = [
@@ -187,7 +187,7 @@ const Banner = () => {
         { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
         { key: 'manage-spa-booking', label: t('spa_booking'), path: '/manage-spa-bookings', parent: t('MANAGEMENT') },
         { key: 'manage-order', label: t('order'), path: '/manage-orders', parent: t('MANAGEMENT') },
-        { key: 'manage-voucher', label: t('voucher'), path: '/manage-voucher', parent: t('MANAGEMENT') },
+        // { key: 'manage-voucher', label: t('voucher'), path: '/manage-voucher', parent: t('MANAGEMENT') },
       ];
     }
 
@@ -234,14 +234,14 @@ const Banner = () => {
         )}
         {role === 'Customer' && isVertical && (
           <>
-            <Menu.Item key="cart" onClick={() => navigate('/cart')}>GIỎ HÀNG</Menu.Item>
-            <Menu.SubMenu key="user-profile" title="TÀI KHOẢN">
-              <Menu.Item onClick={() => { navigate('/user-profile') }}>Thông tin người dùng</Menu.Item>
-              <Menu.Item onClick={() => { navigate('/pet-list') }}>Danh sách thú cưng</Menu.Item>
-              <Menu.Item onClick={() => { navigate('/order-history') }}>Lịch sử đặt hàng</Menu.Item>
-              <Menu.Item onClick={() => { navigate('/spa-booking') }}>Lịch sử dịch vụ</Menu.Item>
+            <Menu.Item key="cart" onClick={() => navigate('/cart')}>{t('CART')}</Menu.Item>
+            <Menu.SubMenu key="user-profile" title={t('ACCOUNT')}>
+              <Menu.Item onClick={() => { navigate('/user-profile') }}>{t('user_profile')}</Menu.Item>
+              <Menu.Item onClick={() => { navigate('/pet-list') }}>{t('list_of_pets')}</Menu.Item>
+              <Menu.Item onClick={() => { navigate('/order-history') }}>{t('orders_history')}</Menu.Item>
+              <Menu.Item onClick={() => { navigate('/spa-booking') }}>{t('service_history')}</Menu.Item>
             </Menu.SubMenu>
-            <Menu.Item onClick={handleLogout}>ĐĂNG XUẤT</Menu.Item>
+            <Menu.Item onClick={handleLogout}>{t('LOG_OUT')}</Menu.Item>
           </>
         )}
         {['Sales Staff', 'Caretaker Staff', 'Store Manager', 'Administrator'].includes(role) && isVertical && (
