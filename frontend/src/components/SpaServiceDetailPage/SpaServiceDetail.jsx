@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Button, Input, Image, Form, Typography, message, Skeleton, Select, Modal, DatePicker, Row, Col, notification } from 'antd';
-import { ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CheckCircleOutlined, ScheduleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { useTranslation } from 'react-i18next';
 
@@ -392,6 +392,8 @@ const SpaServiceDetail = () => {
                                     type="primary"
                                     onClick={handleBookingNow}
                                     disabled={serviceData.Status === 'Unavailable'}
+                                    className='py-10 px-20'
+                                    icon={<ScheduleOutlined style={{ fontSize: '24px' }}/>}
                                 >
                                     {t('booking_now')}
                                 </Button>
@@ -433,9 +435,9 @@ const SpaServiceDetail = () => {
                                 name="CustomerName"
                                 label={t('customer_name')}
                                 rules={[{ required: true, message: t('unavailaplz_enter_customer_nameble') }]}
-                                initialValue={user.fullname}
+                                initialValue={user?.fullname}
                             >
-                                <Input value={user.fullname} placeholder={t('enter_name')} />
+                                <Input placeholder={t('enter_name')} />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>
@@ -443,7 +445,7 @@ const SpaServiceDetail = () => {
                                 name="Phone"
                                 label={t('phone')}
                                 rules={[{ required: true, message: t('plz_enter_phone_number') }]}
-                                initialValue={user.phone}
+                                initialValue={user?.phone}
                             >
                                 <Input placeholder={t('enter_phone')} />
                             </Form.Item>
