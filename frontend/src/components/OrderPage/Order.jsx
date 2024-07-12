@@ -19,9 +19,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
-const REACT_APP_EXCHANGE_RATE_VND_TO_USD = import.meta.env
-  .REACT_APP_EXCHANGE_RATE_VND_TO_USD;
 const REACT_APP_SHIPPING_COST = import.meta.env.REACT_APP_SHIPPING_COST;
+const REACT_APP_EXCHANGE_RATE_API = import.meta.env.REACT_APP_EXCHANGE_RATE_API;
 import useShopping from '../../hook/useShopping';
 import { useDispatch } from "react-redux";
 import { setShoppingCart } from '../../redux/shoppingCart';
@@ -33,6 +32,7 @@ const Order = () => {
   const [selectedShippingMethod, setSelectedShippingMethod] =
     useState("nationwide");
   const shippingCost = parseFloat(REACT_APP_SHIPPING_COST);
+  const [exchangeRateVNDtoUSD, setExchangeRateVNDtoUSD] = useState(null)
   const dispatch = useDispatch();
   const [orderDetails, setOrderDetails] = useState({
     totalAmount: 0,
@@ -46,14 +46,28 @@ const Order = () => {
     phone: "",
   });
   const [isPayPalEnabled, setIsPayPalEnabled] = useState(false);
-  // const [voucherCode, setVoucherCode] = useState(""); // State for voucher code
+  const [voucherCode, setVoucherCode] = useState(""); // State for voucher code
   const [editMode, setEditMode] = useState(false); // State for edit mode
   const [originalCustomerInfo, setOriginalCustomerInfo] = useState({}); // State to store original values
   const navigate = useNavigate();
-  const exchangeRateVNDtoUSD = parseFloat(REACT_APP_EXCHANGE_RATE_VND_TO_USD);
   const { t } = useTranslation();
   const { handleRemoveItem } = useShopping();
-  // const [discountValue, setDiscountValue] = useState(0); // State for discount value
+  const [discountValue, setDiscountValue] = useState(0); // State for discount value
+
+  useEffect(() => {
+    const fetchExchangeRate = async () => {
+      try {
+        const response = await axios.get(`https://v6.exchangerate-api.com/v6/${REACT_APP_EXCHANGE_RATE_API}/latest/VND`);
+        setExchangeRateVNDtoUSD(response.data.conversion_rates.USD);
+      } catch (error) {
+        console.error("Error fetching exchange rate:", error);
+        message.error("Error fetching exchange rate.");
+      }
+    };
+
+    fetchExchangeRate();
+  }, []);
+  console.log(exchangeRateVNDtoUSD)
 
   useEffect(() => {
     const addressInfo = JSON.parse(localStorage.getItem("addressInfo"));
@@ -238,39 +252,39 @@ const Order = () => {
     }
   };
   
-  // const checkVoucher = async () => {
-  //   try {
-  //     if (voucherCode.trim() === '') {
-  //       return;
-  //     }
-  //     const response = await axios.get(`${API_URL}/api/voucher/pattern/${voucherCode}`);
-  //     const voucher = response.data;
+  const checkVoucher = async () => {
+    try {
+      if (voucherCode.trim() === '') {
+        return;
+      }
+      const response = await axios.get(`${API_URL}/api/voucher/pattern/${voucherCode}`);
+      const voucher = response.data;
 
-  //     // Check if the voucher is valid and apply the discount
-  //     if (voucher) {
-  //       await setDiscountValue(voucher.DiscountValue);
-  //       message.success(t("voucher_applied"));
-  //     } else {
-  //       message.error(t("invalid_voucher"));
-  //     }
-  //   } catch (error) {
-  //     console.error(`Error:`, error);
-  //     message.error(t("invalid_voucher"));
-  //   }
-  // };
+      // Check if the voucher is valid and apply the discount
+      if (voucher) {
+        await setDiscountValue(voucher.DiscountValue);
+        message.success(t("voucher_applied"));
+      } else {
+        message.error(t("invalid_voucher"));
+      }
+    } catch (error) {
+      console.error(`Error:`, error);
+      message.error(t("invalid_voucher"));
+    }
+  };
 
-  // const updateVoucherUsageLimit = async () => {
-  //   try {
-  //     if (voucherCode.trim() === '') {
-  //       return;
-  //     }
-  //     const response = await axios.put(`${API_URL}/api/voucher/pattern/${voucherCode}`);
-  //     return(response.data)
-  //   } catch (error) {
-  //     console.error(`Error:`, error);
-  //     message.error(t("invalid_voucher"));
-  //   }
-  // };
+  const updateVoucherUsageLimit = async () => {
+    try {
+      if (voucherCode.trim() === '') {
+        return;
+      }
+      const response = await axios.put(`${API_URL}/api/voucher/pattern/${voucherCode}`);
+      return(response.data)
+    } catch (error) {
+      console.error(`Error:`, error);
+      message.error(t("invalid_voucher"));
+    }
+  };
 
   const createOrder = (data, actions) => {
     const totalAmountWithDiscount = (
@@ -353,13 +367,13 @@ const Order = () => {
 
       await updateInventoryQuantity(orderDetails);
       
-      // if (voucherCode) {
-      //   try {
-      //     await updateVoucherUsageLimit();
-      //   } catch (error) {
-      //     console.error('Error updating voucher usage limit:', error)
-      //   }
-      // }
+      if (voucherCode) {
+        try {
+          await updateVoucherUsageLimit();
+        } catch (error) {
+          console.error('Error updating voucher usage limit:', error)
+        }
+      }
 
       // Xóa các sản phẩm đã thanh toán thành công khỏi giỏ hàng trong cơ sở dữ liệu
       await Promise.all(orderDetails.cartItems.map(async (item) => {
@@ -503,7 +517,7 @@ const Order = () => {
           </Col>
           {/* Shipping Method and Total Amount  */}
           <Col xs={24} md={8}>
-            {/* <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
+            <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
               <Title level={3} className="mb-6">{t('shipping_method')}</Title>
               <Radio.Group
                 value={selectedShippingMethod}
@@ -511,7 +525,7 @@ const Order = () => {
               >
                 <Radio value="nationwide" className="font-medium block mb-2">{t('shipping_fee_nationwide')} ({shippingCost.toLocaleString('en-US')}đ)</Radio>
               </Radio.Group>
-            </div> */}
+            </div>
             <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
               <Title level={3} className="mb-6">
                 {t("shipping_method")}
@@ -527,7 +541,7 @@ const Order = () => {
               </Radio.Group>
             </div>
 
-            {/* <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
+            <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
               <Title level={3} className="mb-6">
                 {t("voucher")}
               </Title>
@@ -542,7 +556,7 @@ const Order = () => {
                   {t("apply_voucher")}
                 </Button>
               </div>
-            </div> */}
+            </div>
 
             <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
               <Title level={3} className="mb-6">
@@ -561,14 +575,14 @@ const Order = () => {
                     {orderDetails.shippingCost.toLocaleString("en-US")}
                   </Text>
                 </div>
-                {/* {discountValue > 0 && (
+                {discountValue > 0 && (
                     <div className="flex justify-between mb-2">
                       <Text strong>{t("voucher_applied")}:</Text>
                       <Text className="text-red-600">
                         -{(discountValue).toLocaleString("en-US")}
                       </Text>
                   </div>
-                )} */}
+                )}
                 <div className="flex justify-between">
                   <Text strong>{t("total_3")}:</Text>
                   <Text className="text-2xl text-green-600">
@@ -580,7 +594,7 @@ const Order = () => {
               </div>
               <div className="text-right">
                 {/* PayPal Buttons */}
-                {isPayPalEnabled && !editMode && (
+                {exchangeRateVNDtoUSD > 0 && isPayPalEnabled && !editMode && (
                   <PayPalButtons
                     createOrder={createOrder}
                     onApprove={(data, actions) => onApprove(data, actions)}

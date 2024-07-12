@@ -72,6 +72,19 @@ exports.updateOrderDetail = async (req, res) => {
   }
 };
 
+// Delete order detail
+exports.deleteOrderDetail = async (req, res) => {
+  try {
+    const orderDetail = await OrderDetails.findOneAndDelete({OrderDetailsID: req.params.id});
+    if (!orderDetail) {
+      return res.status(404).json({ error: 'Order Detail not found' });
+    }
+    res.status(200).json({ message: 'Order Detail deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 // Update order comment status
 exports.updateOrderCommentStatus = async (req, res) => {
   try {
@@ -88,19 +101,6 @@ exports.updateOrderCommentStatus = async (req, res) => {
     }
 
     res.status(200).json(orderDetail);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-// Delete order detail
-exports.deleteOrderDetail = async (req, res) => {
-  try {
-    const orderDetail = await OrderDetails.findOneAndDelete({OrderDetailsID: req.params.id});
-    if (!orderDetail) {
-      return res.status(404).json({ error: 'Order Detail not found' });
-    }
-    res.status(200).json({ message: 'Order Detail deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

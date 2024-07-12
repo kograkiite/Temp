@@ -112,6 +112,7 @@ exports.countOrdersAndBookingsByDayInWeek = async (req, res) => {
         $sort: { _id: 1 },
       },
     ]);
+
     const bookings = await SpaBooking.aggregate([
       {
         $match: {
@@ -182,6 +183,7 @@ exports.calculateEarnings = async (req, res) => {
         },
       },
     ]);
+
     const bookings = await SpaBooking.aggregate([
       {
         $match: {

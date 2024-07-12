@@ -1,4 +1,7 @@
 const Comment = require('../models/Comment');
+const Product = require('../models/Product');
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
 // Import generateCommentID from utils/idGenerators
 const { generateCommentID } = require('../utils/idGenerators');
@@ -31,6 +34,7 @@ exports.createComment = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 
 // Get comments by ProductID
 exports.getCommentsByProductId = async (req, res) => {
@@ -71,6 +75,7 @@ exports.updateComment = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 
 // Delete a comment by CommentID
 exports.deleteComment = async (req, res) => {
