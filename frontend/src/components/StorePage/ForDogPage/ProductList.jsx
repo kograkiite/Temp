@@ -1,17 +1,20 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, message, Select } from 'antd';
+import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, message, Select, Tabs } from 'antd';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import '../../../styles/style.css';
 
 const { Option } = Select;
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
 const { Search } = Input;
+const { TabPane  } = Tabs;
 const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const ProductList = () => {
   const [productData, setProductData] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false); // State for API call status
   const [userRole] = useState(localStorage.getItem('role') || 'Guest');
@@ -21,8 +24,9 @@ const ProductList = () => {
   const [form] = Form.useForm();
   const [productImg, setProductImg] = useState(""); // For image upload
   const navigate = useNavigate();
-  const [filteredProducts, setfilteredProducts] = useState([]); // State for filtered data
+  const [filteredProducts, setFilteredProducts] = useState([]); // State for filtered data
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
+  const [activeCategory, setActiveCategory] = useState('');
   const { t } = useTranslation();
 
   const fetchProducts = async () => {
@@ -37,15 +41,42 @@ const ProductList = () => {
     }
   };
 
+  const fetchCategories = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`${API_URL}/api/categories`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      message.error("Error fetching categories.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
+    fetchCategories();
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    // Filter products based on activeCategory whenever it changes
+    const filteredData = activeCategory === 'all' 
+      ? productData 
+      : productData.filter(product => product.CategoryID === activeCategory);
+    setFilteredProducts(filteredData);
+  }, [activeCategory, productData]);
+  
 
   useEffect(() => {
     const filteredData = productData.filter(product =>
       product.ProductName.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    setfilteredProducts(filteredData);
+    setFilteredProducts(filteredData);
   }, [searchQuery, productData]);
 
   const handleProductClick = (id) => {
@@ -78,6 +109,7 @@ const ProductList = () => {
       formData.append('Description', values.Description);
       formData.append('Quantity', parseInt(values.Quantity, 10));
       formData.append('PetTypeID', petTypeID);
+      formData.append('CategoryID', values.CategoryID); // Added CategoryID
       formData.append('Status', values.Status);
       if (productImg) {
         formData.append('image', productImg);
@@ -130,6 +162,7 @@ const ProductList = () => {
       Description: record.Description,
       Quantity: record.Quantity,
       Status: record.Status,
+      CategoryID: record.CategoryID, // Added CategoryID
     });
     setProductImg(""); // Reset image state
   };
@@ -156,10 +189,11 @@ const ProductList = () => {
       formData.append('Description', values.Description);
       formData.append('Quantity', parseInt(values.Quantity, 10));
       formData.append('Status', values.Status);
+      formData.append('CategoryID', values.CategoryID); // Added CategoryID
       if (productImg) {
         formData.append('image', productImg);
       }
-      message.warning(t('processing'))
+      message.warning(t('processing'));
       for (let pair of formData.entries()) {
         console.log(pair[0] + ', ' + pair[1]);
       }
@@ -270,6 +304,15 @@ const ProductList = () => {
       key: 'Quantity',
     },
     {
+      title: t('category'),
+      dataIndex: 'CategoryID',
+      key: 'CategoryID',
+      render: (text) => {
+        const category = categories.find(cat => cat.CategoryID === text);
+        return category ? category.Name : text;
+      },
+    },
+    {
       title: t('actions'),
       key: 'actions',
       fixed: 'right',
@@ -299,6 +342,18 @@ const ProductList = () => {
           style={{ marginBottom: 16, width: 300 }}
         />
       </div>
+      {/* Tabs for categories */}
+      <Tabs
+        activeKey={activeCategory}
+        onChange={setActiveCategory}
+        type="card"
+        className="custom-tabs"
+      >
+        <TabPane tab={t('all')} key="all" />
+        {categories.map(category => (
+          <TabPane tab={category.Name} key={category.CategoryID} />
+        ))}
+      </Tabs>
       {/* Product list */}
       <Form form={form}>
         {userRole === 'Store Manager' ? (
@@ -428,6 +483,18 @@ const ProductList = () => {
             <Select placeholder={t('status')}>
               <Option value="Available">{t('available')}</Option>
               <Option value="Unavailable">{t('unavailable')}</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="CategoryID"
+            label={t('category')}
+            rules={[{ required: true, message: t('please_select_category') }]}
+            className="mb-4"
+          >
+            <Select placeholder={t('category')}>
+              {categories.map(category => (
+                <Option key={category.CategoryID} value={category.CategoryID}>{category.Name}</Option>
+              ))}
             </Select>
           </Form.Item>
         </Form>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Row,
   Col,
@@ -53,6 +53,10 @@ const Order = () => {
   const { t } = useTranslation();
   const { handleRemoveItem } = useShopping();
   const [discountValue, setDiscountValue] = useState(0); // State for discount value
+  const discountValueRef = useRef(discountValue);
+  const [voucherID, setVoucherID] = useState(null);
+  const voucherIDref = useRef(voucherID);
+
 
   useEffect(() => {
     const fetchExchangeRate = async () => {
@@ -67,7 +71,7 @@ const Order = () => {
 
     fetchExchangeRate();
   }, []);
-  console.log(exchangeRateVNDtoUSD)
+
 
   useEffect(() => {
     const addressInfo = JSON.parse(localStorage.getItem("addressInfo"));
@@ -252,6 +256,9 @@ const Order = () => {
     }
   };
   
+  useEffect(() => {
+    discountValueRef.current = discountValue;
+  }, [discountValue]);
   const checkVoucher = async () => {
     try {
       if (voucherCode.trim() === '') {
@@ -259,10 +266,15 @@ const Order = () => {
       }
       const response = await axios.get(`${API_URL}/api/voucher/pattern/${voucherCode}`);
       const voucher = response.data;
+      if(voucher.MinimumOrderValue > orderDetails.totalAmount){
+        message.error("Giá trị đơn hàng không đủ để sử dụng voucher này");
+        return
+      }
 
       // Check if the voucher is valid and apply the discount
       if (voucher) {
-        await setDiscountValue(voucher.DiscountValue);
+        setDiscountValue(voucher.DiscountValue);
+        setVoucherID(voucher.VoucherID); 
         message.success(t("voucher_applied"));
       } else {
         message.error(t("invalid_voucher"));
@@ -273,23 +285,10 @@ const Order = () => {
     }
   };
 
-  const updateVoucherUsageLimit = async () => {
-    try {
-      if (voucherCode.trim() === '') {
-        return;
-      }
-      const response = await axios.put(`${API_URL}/api/voucher/pattern/${voucherCode}`);
-      return(response.data)
-    } catch (error) {
-      console.error(`Error:`, error);
-      message.error(t("invalid_voucher"));
-    }
-  };
-
   const createOrder = (data, actions) => {
     const totalAmountWithDiscount = (
       orderDetails.totalAmount +
-      orderDetails.shippingCost 
+      orderDetails.shippingCost - discountValueRef.current
     ).toFixed(2);
 
     const totalAmountInUSD = (totalAmountWithDiscount * exchangeRateVNDtoUSD).toFixed(2);
@@ -304,6 +303,10 @@ const Order = () => {
     });
   };
 
+  useEffect(() => {
+    voucherIDref.current = voucherID;
+  }, [voucherID]);
+
   const onApprove = async (data, actions) => {
     try {
       if (orderDetails.cartItems.length === 0) {
@@ -316,6 +319,7 @@ const Order = () => {
         AccountID: JSON.parse(localStorage.getItem("user")).id,
         OrderDate: new Date(),
         PaypalOrderID: paypalOrder.purchase_units[0].payments.captures[0].id,
+        VoucherID: voucherIDref.current,
       };
 
       // Call the createOrder API using Axios
@@ -367,13 +371,6 @@ const Order = () => {
 
       await updateInventoryQuantity(orderDetails);
       
-      if (voucherCode) {
-        try {
-          await updateVoucherUsageLimit();
-        } catch (error) {
-          console.error('Error updating voucher usage limit:', error)
-        }
-      }
 
       // Xóa các sản phẩm đã thanh toán thành công khỏi giỏ hàng trong cơ sở dữ liệu
       await Promise.all(orderDetails.cartItems.map(async (item) => {
@@ -587,16 +584,16 @@ const Order = () => {
                   <Text strong>{t("total_3")}:</Text>
                   <Text className="text-2xl text-green-600">
                     {(
-                      orderDetails.totalAmount + orderDetails.shippingCost 
+                      orderDetails.totalAmount + orderDetails.shippingCost - discountValue 
                     ).toLocaleString("en-US")}
                   </Text>
                 </div>
               </div>
               <div className="text-right">
                 {/* PayPal Buttons */}
-                {exchangeRateVNDtoUSD > 0 && isPayPalEnabled && !editMode && (
+                { exchangeRateVNDtoUSD > 0 && isPayPalEnabled && !editMode && (
                   <PayPalButtons
-                    createOrder={createOrder}
+                  createOrder={(data, actions) => createOrder(data, actions)}
                     onApprove={(data, actions) => onApprove(data, actions)}
                     onError={(err) => onError(err)}
                   />

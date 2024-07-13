@@ -22,7 +22,7 @@ import RegisterPage from './pages/RegisterPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import SchedulePage from './pages/SchedulePage'
-import ProdutcDetailPage from './pages/ProdutcDetailPage'
+import ProductDetailPage from './pages/ProductDetailPage'
 import SpaBookingPage from './pages/SpaBookingPage'
 import OrderHistoryDetail from './pages/OrderHistoryDetailPage'
 import SpaBookingDetailPage from './pages/SpaBookingDetailPage'
@@ -32,6 +32,7 @@ import PurchaseSuccessPage from './pages/PurchaseOrderSuccessPage'
 import StatisticPage from './pages/StatisticPage'
 // import { AdminDashboardPage } from './pages/AdminDashboardPage'
 import VoucherPage from './pages/VoucherPage'
+import CategoryManagementPage from './pages/CategoryManagementPage'
 function App() {
   return (
     <>
@@ -46,7 +47,7 @@ function App() {
       <Route path='/services-for-cat' element={<ServiceForCatPage/>}/>
       <Route path='/user-profile' element={<UserProfilePage/>}/>
       <Route path='/change-password' element={<ChangePasswordPage/>}/>
-      <Route path='/product-detail/:id' element={<ProdutcDetailPage/>}/>
+      <Route path='/product-detail/:id' element={<ProductDetailPage/>}/>
       <Route path='/pet-list' element={<PetListPage/>}/>
       <Route path='/order-history' element={<OrderHistoryPage/>}/>
       <Route path='/spa-service-detail/:id' element={<SpaServiceDetailPage/>}/>
@@ -63,6 +64,7 @@ function App() {
       <Route path='/purchase-order-successfully' element={<PurchaseSuccessPage/>}/>
       <Route path='/statistics' element={<StatisticPage/>}/>
       <Route path='/manage-voucher' element={<VoucherPage/>}/>
+      <Route path='/manage-category' element={<CategoryManagementPage/>}/>
     </Routes>
     </>
   )
