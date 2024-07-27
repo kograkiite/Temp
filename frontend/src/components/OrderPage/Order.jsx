@@ -480,9 +480,7 @@ const Order = () => {
                   {t("list_of_product")}
                 </Title>
                 {productDetails.map((item, index) => {
-                  const totalPrice = (item.Price * item.Quantity).toLocaleString(
-                    "en-US"
-                  );
+                  const totalPrice = (item.Price * item.Quantity).toLocaleString("en-US");
                   return (
                     <Row key={index} className="mb-4" gutter={[16, 16]}>
                       <Col span={4}>
@@ -521,21 +519,7 @@ const Order = () => {
                   value={selectedShippingMethod}
                   onChange={handleShippingChange}
                 >
-                  <Radio value="nationwide" className="font-medium block mb-2">{t('shipping_fee_nationwide')} ({shippingCost.toLocaleString('en-US')}đ)</Radio>
-                </Radio.Group>
-              </div>
-              <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
-                <Title level={3} className="mb-6">
-                  {t("shipping_method")}
-                </Title>
-                <Radio.Group
-                  value={selectedShippingMethod}
-                  onChange={handleShippingChange}
-                >
-                  <Radio value="nationwide" className="font-medium block mb-2">
-                    {t("shipping_fee_nationwide")} (
-                    {shippingCost.toLocaleString("en-US")}đ)
-                  </Radio>
+                  <Radio value="nationwide" className="font-medium block mb-2">{t('shipping_fee_nationwide')} ({shippingCost}đ)</Radio>
                 </Radio.Group>
               </div>
 

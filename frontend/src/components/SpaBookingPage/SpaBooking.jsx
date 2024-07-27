@@ -41,7 +41,6 @@ const SpaBooking = () => {
   const [reviewText, setReviewText] = useState('');
   const [reviewError, setReviewError] = useState('');
   const [bookingID, setBookingID] = useState(null);
-  const [bookingDetailID, setBookingDetailID] = useState(null); // Moved to useState
   const dispatch = useDispatch();
   const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false);
@@ -53,7 +52,7 @@ const SpaBooking = () => {
     all: 0,
     completed: 0,
     pending: 0,
-    processing: 0,
+    checkedIn: 0,
     canceled: 0,
   });
 
@@ -85,7 +84,7 @@ const SpaBooking = () => {
         id: booking.BookingID,
         date: new Date(booking.CreateDate),
         TotalPrice: booking.TotalPrice,
-        status: booking.Status,
+        status: booking.CurrentStatus,
         isReviewed: booking.isReviewed,
       }));
 
@@ -97,7 +96,7 @@ const SpaBooking = () => {
           all: sortedData.length,
           completed: sortedData.filter(booking => booking.status === 'Completed').length,
           pending: sortedData.filter(booking => booking.status === 'Pending').length,
-          processing: sortedData.filter(booking => booking.status === 'Processing').length,
+          checkedIn: sortedData.filter(booking => booking.status === 'Checked In').length,
           canceled: sortedData.filter(booking => booking.status === 'Canceled').length,
         });
 
@@ -119,42 +118,40 @@ const SpaBooking = () => {
       message.info('Bạn đã đánh giá dịch vụ này rồi.');
       return;
     }
-
     setBookingID(id);
     setIsReviewing(true);
     setReviewText('');
     setReviewError('');
 
     // Load booking detail ID when reviewing
-    await getSpaBookingDetailID(id);
+    // await getSpaBookingDetailID(id);
   };
 
-  const getSpaBookingDetailID = async (id) => {
-    const token = localStorage.getItem('token');
-    try {
-      const response = await axios.get(`${API_URL}/api/spa-booking-details/booking/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setBookingDetailID(response.data.BookingDetailsID);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching spa booking detail:', error);
-      throw error;
-    }
-  }
+  // const getSpaBookingDetailID = async (id) => {
+  //   const token = localStorage.getItem('token');
+  //   try {
+  //     const response = await axios.get(`${API_URL}/api/spa-booking-details/booking/${id}`, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+  //     setBookingDetailID(response.data.BookingDetailsID);
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error('Error fetching spa booking detail:', error);
+  //     throw error;
+  //   }
+  // }
 
   const handleSubmitReview = async () => {
     if (reviewText.trim() === '') {
       setReviewError(t('review_error_empty'));
       return;
     }
-
     const token = localStorage.getItem('token');
     try {
-      await axios.put(
-        `${API_URL}/api/spa-booking-details/${bookingDetailID}`,
+      await axios.patch(
+        `${API_URL}/api/Spa-bookings/${bookingID}`,
         { Feedback: reviewText},
         {
           headers: {
@@ -163,7 +160,7 @@ const SpaBooking = () => {
         }
       );
 
-      await axios.put(
+      await axios.patch(
         `${API_URL}/api/Spa-bookings/${bookingID}`,
         { isReviewed: true},
         {
@@ -177,7 +174,7 @@ const SpaBooking = () => {
 
       setSpaBookings(prevBookings => prevBookings.map(booking => {
         if (booking.id === bookingID) {
-          return { ...booking, isReviewed: true }; // Cập nhật trạng thái isReviewed khi đã đánh giá
+          return { ...booking, isReviewed: true };
         }
         return booking;
       }));
@@ -216,7 +213,7 @@ const SpaBooking = () => {
       render: (text, record) => (
         <Tag className='min-w-[70px] w-auto px-2 py-1 text-center' color={record.status === 'Completed' ? 
                     'green' : record.status === 'Pending' ? 
-                    'yellow' : record.status === 'Processing' ? 
+                    'yellow' : record.status === 'Checked In' ? 
                     'blue' : 'red'}>
           {record.status}
         </Tag>
@@ -333,7 +330,7 @@ const SpaBooking = () => {
             <TabPane tab={<span>{t('all')} <span className="inline-block bg-gray-200 text-gray-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.all}</span></span>} key="all" />
             <TabPane tab={<span>{t('completed')} <span className="inline-block bg-green-200 text-green-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.completed}</span></span>} key="completed" />
             <TabPane tab={<span>{t('pending')} <span className="inline-block bg-yellow-200 text-yellow-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.pending}</span></span>} key="pending" />
-            <TabPane tab={<span>{t('processing')} <span className="inline-block bg-blue-200 text-blue-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.processing}</span></span>} key="processing" />
+            <TabPane tab={<span>{t('processing')} <span className="inline-block bg-blue-200 text-blue-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.checkedIn}</span></span>} key="checked in" />
             <TabPane tab={<span>{t('canceled')} <span className="inline-block bg-red-200 text-red-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.canceled}</span></span>} key="canceled" />
           </Tabs>
           <Spin spinning={loading}>

@@ -157,7 +157,7 @@ const OrderHistory = () => {
       dataIndex: 'amount',
       key: 'amount',
       render: (text, record) => (
-        <Text className="text-green-600">{record.amount.toLocaleString('en-US')}</Text>
+        <Text className="text-green-600">{record.amount}</Text>
       )
     },
     {
@@ -165,10 +165,20 @@ const OrderHistory = () => {
       dataIndex: 'status',
       key: 'status',
       render: (text, record) => (
-        <Tag className='min-w-[70px] w-auto px-2 py-1 text-center' color={record.status === 'Shipped' ? 
-                    'green' : record.status === 'Pending' ? 
-                    'orange' : record.status === 'Processing' ? 
-                    'blue' : 'red'}>
+        <Tag
+          className='min-w-[70px] w-auto px-2 py-1 text-center'
+          color={
+            record.status === 'Shipped'
+              ? 'green'
+              : record.status === 'Pending'
+              ? 'orange'
+              : record.status === 'Processing'
+              ? 'blue'
+              : record.status === 'Delivering'
+              ? 'orange'
+              : 'red'
+          }
+        >
           {record.status}
         </Tag>
       )

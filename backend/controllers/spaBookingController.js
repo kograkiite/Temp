@@ -5,23 +5,72 @@ const { generateSpaBookingID } = require('../utils/idGenerators');
 
 // Create a new spa booking
 exports.createSpaBooking = async (req, res) => {
-  const { BookingDate, BookingTime } = req.body;
   try {
-    const existingOrdersCount = await SpaBookingDetails.countDocuments({
-      BookingDate: BookingDate,
-      BookingTime: BookingTime,
-      status: { $ne: 'Cancelled' } 
-  });
-  console.log(existingOrdersCount);
-    const maxOrdersPerSlot = 4;
-    if (existingOrdersCount <= maxOrdersPerSlot) {
     const newId = await generateSpaBookingID(); // Generate a new unique BookingDetailID
-    const spaBooking = new SpaBooking({ ...req.body, BookingID: newId });
+    const spaBooking = new SpaBooking({
+      ...req.body,
+      BookingID: newId,
+      CurrentStatus: req.body.Status,
+      StatusChanges: [{ Status: req.body.Status, ChangeTime: new Date() }]
+    });
     await spaBooking.save();
     res.status(201).json(spaBooking);
-} else {
-  res.status(400).json({ message: 'Maximum number of orders per slot reached' });
-}
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Check if booking can be made
+exports.checkBooking = async (req, res) => {
+  const { BookingDate, BookingTime, PetID } = req.body;
+  try {
+    // Find all existing booking details with the same date, time, and pet ID
+    const existingBookingDetails = await SpaBookingDetails.find({
+      BookingDate,
+      BookingTime,
+      PetID
+    });
+
+    // If there are existing bookings for this pet at this time
+    if (existingBookingDetails.length > 0) {
+      // Extract BookingIDs from the existing details
+      const bookingIds = existingBookingDetails.map(detail => detail.BookingID);
+
+      // Find all bookings with these BookingIDs
+      const existingBookings = await SpaBooking.find({
+        BookingID: { $in: bookingIds }
+      });
+
+      // Check if any of these bookings have a status other than 'Cancelled'
+      const activeBookings = existingBookings.filter(booking =>
+        booking.CurrentStatus !== 'Canceled'
+      );
+
+      if (activeBookings.length > 0) {
+        return res.status(409).json({
+          canBook: false,
+          message: 'Booking conflict: The selected pet is already booked at this time and date. Please choose a different time slot.',
+        });
+      }
+    }
+
+    // Count existing orders for the given date and time, excluding 'Cancelled'
+    const existingOrdersCount = await SpaBookingDetails.countDocuments({
+      BookingDate,
+      BookingTime,
+      status: { $ne: 'Cancelled' }
+    });
+
+    const maxOrdersPerSlot = 4;
+    if (existingOrdersCount >= maxOrdersPerSlot) {
+      return res.status(400).json({
+        canBook: false,
+        message: 'Maximum number of orders per slot reached',
+      });
+    }
+
+    // If both checks pass
+    res.status(200).json({ canBook: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -69,14 +118,23 @@ exports.getSpaBookingsByAccountID = async (req, res) => {
 // Update spa booking
 exports.updateSpaBooking = async (req, res) => {
   try {
-    // Create an object that excludes BookingDetailID
-    const { BookingID, ...updateData } = req.body;
-    
-    // Perform the update without BookingDetailID
+    const { Status, StatusChanges, ...updateData } = req.body;
+
+    const updateOptions = {
+      $set: { ...updateData }, 
+    };
+
+    if (Status) {
+      updateOptions.$set.CurrentStatus = Status; 
+      updateOptions.$push = {
+        StatusChanges: { Status, ChangeTime: new Date() }, 
+      };
+    }
+
     const spaBooking = await SpaBooking.findOneAndUpdate(
       { BookingID: req.params.id },
-      { $set: req.body },
-      { new: true }
+      updateOptions,
+      { new: true, runValidators: true } 
     );
 
     if (!spaBooking) {
@@ -89,15 +147,5 @@ exports.updateSpaBooking = async (req, res) => {
   }
 };
 
-// Delete spa booking
-exports.deleteSpaBooking = async (req, res) => {
-  try {
-    const spaBooking = await SpaBooking.findByIdAndDelete(req.params.id);
-    if (!spaBooking) {
-      return res.status(404).json({ error: 'Spa Booking not found' });
-    }
-    res.status(200).json({ message: 'Spa Booking deleted successfully' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
+
+

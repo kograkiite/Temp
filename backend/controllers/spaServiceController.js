@@ -6,13 +6,12 @@ const cloudinary = require('../config/cloudinary');
 exports.createService = async (req, res) => {
   try {
     const serviceID = await generateServiceID();
-    const { ServiceName, Description, PetTypeID, Price, Status } = req.body;
+    const { ServiceName, Description, PetTypeID, Status } = req.body;
     let newService = new SpaService({
       ServiceID: serviceID,
       ServiceName: ServiceName,
       Description: Description,
       PetTypeID: PetTypeID,
-      Price: Price,
       Status: Status,
     });
 
@@ -51,13 +50,13 @@ exports.getServiceById = async (req, res) => {
   }
 };
 
-// Update a service
 exports.updateService = async (req, res) => {
   const { id } = req.params;
   const updateData = req.body;
   delete updateData.serviceId; // Ensure ServiceID is not updated accidentally
 
   try {
+    // If a new image file is uploaded, handle image update
     if (req.file && req.file.path) {
       const service = await SpaService.findOne({ ServiceID: id });
 
@@ -75,6 +74,17 @@ exports.updateService = async (req, res) => {
       updateData.ImageURL = req.file.path;
     }
 
+    // Handle PriceByWeight if present in the updateData
+    if (updateData.PriceByWeight) {
+      // Parse the PriceByWeight JSON string
+      try {
+        updateData.PriceByWeight = JSON.parse(updateData.PriceByWeight); // Convert JSON string to array
+      } catch (err) {
+        return res.status(400).json({ message: 'Invalid format for PriceByWeight' });
+      }
+    }
+
+    // Update the service
     const service = await SpaService.findOneAndUpdate(
       { ServiceID: id },
       updateData,

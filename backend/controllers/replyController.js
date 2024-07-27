@@ -4,10 +4,10 @@ const { generateReplyID } = require('../utils/idGenerators');
 // Create a new reply
 exports.createReply = async (req, res) => {
     try {
-        const { CommentID, AccountID, ReplyContent, ReplyDate } = req.body;
+        const { BookingID, AccountID, ReplyContent, ReplyDate } = req.body;
         const newReply = new Reply({
             ReplyID: await generateReplyID(),
-            CommentID,
+            BookingID,
             AccountID,
             ReplyContent,
             ReplyDate,
@@ -21,11 +21,11 @@ exports.createReply = async (req, res) => {
 };
 
 // Get all replies for a specific comment by CommentID
-exports.getReplyByCommentId = async (req, res) => {
+exports.getReplyByBookingId = async (req, res) => {
     try {
-        const { CommentID } = req.params;
-        const replies = await Reply.find({ CommentID });
-        res.json({ replies });
+        const { BookingID } = req.params;
+        const replies = await Reply.find({ BookingID });
+        res.status(200).json(replies);
     } catch (error) {
         console.error('Error fetching replies:', error);
         res.status(500).json({ error: 'Server error' });
@@ -37,7 +37,7 @@ exports.updateReply = async (req, res) => {
     try {
         const { id } = req.params;
         const { ReplyContent } = req.body;
-        const updatedReply = await Reply.findByIdAndUpdate(
+        const updatedReply = await Reply.findOneAndUpdate(
             id,
             { ReplyContent },
             { new: true }
@@ -53,7 +53,7 @@ exports.updateReply = async (req, res) => {
 exports.deleteReply = async (req, res) => {
     try {
         const { id } = req.params;
-        await Reply.findByIdAndDelete(id);
+        await Reply.findOneAndDelete(id);
         res.json({ message: 'Reply deleted successfully' });
     } catch (error) {
         console.error('Error deleting reply:', error);

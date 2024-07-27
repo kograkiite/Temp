@@ -3,7 +3,14 @@ const Order = require("../models/Order");
 const SpaBooking = require("../models/SpaBooking");
 const OrderDetails = require("../models/OrderDetails");
 const Product = require("../models/Product");
-const { getStartOfWeek, getEndOfWeek } = require("../utils/idGenerators");
+const {
+  getStartOfWeek,
+  getEndOfWeek,
+  getStartOfMonth,
+  getEndOfMonth,
+  getStartOfYear,
+  getEndOfYear
+} = require("../utils/idGenerators");
 
 exports.countAvailableAccounts = async (req, res) => {
   try {
@@ -27,7 +34,7 @@ exports.countCompletedOrders = async (req, res) => {
 
 exports.countCompletedBookings = async (req, res) => {
   try {
-    const count = await SpaBooking.countDocuments({ Status: "Completed" });
+    const count = await SpaBooking.countDocuments({ CurrentStatus: "Completed" });
     res.json({ count });
   } catch (error) {
     console.error("Error counting available bookings:", error);
@@ -120,7 +127,7 @@ exports.countOrdersAndBookingsByDayInWeek = async (req, res) => {
             $gte: startOfWeek,
             $lte: endOfWeek,
           },
-          Status: { $ne: "Canceled" },
+          CurrentStatus: { $ne: "Canceled" },
         },
       },
       {
@@ -191,26 +198,127 @@ exports.calculateEarnings = async (req, res) => {
             $gte: startOfWeek,
             $lte: endOfWeek,
           },
-          Status: "Completed",
+          CurrentStatus: "Completed",
         },
       },
       {
         $group: {
           _id: null,
-          totalEarnings: { $sum: "$Price" },
+          totalEarnings: { $sum: "$FinalPrice" },
         },
       },
     ]);
-
     const totalOrderEarnings = orders.length > 0 ? orders[0].totalEarnings : 0;
     const totalBookingEarnings =
       bookings.length > 0 ? bookings[0].totalEarnings : 0;
 
     const totalEarnings = totalOrderEarnings + totalBookingEarnings;
-
     res.status(200).json({ totalEarnings });
   } catch (error) {
     console.error("Error calculating weekly earnings:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.getWeeklyEarningsData = async (req, res) => {
+  try {
+    const startOfWeek = getStartOfWeek();
+    const endOfWeek = getEndOfWeek();
+    const earningsData = await SpaBooking.aggregate([
+      {
+        $match: {
+          CreateDate: {
+            $gte: startOfWeek,
+            $lte: endOfWeek,
+          },
+          CurrentStatus: "Completed",
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: "%Y-%m-%d", date: "$CreateDate" }
+          },
+          totalEarnings: { $sum: "$FinalPrice" }
+        },
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+    res.status(200).json(earningsData);
+  } catch (error) {
+    console.error("Error fetching weekly earnings data:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.getMonthlyEarningsData = async (req, res) => {
+  try {
+    const startOfMonth = getStartOfMonth();
+    const endOfMonth = getEndOfMonth();
+
+    const earningsData = await SpaBooking.aggregate([
+      {
+        $match: {
+          CreateDate: {
+            $gte: startOfMonth,
+            $lte: endOfMonth,
+          },
+          CurrentStatus: "Completed",
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: "%Y-%m-%d", date: "$CreateDate" }
+          },
+          totalEarnings: { $sum: "$FinalPrice" }
+        },
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+
+    res.status(200).json(earningsData);
+  } catch (error) {
+    console.error("Error fetching monthly earnings data:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.getYearlyEarningsData = async (req, res) => {
+  try {
+    const startOfYear = getStartOfYear();
+    const endOfYear = getEndOfYear();
+
+    const earningsData = await SpaBooking.aggregate([
+      {
+        $match: {
+          CreateDate: {
+            $gte: startOfYear,
+            $lte: endOfYear,
+          },
+          CurrentStatus: "Completed",
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: "%Y-%m", date: "$CreateDate" }
+          },
+          totalEarnings: { $sum: "$FinalPrice" }
+        },
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+
+    res.status(200).json(earningsData);
+  } catch (error) {
+    console.error("Error fetching yearly earnings data:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
