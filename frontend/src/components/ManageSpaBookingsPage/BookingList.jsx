@@ -249,16 +249,11 @@ const BookingList = () => {
         }
       }
     }
-    // Log to verify the values
-    console.log('Selected Booking Total Price:', selectedBooking.TotalPrice);
-    console.log('Initial Final Price:', finalPrice);
 
     if (finalPrice === 0) {
       // Set finalPrice only if it is currently 0
       setFinalPrice(selectedBooking.TotalPrice);
     }
-    
-    console.log('Updated Final Price:', finalPrice);
     
     try {
       const token = localStorage.getItem('token');
@@ -269,8 +264,7 @@ const BookingList = () => {
           ChangeTime: new Date().toISOString(), 
         },
       ];
-      console.log(selectedBooking.status)
-      console.log(pendingStatus)
+
       if(selectedBooking.status === 'Checked In' && pendingStatus === 'Completed'){
         await axios.patch(
           `${API_URL}/api/Spa-bookings/${selectedBookingId}`,
@@ -287,7 +281,7 @@ const BookingList = () => {
               Authorization: `Bearer ${token}`, 
             },
           }
-        ); 
+        );
       }
 
       if(selectedBooking.status === 'Pending' && pendingStatus === 'Checked In'){
@@ -307,7 +301,6 @@ const BookingList = () => {
             },
           }
         );
-
         const bookingDetails = await getSpaBookingDetail(selectedBooking.id);
 
         await axios.patch(
