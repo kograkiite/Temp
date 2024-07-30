@@ -290,7 +290,7 @@ const BookingList = () => {
             StatusChanges: updatedStatusChanges,
             CaretakerID: selectedCaretaker ? selectedCaretaker.id : selectedBooking.CaretakerID,
             ExtraCharge: additionalCost,
-            FinalPrice: finalPrice,
+            TotalPrice: finalPrice,
             isReplied: false,
           },
           {
@@ -344,17 +344,17 @@ const BookingList = () => {
         await processRefund(selectedBooking.PaypalOrderID, selectedBooking.TotalPrice);
       }
       // If the status is "Completed", call the update-spent API
-      if (pendingStatus === 'Completed') {
-        await axios.patch(
-          `${API_URL}/api/accounts/${selectedBooking.CustomerID}/update-spent`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-      }
+      // if (pendingStatus === 'Completed') {
+      //   await axios.patch(
+      //     `${API_URL}/api/accounts/${selectedBooking.CustomerID}/update-spent`,
+      //     {},
+      //     {
+      //       headers: {
+      //         Authorization: `Bearer ${token}`,
+      //       },
+      //     }
+      //   );
+      // }
 
       if(selectedBooking.status == 'Checked In' && pendingStatus === 'Canceled'){
         await axios.patch(
@@ -371,20 +371,20 @@ const BookingList = () => {
             },
           }
         );
-        await processRefund(selectedBooking.PaypalOrderID, selectedBooking.FinalPrice);
+        await processRefund(selectedBooking.PaypalOrderID, selectedBooking.TotalPrice);
       }
       // If the status is "Completed", call the update-spent API
-      if (pendingStatus === 'Completed') {
-        await axios.patch(
-          `${API_URL}/api/accounts/${selectedBooking.CustomerID}/update-spent`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-      }
+      // if (pendingStatus === 'Completed') {
+      //   await axios.patch(
+      //     `${API_URL}/api/accounts/${selectedBooking.CustomerID}/update-spent`,
+      //     {},
+      //     {
+      //       headers: {
+      //         Authorization: `Bearer ${token}`,
+      //       },
+      //     }
+      //   );
+      // }
   
       // Show success message
       message.success(`${t('booking_success_update_to')} "${pendingStatus}"`);

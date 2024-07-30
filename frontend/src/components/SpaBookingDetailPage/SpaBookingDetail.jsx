@@ -749,7 +749,7 @@ const SpaBookingDetail = () => {
               </div>
               <div className="flex justify-between items-end">
                 <Text strong className="mr-2 md:text-4xl">{t('Tổng tiền: ')}</Text>
-                <Text className="text-green-600 text-3xl md:text-4xl flex justify-between">{formatNumberWithCommas(spaBooking.FinalPrice-discountValue)}đ</Text>
+                <Text className="text-green-600 text-3xl md:text-4xl flex justify-between">{formatNumberWithCommas(spaBooking.TotalPrice + spaBooking.ExtraCharge)}đ</Text>
               </div>
             </div>
           ) : (
