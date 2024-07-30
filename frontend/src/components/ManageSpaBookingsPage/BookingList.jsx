@@ -314,17 +314,17 @@ const BookingList = () => {
         );
       }
       // If the status is "Completed", call the update-spent API
-      if (pendingStatus === 'Completed') {
-        await axios.patch(
-          `${API_URL}/api/accounts/${selectedBooking.CustomerID}/update-spent`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-      }
+      // if (pendingStatus === 'Completed') {
+      //   await axios.patch(
+      //     `${API_URL}/api/accounts/${selectedBooking.CustomerID}/update-spent`,
+      //     {},
+      //     {
+      //       headers: {
+      //         Authorization: `Bearer ${token}`,
+      //       },
+      //     }
+      //   );
+      // }
 
       if(selectedBooking.status == 'Pending' && pendingStatus === 'Canceled'){
         await axios.patch(
