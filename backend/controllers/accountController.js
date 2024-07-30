@@ -150,7 +150,7 @@ exports.updateCurrentSpent = async (req, res) => {
   let booleanUpgrade = false;
   const accountId = req.params.id;
   let memberStatus = 0;
-
+  console.log(1)
   try {
     const account = await Account.findOne({ AccountID: accountId });
     const bookings = await SpaBooking.find({ AccountID: accountId, isSpentUpdated: false });
